@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/client'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -7,7 +7,15 @@ export const dynamic = 'force-dynamic'
 // GET /api/database-status
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
+    if (!supabaseAdmin) {
+      return NextResponse.json({
+        success: false,
+        data: null,
+        error: 'Supabase admin client is not configured'
+      }, { status: 500 })
+    }
+
+    const supabase = supabaseAdmin
     
     const status = {
       tables_exist: false,
