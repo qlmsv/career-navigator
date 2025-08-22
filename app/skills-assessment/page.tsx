@@ -99,7 +99,8 @@ function SkillsAssessmentPage() {
         setRegions(regionsData)
         setProfessions(professionsData)
       } catch (err) {
-        setError('Ошибка загрузки данных')
+        const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка'
+        setError(errorMessage)
         console.error('Error loading assessment data:', err)
       } finally {
         setIsLoading(false)
@@ -163,14 +164,48 @@ function SkillsAssessmentPage() {
   }
 
   if (error) {
+    const isDatabaseError = error.includes('База данных не настроена')
+    
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-800 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-6 text-center">
-            <p className="text-red-600 mb-4">{error}</p>
-            <Button onClick={() => router.push('/dashboard')}>
-              Вернуться к дашборду
-            </Button>
+        <Card className="w-full max-w-2xl">
+          <CardContent className="p-6">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Brain className="w-8 h-8 text-red-600" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                {isDatabaseError ? 'База данных не настроена' : 'Ошибка загрузки'}
+              </h2>
+              <p className="text-red-600 mb-4">{error}</p>
+            </div>
+            
+            {isDatabaseError && (
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
+                <h3 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+                  Необходимо настроить базу данных:
+                </h3>
+                <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
+                  <li>Откройте Supabase Dashboard</li>
+                  <li>Перейдите в SQL Editor</li>
+                  <li>Выполните миграции из папки supabase/migrations/</li>
+                  <li>Сначала 011_career_navigator_schema.sql</li>
+                  <li>Затем 012_initial_data.sql</li>
+                </ol>
+              </div>
+            )}
+            
+            <div className="flex gap-3 justify-center">
+              <Button onClick={() => router.push('/dashboard')}>
+                Вернуться к дашборду
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => window.location.reload()}
+              >
+                Попробовать снова
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

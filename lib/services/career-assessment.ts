@@ -31,14 +31,26 @@ export class CareerAssessmentService {
    * Получить все категории навыков
    */
   async getSkillCategories(): Promise<DigitalSkillCategory[]> {
-    const { data, error } = await this.supabase
-      .from('digital_skill_categories')
-      .select('*')
-      .eq('is_active', true)
-      .order('order_index')
+    try {
+      const { data, error } = await this.supabase
+        .from('digital_skill_categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index')
 
-    if (error) throw new Error(`Ошибка получения категорий навыков: ${error.message}`)
-    return data || []
+      if (error) {
+        if (error.message.includes('table') && error.message.includes('not found')) {
+          throw new Error('База данных не настроена. Необходимо применить миграции.')
+        }
+        throw new Error(`Ошибка получения категорий навыков: ${error.message}`)
+      }
+      return data || []
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('База данных не настроена')) {
+        throw err
+      }
+      throw new Error('База данных не настроена. Необходимо применить миграции.')
+    }
   }
 
   /**
@@ -68,46 +80,82 @@ export class CareerAssessmentService {
    * Получить все навыки с категориями
    */
   async getAllSkills(): Promise<DigitalSkill[]> {
-    const { data, error } = await this.supabase
-      .from('digital_skills')
-      .select(`
-        *,
-        category:digital_skill_categories(*)
-      `)
-      .eq('is_active', true)
-      .order('category.order_index, order_index')
+    try {
+      const { data, error } = await this.supabase
+        .from('digital_skills')
+        .select(`
+          *,
+          category:digital_skill_categories(*)
+        `)
+        .eq('is_active', true)
+        .order('category.order_index, order_index')
 
-    if (error) throw new Error(`Ошибка получения всех навыков: ${error.message}`)
-    return data || []
+      if (error) {
+        if (error.message.includes('table') && error.message.includes('not found')) {
+          throw new Error('База данных не настроена. Необходимо применить миграции.')
+        }
+        throw new Error(`Ошибка получения всех навыков: ${error.message}`)
+      }
+      return data || []
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('База данных не настроена')) {
+        throw err
+      }
+      throw new Error('База данных не настроена. Необходимо применить миграции.')
+    }
   }
 
   /**
    * Получить регионы
    */
   async getRegions(): Promise<Region[]> {
-    const { data, error } = await this.supabase
-      .from('regions')
-      .select('*')
-      .eq('is_active', true)
-      .order('name_ru')
+    try {
+      const { data, error } = await this.supabase
+        .from('regions')
+        .select('*')
+        .eq('is_active', true)
+        .order('name_ru')
 
-    if (error) throw new Error(`Ошибка получения регионов: ${error.message}`)
-    return data || []
+      if (error) {
+        if (error.message.includes('table') && error.message.includes('not found')) {
+          throw new Error('База данных не настроена. Необходимо применить миграции.')
+        }
+        throw new Error(`Ошибка получения регионов: ${error.message}`)
+      }
+      return data || []
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('База данных не настроена')) {
+        throw err
+      }
+      throw new Error('База данных не настроена. Необходимо применить миграции.')
+    }
   }
 
   /**
    * Получить профессии (не ИКТ)
    */
   async getProfessions(): Promise<Profession[]> {
-    const { data, error } = await this.supabase
-      .from('professions')
-      .select('*')
-      .eq('is_active', true)
-      .eq('is_ict_related', false)
-      .order('name_ru')
+    try {
+      const { data, error } = await this.supabase
+        .from('professions')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_ict_related', false)
+        .order('name_ru')
 
-    if (error) throw new Error(`Ошибка получения профессий: ${error.message}`)
-    return data || []
+      if (error) {
+        if (error.message.includes('table') && error.message.includes('not found')) {
+          throw new Error('База данных не настроена. Необходимо применить миграции.')
+        }
+        throw new Error(`Ошибка получения профессий: ${error.message}`)
+      }
+      return data || []
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('База данных не настроена')) {
+        throw err
+      }
+      throw new Error('База данных не настроена. Необходимо применить миграции.')
+    }
   }
 
   // ========== РАБОТА С ОЦЕНКАМИ ==========
