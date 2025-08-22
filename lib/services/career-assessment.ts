@@ -32,21 +32,34 @@ export class CareerAssessmentService {
    */
   async getSkillCategories(): Promise<DigitalSkillCategory[]> {
     try {
+      console.log('CareerAssessmentService: Загрузка категорий навыков...')
+      
       const { data, error } = await this.supabase
         .from('digital_skill_categories')
         .select('*')
         .eq('is_active', true)
         .order('order_index')
 
+      console.log('CareerAssessmentService: Результат запроса категорий:', { data, error })
+
       if (error) {
+        console.error('CareerAssessmentService: Ошибка получения категорий:', error)
+        
         if (error.message.includes('table') && error.message.includes('not found')) {
           throw new Error('База данных не настроена. Необходимо применить миграции.')
         }
+        if (error.message.includes('permission') || error.message.includes('policy')) {
+          throw new Error('Проблема с правами доступа. Возможно, нужно отключить RLS политики.')
+        }
         throw new Error(`Ошибка получения категорий навыков: ${error.message}`)
       }
+      
+      console.log('CareerAssessmentService: Успешно загружено категорий:', data?.length || 0)
       return data || []
     } catch (err) {
-      if (err instanceof Error && err.message.includes('База данных не настроена')) {
+      console.error('CareerAssessmentService: Исключение при загрузке категорий:', err)
+      
+      if (err instanceof Error && (err.message.includes('База данных не настроена') || err.message.includes('правами доступа'))) {
         throw err
       }
       throw new Error('База данных не настроена. Необходимо применить миграции.')

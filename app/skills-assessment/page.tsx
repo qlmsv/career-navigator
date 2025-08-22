@@ -185,13 +185,28 @@ function SkillsAssessmentPage() {
                 <h3 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
                   Необходимо настроить базу данных:
                 </h3>
-                <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
-                  <li>Откройте Supabase Dashboard → SQL Editor</li>
-                  <li>Скопируйте ВЕСЬ код из файла <strong>setup_database_basic.sql</strong></li>
-                  <li>Вставьте в SQL Editor и нажмите "Run"</li>
-                  <li>Увидите "Успешно настроено!" с количеством записей</li>
-                  <li>Обновите эту страницу - ошибка исчезнет</li>
-                </ol>
+                
+                {error.includes('правами доступа') ? (
+                  <div className="space-y-2">
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300 font-medium">
+                      Таблицы созданы, но есть проблемы с доступом. Выполните:
+                    </p>
+                    <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
+                      <li>Откройте Supabase Dashboard → SQL Editor</li>
+                      <li>Скопируйте код из файла <strong>disable_rls.sql</strong></li>
+                      <li>Выполните SQL для отключения RLS</li>
+                      <li>Обновите эту страницу</li>
+                    </ol>
+                  </div>
+                ) : (
+                  <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
+                    <li>Откройте Supabase Dashboard → SQL Editor</li>
+                    <li>Скопируйте ВЕСЬ код из файла <strong>setup_database_basic.sql</strong></li>
+                    <li>Вставьте в SQL Editor и нажмите "Run"</li>
+                    <li>Увидите "Успешно настроено!" с количеством записей</li>
+                    <li>Обновите эту страницу - ошибка исчезнет</li>
+                  </ol>
+                )}
               </div>
             )}
             
