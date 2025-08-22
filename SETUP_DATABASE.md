@@ -10,7 +10,7 @@ Error: Ошибка получения регионов: Could not find the tabl
 
 ## Решение
 
-### Вариант 1: Через Supabase Dashboard (Рекомендуется)
+### Вариант 1: Быстрая настройка (Рекомендуется)
 
 1. **Откройте Supabase Dashboard**
    - Перейдите на https://supabase.com/dashboard
@@ -20,26 +20,25 @@ Error: Ошибка получения регионов: Could not find the tabl
    - В боковом меню выберите "SQL Editor"
    - Нажмите "New query"
 
-3. **Выполните миграции по порядку:**
-
-   **Шаг 1:** Скопируйте и выполните содержимое файла:
-   ```
-   supabase/migrations/011_career_navigator_schema.sql
-   ```
-
-   **Шаг 2:** Скопируйте и выполните содержимое файла:
-   ```
-   supabase/migrations/012_initial_data.sql
-   ```
+3. **Выполните простой SQL:**
+   - Скопируйте **ВЕСЬ** код из файла `setup_database_simple.sql`
+   - Вставьте в SQL Editor
+   - Нажмите "Run"
 
 4. **Проверьте результат**
    - В разделе "Table Editor" должны появиться новые таблицы:
-     - `digital_skill_categories`
-     - `digital_skills`
-     - `regions`
-     - `professions`
-     - `user_skill_assessments`
-     - и другие...
+     - `digital_skill_categories` (6 записей)
+     - `digital_skills` (14 записей)
+     - `regions` (10 записей)
+     - `professions` (10 записей)
+   - Увидите сообщение: "База данных успешно настроена!"
+
+### Вариант 2: Пошагово (если есть ошибки)
+
+Если простой SQL не работает, выполните по частям:
+1. Сначала создайте таблицы (только CREATE TABLE части)
+2. Затем добавьте данные (только INSERT части)
+3. В конце настройте RLS политики
 
 ### Вариант 2: Через Supabase CLI (для разработчиков)
 
