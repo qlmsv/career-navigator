@@ -205,6 +205,15 @@ function SkillsAssessmentPage() {
               >
                 Попробовать снова
               </Button>
+              {isDatabaseError && (
+                <Button 
+                  variant="outline"
+                  onClick={() => window.open('/api/database-status', '_blank')}
+                  className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                >
+                  Проверить статус БД
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

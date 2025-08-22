@@ -10,7 +10,7 @@ Error: Ошибка получения регионов: Could not find the tabl
 
 ## Решение
 
-### Вариант 1: Быстрая настройка (Рекомендуется)
+### ⚡ БЫСТРОЕ РЕШЕНИЕ (1 минута)
 
 1. **Откройте Supabase Dashboard**
    - Перейдите на https://supabase.com/dashboard
@@ -20,18 +20,22 @@ Error: Ошибка получения регионов: Could not find the tabl
    - В боковом меню выберите "SQL Editor"
    - Нажмите "New query"
 
-3. **Выполните простой SQL:**
-   - Скопируйте **ВЕСЬ** код из файла `setup_database_simple.sql`
-   - Вставьте в SQL Editor
-   - Нажмите "Run"
+3. **Скопируйте и выполните:**
+   - Откройте файл `setup_database_minimal.sql`
+   - Скопируйте **ВЕСЬ** код (Ctrl+A, Ctrl+C)
+   - Вставьте в SQL Editor (Ctrl+V)
+   - Нажмите зеленую кнопку **"Run"**
 
-4. **Проверьте результат**
-   - В разделе "Table Editor" должны появиться новые таблицы:
-     - `digital_skill_categories` (6 записей)
-     - `digital_skills` (14 записей)
-     - `regions` (10 записей)
-     - `professions` (10 записей)
-   - Увидите сообщение: "База данных успешно настроена!"
+4. **Увидите результат:**
+   ```
+   status: "Успешно настроено!"
+   categories_count: 6
+   skills_count: 6  
+   regions_count: 5
+   professions_count: 5
+   ```
+
+5. **Обновите страницу** `/skills-assessment` - ошибка исчезнет!
 
 ### Вариант 2: Пошагово (если есть ошибки)
 
