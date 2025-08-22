@@ -197,10 +197,9 @@ export class CareerAssessmentService {
 
     const assessmentData = {
       user_id: userId,
-      current_profession_id: formData.current_profession_id,
-      // Убедимся, что target_profession_id не пустая строка, а null, если не заполнено
+      current_profession_id: formData.current_profession_id || null,
       target_profession_id: formData.target_profession_id || null,
-      region_id: formData.region_id,
+      region_id: formData.region_id || null,
       experience_years: formData.experience_years,
       current_salary: formData.current_salary,
       target_salary: formData.target_salary,
