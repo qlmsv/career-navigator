@@ -1,4 +1,4 @@
-// PROGRESS: Step 1/1 done – Cleaned up exports
+// PROGRESS: Обновлен для Карьерного навигатора
 
 // Core utilities
 export * from './types'
@@ -9,11 +9,29 @@ export * from './logger'
 export * from './supabase'
 export * from './supabase/client'
 
-// Test engine
-export * from './test-engine'
-export { TestService } from './test-service'
+// Career Assessment System
+export * from './services/career-assessment'
+export type {
+  DigitalSkillCategory,
+  DigitalSkill,
+  Region,
+  Profession,
+  ProfessionSkillRequirement,
+  RegionalSalaryData,
+  UserSkillAssessment,
+  UserSkillScore,
+  LearningResource,
+  UserRecommendation,
+  SkillAssessmentForm,
+  AssessmentResult,
+  CareerRecommendations,
+  SkillLevel,
+  SKILL_LEVEL_NAMES,
+  COMPETITIVENESS_LEVEL_NAMES,
+  DEMAND_LEVEL_NAMES
+} from './types/career-navigator'
 
-// PDF processing
+// PDF processing (если еще используется)
 export * from './pdf-processor'
 
 // Database types

@@ -20,9 +20,7 @@ import type {
   DigitalSkillCategory, 
   DigitalSkill, 
   Region, 
-  Profession,
-  SkillLevel,
-  SKILL_LEVEL_NAMES 
+  Profession
 } from '@/lib/types/career-navigator'
 
 interface AssessmentStep {
@@ -32,7 +30,7 @@ interface AssessmentStep {
   isCompleted: boolean
 }
 
-export default function SkillsAssessmentPage() {
+function SkillsAssessmentPage() {
   const { user } = useAuth()
   const router = useRouter()
   
@@ -201,7 +199,7 @@ export default function SkillsAssessmentPage() {
                   Самодиагностика цифровых навыков
                 </h1>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Шаг {currentStep + 1} из {steps.length}: {steps[currentStep].title}
+                  Шаг {currentStep + 1} из {steps.length}: {steps[currentStep]?.title}
                 </p>
               </div>
             </div>
@@ -467,3 +465,5 @@ export default function SkillsAssessmentPage() {
     </div>
   )
 }
+
+export default SkillsAssessmentPage

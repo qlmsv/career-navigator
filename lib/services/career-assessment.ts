@@ -16,7 +16,14 @@ import type {
 } from '@/lib/types/career-navigator'
 
 export class CareerAssessmentService {
-  private supabase = createClient()
+  private _supabase: any = null
+
+  private get supabase() {
+    if (!this._supabase) {
+      this._supabase = createClient()
+    }
+    return this._supabase
+  }
 
   // ========== ПОЛУЧЕНИЕ СПРАВОЧНЫХ ДАННЫХ ==========
 
@@ -303,7 +310,7 @@ export class CareerAssessmentService {
       competitiveness_level: competitivenessLevel,
       skill_results: skillResults,
       strengths,
-      improvement_areas,
+      improvement_areas: improvementAreas,
       market_comparison: {
         salary_potential_min: salaryData?.salary_min || 0,
         salary_potential_max: salaryData?.salary_max || 0,
@@ -423,10 +430,10 @@ export class CareerAssessmentService {
     if (error) throw new Error(`Ошибка получения ресурсов: ${error.message}`)
 
     return (data || [])
-      .filter(resource => 
-        resource.target_skills?.some(skillId => skillIds.includes(skillId))
+      .filter((resource: LearningResource) => 
+        resource.target_skills?.some((skillId: string) => skillIds.includes(skillId))
       )
-      .map(resource => ({
+      .map((resource: LearningResource) => ({
         resource,
         relevance_score: 0.8, // TODO: рассчитать на основе соответствия навыков
         expected_improvement: 1.5, // TODO: рассчитать ожидаемое улучшение
