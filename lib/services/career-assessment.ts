@@ -101,7 +101,8 @@ export class CareerAssessmentService {
           category:digital_skill_categories(*)
         `)
         .eq('is_active', true)
-        .order('category.order_index, order_index')
+        .order('order_index', { foreignTable: 'digital_skill_categories' })
+        .order('order_index')
 
       if (error) {
         console.error('CareerAssessmentService: Ошибка получения всех навыков:', error)
