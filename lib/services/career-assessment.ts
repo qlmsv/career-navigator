@@ -104,8 +104,13 @@ export class CareerAssessmentService {
         .order('category.order_index, order_index')
 
       if (error) {
+        console.error('CareerAssessmentService: Ошибка получения всех навыков:', error)
+        
         if (error.message.includes('table') && error.message.includes('not found')) {
           throw new Error('База данных не настроена. Необходимо применить миграции.')
+        }
+        if (error.message.includes('permission') || error.message.includes('policy') || error.message.includes('RLS')) {
+          throw new Error('Проблема с правами доступа. RLS политики блокируют чтение данных. Выполните: ALTER TABLE digital_skills DISABLE ROW LEVEL SECURITY;')
         }
         throw new Error(`Ошибка получения всех навыков: ${error.message}`)
       }
@@ -130,8 +135,13 @@ export class CareerAssessmentService {
         .order('name_ru')
 
       if (error) {
+        console.error('CareerAssessmentService: Ошибка получения регионов:', error)
+        
         if (error.message.includes('table') && error.message.includes('not found')) {
           throw new Error('База данных не настроена. Необходимо применить миграции.')
+        }
+        if (error.message.includes('permission') || error.message.includes('policy') || error.message.includes('RLS')) {
+          throw new Error('Проблема с правами доступа. RLS политики блокируют чтение данных. Выполните: ALTER TABLE regions DISABLE ROW LEVEL SECURITY;')
         }
         throw new Error(`Ошибка получения регионов: ${error.message}`)
       }
@@ -157,8 +167,13 @@ export class CareerAssessmentService {
         .order('name_ru')
 
       if (error) {
+        console.error('CareerAssessmentService: Ошибка получения профессий:', error)
+        
         if (error.message.includes('table') && error.message.includes('not found')) {
           throw new Error('База данных не настроена. Необходимо применить миграции.')
+        }
+        if (error.message.includes('permission') || error.message.includes('policy') || error.message.includes('RLS')) {
+          throw new Error('Проблема с правами доступа. RLS политики блокируют чтение данных. Выполните: ALTER TABLE professions DISABLE ROW LEVEL SECURITY;')
         }
         throw new Error(`Ошибка получения профессий: ${error.message}`)
       }

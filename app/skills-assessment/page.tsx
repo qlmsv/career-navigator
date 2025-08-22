@@ -186,10 +186,10 @@ function SkillsAssessmentPage() {
                   Необходимо настроить базу данных:
                 </h3>
                 
-                {error.includes('правами доступа') ? (
+                {error.includes('правами доступа') || error.includes('permission') || error.includes('policy') ? (
                   <div className="space-y-2">
                     <p className="text-sm text-yellow-700 dark:text-yellow-300 font-medium">
-                      Таблицы созданы, но есть проблемы с доступом. Выполните:
+                      ⚠️ Таблицы созданы, но RLS политики блокируют доступ. Выполните:
                     </p>
                     <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
                       <li>Откройте Supabase Dashboard → SQL Editor</li>
@@ -197,6 +197,20 @@ function SkillsAssessmentPage() {
                       <li>Выполните SQL для отключения RLS</li>
                       <li>Обновите эту страницу</li>
                     </ol>
+                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
+                      <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
+                        💡 Быстрое решение: Выполните этот SQL в Supabase:
+                      </p>
+                      <code className="text-xs bg-white dark:bg-slate-800 p-2 rounded block mt-2">
+                        ALTER TABLE digital_skill_categories DISABLE ROW LEVEL SECURITY;
+                        <br />
+                        ALTER TABLE digital_skills DISABLE ROW LEVEL SECURITY;
+                        <br />
+                        ALTER TABLE regions DISABLE ROW LEVEL SECURITY;
+                        <br />
+                        ALTER TABLE professions DISABLE ROW LEVEL SECURITY;
+                      </code>
+                    </div>
                   </div>
                 ) : (
                   <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
@@ -221,13 +235,37 @@ function SkillsAssessmentPage() {
                 Попробовать снова
               </Button>
               {isDatabaseError && (
-                <Button 
-                  variant="outline"
-                  onClick={() => window.open('/api/database-status', '_blank')}
-                  className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                >
-                  Проверить статус БД
-                </Button>
+                <>
+                  <Button 
+                    variant="outline"
+                    onClick={() => window.open('/api/database-status', '_blank')}
+                    className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                  >
+                    Проверить статус БД
+                  </Button>
+                  {(error.includes('правами доступа') || error.includes('permission') || error.includes('policy')) && (
+                    <Button 
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/disable-rls', { method: 'POST' })
+                          const result = await response.json()
+                          if (result.success) {
+                            alert('RLS отключен! Обновите страницу.')
+                            window.location.reload()
+                          } else {
+                            alert('Ошибка отключения RLS: ' + result.error)
+                          }
+                        } catch (err) {
+                          alert('Ошибка: ' + err)
+                        }
+                      }}
+                      className="text-green-600 border-green-600 hover:bg-green-50"
+                    >
+                      🔧 Отключить RLS
+                    </Button>
+                  )}
+                </>
               )}
             </div>
           </CardContent>
