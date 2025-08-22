@@ -65,7 +65,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const isAuthPage = pathname?.startsWith('/auth')
     const isHomePage = pathname === '/'
-    const isOnboardingPage = pathname === '/onboarding'
 
     if (!session) {
       if (!isAuthPage && !isHomePage) {
@@ -75,15 +74,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (session && (isAuthPage || isHomePage)) {
-      // Check if user needs onboarding - only on client side
-      if (typeof window !== 'undefined') {
-        const onboardingCompleted = localStorage.getItem('onboarding_completed')
-        if (!onboardingCompleted && !isOnboardingPage) {
-          router.replace('/onboarding')
-        } else if (onboardingCompleted || isOnboardingPage) {
-          router.replace('/dashboard')
-        }
-      }
+      // Авторизованных пользователей направляем в дашборд
+      router.replace('/dashboard')
     }
   }, [session, isLoading, pathname, router])
 

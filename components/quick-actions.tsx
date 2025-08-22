@@ -22,47 +22,47 @@ export function QuickActions() {
   
   const actions = [
     {
-      title: 'Пройти тест',
-      description: 'Анализ личности Big Five',
+      title: 'Самодиагностика',
+      description: 'Оценка цифровых навыков',
       icon: Brain,
       color: 'from-purple-500 to-pink-500',
-      action: () => router.push('/ai-assistant'),
-      badge: 'Новый'
+      action: () => router.push('/skills-assessment'),
+      badge: 'Новое'
     },
     {
-      title: 'История тестов',
+      title: 'История диагностик',
       description: 'Просмотр результатов',
       icon: Target,
       color: 'from-blue-500 to-cyan-500',
-      action: () => router.push('/test-history')
+      action: () => router.push('/assessment-history')
     },
     {
-      title: 'Аналитика',
-      description: 'Прогресс развития',
+      title: 'Дашборд',
+      description: 'Обзор прогресса',
       icon: TrendingUp,
       color: 'from-green-500 to-emerald-500',
       action: () => router.push('/dashboard')
     },
     {
-      title: 'Экспорт данных',
-      description: 'Скачать отчет',
-      icon: Download,
+      title: 'Курсы развития',
+      description: 'Рекомендуемые ресурсы',
+      icon: BookOpen,
       color: 'from-orange-500 to-red-500',
-      action: () => console.log('Export')
+      action: () => console.log('Courses - Coming Soon')
     },
     {
-      title: 'Настройки',
-      description: 'Управление аккаунтом',
-      icon: Settings,
+      title: 'Сертификаты',
+      description: 'Подтверждение навыков',
+      icon: Award,
       color: 'from-indigo-500 to-purple-500',
-      action: () => console.log('Settings')
+      action: () => console.log('Certificates - Coming Soon')
     },
     {
       title: 'Поделиться',
       description: 'Экспорт в LinkedIn',
       icon: Share2,
       color: 'from-teal-500 to-cyan-500',
-      action: () => console.log('Share')
+      action: () => console.log('Share - Coming Soon')
     }
   ]
 
