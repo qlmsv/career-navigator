@@ -12,7 +12,7 @@ export default function Home() {
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
             <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Evolv
+              Карьерный навигатор
             </h1>
           </div>
           <div className="flex items-center gap-4">
@@ -32,13 +32,13 @@ export default function Home() {
         <div className="text-center mb-20">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-purple-600/10 border border-blue-500/20 rounded-full text-sm text-blue-600 dark:text-blue-400 mb-6">
             <Sparkles className="h-4 w-4" />
-            Evolv your career
+            Навигация к успешной карьере
           </div>
           <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
-            Узнайте свой карьерный потенциал за 5 минут
+            Оцените свою конкурентоспособность на рынке труда
           </h2>
           <p className="max-w-xl mx-auto text-lg text-slate-700 dark:text-slate-200">
-            Раскройте свой потенциал с помощью AI-анализа личности. Определите свои сильные стороны.
+            Проведите самодиагностику цифровых навыков, сравните их с региональными требованиями и получите персональный план развития.
           </p>
         </div>
 
@@ -48,30 +48,30 @@ export default function Home() {
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-xl flex items-center justify-center mb-4 group-hover:from-blue-500/20 group-hover:to-purple-600/20 transition-colors">
               <Brain className="h-6 w-6 text-blue-600" />
             </div>
-            <h3 className="text-xl font-semibold mb-3">Научный подход</h3>
+            <h3 className="text-xl font-semibold mb-3">Самодиагностика навыков</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Тестирование основано на модели Big Five и современных психометрических методиках.
-              Точность анализа — 94%
+              Комплексная оценка цифровых компетенций от базовой грамотности до работы с данными.
+              Объективная самооценка за 10 минут
             </p>
           </div>
           <div className="group p-8 rounded-2xl border border-border/50 bg-card/50 hover:bg-card transition-all duration-300 hover:shadow-lg">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-xl flex items-center justify-center mb-4 group-hover:from-blue-500/20 group-hover:to-purple-600/20 transition-colors">
-              <Zap className="h-6 w-6 text-purple-600" />
+              <TrendingUp className="h-6 w-6 text-purple-600" />
             </div>
-            <h3 className="text-xl font-semibold mb-3">Мгновенный результат</h3>
+            <h3 className="text-xl font-semibold mb-3">Сравнение с рынком</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Персональный отчет с рекомендациями по карьере, развитию навыков и совместимости с
-              командой — сразу после теста
+              Анализ ваших навыков в контексте регионального рынка труда, зарплат и требований
+              работодателей по вашей профессии
             </p>
           </div>
           <div className="group p-8 rounded-2xl border border-border/50 bg-card/50 hover:bg-card transition-all duration-300 hover:shadow-lg">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-xl flex items-center justify-center mb-4 group-hover:from-blue-500/20 group-hover:to-purple-600/20 transition-colors">
               <Target className="h-6 w-6 text-blue-500" />
             </div>
-            <h3 className="text-xl font-semibold mb-3">Конкретные действия</h3>
+            <h3 className="text-xl font-semibold mb-3">Персональные рекомендации</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Не просто описание личности, а четкий план развития с рекомендациями курсов, профессий
-              и компаний
+              Конкретный план развития с курсами, сертификациями и шагами для повышения вашей
+              конкурентоспособности и зарплаты
             </p>
           </div>
         </div>
@@ -81,18 +81,18 @@ export default function Home() {
           <div className="bg-gradient-to-br from-blue-500/5 to-purple-600/5 backdrop-blur-sm p-8 rounded-2xl border border-blue-500/20 shadow-xl">
             <div className="text-center mb-8">
               <h3 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Начать карьерный анализ
+                Начать самодиагностику
               </h3>
-              <p className="text-muted-foreground">Узнайте, какая профессия подходит именно вам</p>
+              <p className="text-muted-foreground">Оцените свои цифровые навыки и конкурентоспособность</p>
             </div>
             <div className="space-y-6">
               <div className="text-center space-y-4">
                 <div className="flex justify-center">
-                  <a
+                                      <a
                     href="/auth"
                     className="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-8 rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    Evolv yourself
+                    Начать диагностику
                     <TrendingUp className="h-4 w-4" />
                   </a>
                 </div>
@@ -103,11 +103,11 @@ export default function Home() {
                     Бесплатно всегда
                   </div>
                   <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>5 минут
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>10 минут
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    94% точность
+                    Региональные данные
                   </div>
                 </div>
               </div>

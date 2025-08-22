@@ -82,8 +82,8 @@ export default function Dashboard() {
                 </div>
               </div>
               <div>
-                <h1 className="text-3xl font-bold">Evolv</h1>
-                <p className="text-blue-100">Платформа карьерного развития</p>
+                <h1 className="text-3xl font-bold">Карьерный навигатор</h1>
+                <p className="text-blue-100">Самодиагностика конкурентоспособности</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -108,7 +108,7 @@ export default function Dashboard() {
             Добро пожаловать, {displayName}!
           </h2>
           <p className="text-lg text-slate-600 dark:text-slate-400">
-            Откройте свой потенциал с помощью психологического анализа
+            Оцените свои цифровые навыки и получите рекомендации по развитию карьеры
           </p>
         </div>
 
@@ -119,29 +119,29 @@ export default function Dashboard() {
             <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-3 text-lg">
                 <Brain className="h-5 w-5" />
-                Пройти тест
+                Самодиагностика навыков
               </CardTitle>
               <CardDescription className="text-blue-100 text-sm">
-                Анализ личности Big Five
+                Оценка цифровых компетенций
               </CardDescription>
             </CardHeader>
             <CardContent className="p-4">
               <div className="space-y-2 mb-4">
                 <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Target className="h-4 w-4 text-blue-500" />
-                  <span>50 вопросов</span>
+                  <span>6 категорий навыков</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Clock className="h-4 w-4 text-amber-500" />
-                  <span>15-20 минут</span>
+                  <span>10-15 минут</span>
                 </div>
               </div>
               <Button
-                onClick={() => router.push('/ai-assistant')}
+                onClick={() => router.push('/skills-assessment')}
                 className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
                 size="sm"
               >
-                Начать тест
+                Начать диагностику
                 <TrendingUp className="h-4 w-4 ml-2" />
               </Button>
             </CardContent>
@@ -155,14 +155,14 @@ export default function Dashboard() {
                 Результаты
               </CardTitle>
               <CardDescription className="text-green-100 text-sm">
-                Просмотр прошлых тестов
+                Просмотр прошлых диагностик
               </CardDescription>
             </CardHeader>
             <CardContent className="p-4">
               <div className="space-y-2 mb-4">
                 <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Target className="h-4 w-4 text-green-500" />
-                  <span>{testCount} тестов пройдено</span>
+                  <span>{testCount} диагностик пройдено</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Clock className="h-4 w-4 text-amber-500" />
@@ -170,7 +170,7 @@ export default function Dashboard() {
                 </div>
               </div>
               <Button
-                onClick={() => router.push('/test-history')}
+                onClick={() => router.push('/assessment-history')}
                 className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white"
                 size="sm"
               >

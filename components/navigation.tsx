@@ -13,7 +13,7 @@ export default function Navigation() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <BarChart3 className="h-8 w-8 text-purple-400" />
-              <span className="text-xl font-bold text-white">Evolv Platform</span>
+              <span className="text-xl font-bold text-white">Карьерный навигатор</span>
             </Link>
           </div>
 
@@ -27,14 +27,14 @@ export default function Navigation() {
                   </Button>
                 </Link>
                 
-                <Link href="/ai-assistant">
+                <Link href="/skills-assessment">
                   <Button variant="ghost" className="text-white hover:bg-white/10">
                     <BarChart3 className="h-4 w-4 mr-2" />
-                    Тест
+                    Диагностика
                   </Button>
                 </Link>
 
-                <Link href="/test-history">
+                <Link href="/assessment-history">
                   <Button variant="ghost" className="text-white hover:bg-white/10">
                     <History className="h-4 w-4 mr-2" />
                     История
