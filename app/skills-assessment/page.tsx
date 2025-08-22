@@ -186,11 +186,11 @@ function SkillsAssessmentPage() {
                   Необходимо настроить базу данных:
                 </h3>
                 <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
-                  <li>Откройте Supabase Dashboard</li>
-                  <li>Перейдите в SQL Editor</li>
-                  <li>Выполните миграции из папки supabase/migrations/</li>
-                  <li>Сначала 011_career_navigator_schema.sql</li>
-                  <li>Затем 012_initial_data.sql</li>
+                  <li>Откройте Supabase Dashboard → SQL Editor</li>
+                  <li>Скопируйте ВЕСЬ код из файла <strong>setup_database_basic.sql</strong></li>
+                  <li>Вставьте в SQL Editor и нажмите "Run"</li>
+                  <li>Увидите "Успешно настроено!" с количеством записей</li>
+                  <li>Обновите эту страницу - ошибка исчезнет</li>
                 </ol>
               </div>
             )}

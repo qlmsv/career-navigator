@@ -1,7 +1,7 @@
--- МИНИМАЛЬНАЯ НАСТРОЙКА БД для Карьерного навигатора
+-- БАЗОВАЯ НАСТРОЙКА БД для Карьерного навигатора
 -- Скопируйте ВЕСЬ этот код в Supabase SQL Editor и нажмите Run
 
--- Включаем расширения
+-- Включаем UUID расширение
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 1. Категории навыков
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS digital_skill_categories (
 -- 2. Навыки
 CREATE TABLE IF NOT EXISTS digital_skills (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  category_id UUID NOT NULL REFERENCES digital_skill_categories(id),
+  category_id UUID REFERENCES digital_skill_categories(id),
   name TEXT NOT NULL,
   name_ru TEXT NOT NULL,
   description TEXT,
@@ -58,12 +58,12 @@ CREATE TABLE IF NOT EXISTS professions (
 -- 5. Оценки пользователей
 CREATE TABLE IF NOT EXISTS user_skill_assessments (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_id UUID NOT NULL REFERENCES auth.users(id),
+  user_id UUID REFERENCES auth.users(id),
   current_profession_id UUID REFERENCES professions(id),
   region_id UUID REFERENCES regions(id),
   experience_years INTEGER,
   current_salary INTEGER,
-  assessment_data JSONB NOT NULL DEFAULT '{}',
+  assessment_data JSONB DEFAULT '{}',
   overall_score DECIMAL(5,2),
   competitiveness_level TEXT,
   is_completed BOOLEAN DEFAULT false,
@@ -74,8 +74,8 @@ CREATE TABLE IF NOT EXISTS user_skill_assessments (
 -- 6. Детальные оценки
 CREATE TABLE IF NOT EXISTS user_skill_scores (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  assessment_id UUID NOT NULL REFERENCES user_skill_assessments(id),
-  skill_id UUID NOT NULL REFERENCES digital_skills(id),
+  assessment_id UUID REFERENCES user_skill_assessments(id),
+  skill_id UUID REFERENCES digital_skills(id),
   self_assessment_level INTEGER NOT NULL,
   confidence_level INTEGER,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -97,43 +97,18 @@ CREATE TABLE IF NOT EXISTS learning_resources (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Настройка RLS
-ALTER TABLE digital_skill_categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE digital_skills ENABLE ROW LEVEL SECURITY;
-ALTER TABLE regions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE professions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_skill_assessments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_skill_scores ENABLE ROW LEVEL SECURITY;
-ALTER TABLE learning_resources ENABLE ROW LEVEL SECURITY;
+-- ОТКЛЮЧАЕМ RLS для простоты (можно включить позже)
+ALTER TABLE digital_skill_categories DISABLE ROW LEVEL SECURITY;
+ALTER TABLE digital_skills DISABLE ROW LEVEL SECURITY;
+ALTER TABLE regions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE professions DISABLE ROW LEVEL SECURITY;
+ALTER TABLE user_skill_assessments DISABLE ROW LEVEL SECURITY;
+ALTER TABLE user_skill_scores DISABLE ROW LEVEL SECURITY;
+ALTER TABLE learning_resources DISABLE ROW LEVEL SECURITY;
 
--- Политики чтения для всех
-DROP POLICY IF EXISTS "allow_read_categories" ON digital_skill_categories;
-CREATE POLICY "allow_read_categories" ON digital_skill_categories FOR SELECT USING (true);
+-- ДОБАВЛЯЕМ БАЗОВЫЕ ДАННЫЕ
 
-DROP POLICY IF EXISTS "allow_read_skills" ON digital_skills;
-CREATE POLICY "allow_read_skills" ON digital_skills FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "allow_read_regions" ON regions;
-CREATE POLICY "allow_read_regions" ON regions FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "allow_read_professions" ON professions;
-CREATE POLICY "allow_read_professions" ON professions FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "allow_read_resources" ON learning_resources;
-CREATE POLICY "allow_read_resources" ON learning_resources FOR SELECT USING (true);
-
--- Политики для пользовательских данных
-DROP POLICY IF EXISTS "users_own_assessments" ON user_skill_assessments;
-CREATE POLICY "users_own_assessments" ON user_skill_assessments FOR ALL USING (auth.uid() = user_id);
-
-DROP POLICY IF EXISTS "users_own_scores" ON user_skill_scores;
-CREATE POLICY "users_own_scores" ON user_skill_scores FOR ALL USING (
-  assessment_id IN (SELECT id FROM user_skill_assessments WHERE user_id = auth.uid())
-);
-
--- ДОБАВЛЯЕМ ДАННЫЕ (только если таблицы пустые)
-
--- Категории
+-- Категории навыков
 INSERT INTO digital_skill_categories (name, name_ru, description, icon, order_index)
 SELECT 'basic_digital_literacy', 'Базовая цифровая грамотность', 'Основы работы с компьютером', 'monitor', 1
 WHERE NOT EXISTS (SELECT 1 FROM digital_skill_categories WHERE name = 'basic_digital_literacy');
@@ -172,12 +147,12 @@ SELECT 'moscow_region', 'Московская область', 'Централь
 WHERE NOT EXISTS (SELECT 1 FROM regions WHERE name = 'moscow_region');
 
 INSERT INTO regions (name, name_ru, federal_district)
-SELECT 'krasnodar_krai', 'Краснодарский край', 'Южный'
-WHERE NOT EXISTS (SELECT 1 FROM regions WHERE name = 'krasnodar_krai');
-
-INSERT INTO regions (name, name_ru, federal_district)
 SELECT 'tatarstan', 'Республика Татарстан', 'Приволжский'
 WHERE NOT EXISTS (SELECT 1 FROM regions WHERE name = 'tatarstan');
+
+INSERT INTO regions (name, name_ru, federal_district)
+SELECT 'krasnodar_krai', 'Краснодарский край', 'Южный'
+WHERE NOT EXISTS (SELECT 1 FROM regions WHERE name = 'krasnodar_krai');
 
 -- Профессии
 INSERT INTO professions (name, name_ru, description, industry, is_ict_related)
@@ -236,11 +211,3 @@ SELECT
   (SELECT id FROM digital_skill_categories WHERE name = 'online_presence'),
   'linkedin_usage', 'LinkedIn', 'Профиль, нетворкинг', 1
 WHERE NOT EXISTS (SELECT 1 FROM digital_skills WHERE name = 'linkedin_usage');
-
--- Проверяем результат
-SELECT 
-  'Успешно настроено!' as status,
-  (SELECT COUNT(*) FROM digital_skill_categories) as categories_count,
-  (SELECT COUNT(*) FROM digital_skills) as skills_count,
-  (SELECT COUNT(*) FROM regions) as regions_count,
-  (SELECT COUNT(*) FROM professions) as professions_count;
