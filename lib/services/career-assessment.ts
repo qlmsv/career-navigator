@@ -193,10 +193,13 @@ export class CareerAssessmentService {
    * Создать новую оценку
    */
   async createAssessment(userId: string, formData: SkillAssessmentForm): Promise<string> {
+    console.log('createAssessment: Создание записи в user_skill_assessments...', { userId, formData })
+
     const assessmentData = {
       user_id: userId,
       current_profession_id: formData.current_profession_id,
-      target_profession_id: formData.target_profession_id,
+      // Убедимся, что target_profession_id не пустая строка, а null, если не заполнено
+      target_profession_id: formData.target_profession_id || null,
       region_id: formData.region_id,
       experience_years: formData.experience_years,
       current_salary: formData.current_salary,
@@ -204,6 +207,7 @@ export class CareerAssessmentService {
       assessment_data: formData.skill_assessments,
       is_completed: false
     }
+    console.log('createAssessment: Подготовленные данные:', assessmentData)
 
     const { data, error } = await this.supabase
       .from('user_skill_assessments')
@@ -211,7 +215,12 @@ export class CareerAssessmentService {
       .select('id')
       .single()
 
-    if (error) throw new Error(`Ошибка создания оценки: ${error.message}`)
+    if (error) {
+      console.error('createAssessment: Ошибка Supabase:', error)
+      throw new Error(`Ошибка создания оценки: ${error.message}`)
+    }
+    
+    console.log('createAssessment: Успешно создано, ID:', data.id)
     return data.id
   }
 
@@ -219,6 +228,7 @@ export class CareerAssessmentService {
    * Сохранить оценки навыков
    */
   async saveSkillScores(assessmentId: string, skillScores: Record<string, any>): Promise<void> {
+    console.log('saveSkillScores: Сохранение оценок для assessmentId:', assessmentId)
     const scores = Object.entries(skillScores).map(([skillId, score]) => ({
       assessment_id: assessmentId,
       skill_id: skillId,
@@ -226,11 +236,21 @@ export class CareerAssessmentService {
       confidence_level: score.confidence_level
     }))
 
+    if (scores.length === 0) {
+      console.warn('saveSkillScores: Нет оценок для сохранения.')
+      return
+    }
+    console.log(`saveSkillScores: Подготовлено ${scores.length} записей для вставки.`)
+
     const { error } = await this.supabase
       .from('user_skill_scores')
       .insert(scores)
 
-    if (error) throw new Error(`Ошибка сохранения оценок навыков: ${error.message}`)
+    if (error) {
+      console.error('saveSkillScores: Ошибка Supabase:', error)
+      throw new Error(`Ошибка сохранения оценок навыков: ${error.message}`)
+    }
+    console.log('saveSkillScores: Оценки успешно сохранены.')
   }
 
   /**

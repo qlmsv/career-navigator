@@ -136,16 +136,29 @@ function SkillsAssessmentPage() {
   }
 
   const handleSubmit = async () => {
+    if (!user) {
+      setError('Ошибка: пользователь не авторизован.')
+      return
+    }
+
     try {
       setIsLoading(true)
-      const assessmentId = await careerAssessmentService.createAssessment(user!.id, formData)
+      console.log('Отправка данных на сервер:', { userId: user.id, formData })
+
+      const assessmentId = await careerAssessmentService.createAssessment(user.id, formData)
+      console.log('Создана оценка с ID:', assessmentId)
+
       await careerAssessmentService.saveSkillScores(assessmentId, formData.skill_assessments)
+      console.log('Оценки навыков сохранены для ID:', assessmentId)
+
       const results = await careerAssessmentService.completeAssessment(assessmentId)
+      console.log('Результаты рассчитаны:', results)
       
       // Переход к результатам
       router.push(`/assessment-results/${assessmentId}`)
     } catch (err) {
-      setError('Ошибка сохранения оценки')
+      const errorMessage = err instanceof Error ? err.message : 'Неизвестная ошибка'
+      setError(`Ошибка сохранения оценки: ${errorMessage}`)
       console.error('Error submitting assessment:', err)
     } finally {
       setIsLoading(false)
