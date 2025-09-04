@@ -494,16 +494,29 @@ export class CareerAssessmentService {
       title: `Развитие навыка: ${skill.skill.name_ru}`,
       description: `Повысить уровень владения с ${skill.current_level} до ${skill.target_level}`,
       timeline: `${(skill.target_level - skill.current_level) * 2} недели`,
-      resources: recommendedResources.filter(r => 
+      resources: recommendedResources.filter(r =>
         r.resource.target_skills?.includes(skill.skill.id)
       ).slice(0, 2).map(r => r.resource),
       expected_outcome: `Увеличение конкурентоспособности на ${skill.salary_impact}%`
     }))
 
+    // Генерируем карьерные пути (упрощенная логика)
+    const careerPaths = []
+    if (assessment.current_profession) {
+      careerPaths.push({
+        target_profession: assessment.current_profession,
+        required_skills: prioritySkills.map(p => p.skill),
+        timeline_months: 6,
+        salary_increase_potential: 20,
+        difficulty: 'medium' as const
+      })
+    }
+    // TODO: Добавить более сложную логику для генерации карьерных путей
+
     return {
       priority_skills: prioritySkills,
       recommended_resources: recommendedResources,
-      career_paths: [], // TODO: реализовать
+      career_paths: careerPaths,
       action_plan: actionPlan
     }
   }
@@ -526,16 +539,23 @@ export class CareerAssessmentService {
     if (error) throw new Error(`Ошибка получения ресурсов: ${error.message}`)
 
     return (data || [])
-      .filter((resource: LearningResource) => 
+      .filter((resource: LearningResource) =>
         resource.target_skills?.some((skillId: string) => skillIds.includes(skillId))
       )
-      .map((resource: LearningResource) => ({
-        resource,
-        relevance_score: 0.8, // TODO: рассчитать на основе соответствия навыков
-        expected_improvement: 1.5, // TODO: рассчитать ожидаемое улучшение
-        roi_estimate: resource.price_rub > 0 ? 300 : 500 // ROI в %
-      }))
-      .slice(0, 10)
+      .map((resource: LearningResource) => {
+        const relevance_score = resource.target_skills?.some(skillId => skillIds.includes(skillId)) ? 1.0 : 0.5; // Простая логика релевантности
+        const expected_improvement = (resource.skill_level_to - resource.skill_level_from) * 0.5; // Примерное улучшение
+        const roi_estimate = resource.price_rub > 0 ? (expected_improvement * 1000) / resource.price_rub : 500; // Примерный ROI
+
+        return {
+          resource,
+          relevance_score,
+          expected_improvement,
+          roi_estimate
+        };
+      })
+      .sort((a: { relevance_score: number; roi_estimate: number }, b: { relevance_score: number; roi_estimate: number }) => b.relevance_score - a.relevance_score || b.roi_estimate - a.roi_estimate) // Сортировка по релевантности и ROI
+      .slice(0, 10);
   }
 }
 

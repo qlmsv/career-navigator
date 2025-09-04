@@ -177,8 +177,8 @@ function SkillsAssessmentPage() {
   }
 
   if (error) {
-    const isDatabaseError = error.includes('База данных не настроена')
-    
+    const isDatabaseError = error.includes('База данных не настроена') || error.includes('RLS') || error.includes('permission') || error.includes('policy');
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-800 flex items-center justify-center">
         <Card className="w-full max-w-2xl">
@@ -188,7 +188,7 @@ function SkillsAssessmentPage() {
                 <Brain className="w-8 h-8 text-red-600" />
               </div>
               <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                {isDatabaseError ? 'База данных не настроена' : 'Ошибка загрузки'}
+                {isDatabaseError ? 'Проблема с базой данных' : 'Ошибка загрузки данных'}
               </h2>
               <p className="text-red-600 mb-4">{error}</p>
             </div>
@@ -196,89 +196,34 @@ function SkillsAssessmentPage() {
             {isDatabaseError && (
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
                 <h3 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
-                  Необходимо настроить базу данных:
+                  Возможные решения:
                 </h3>
-                
-                {error.includes('правами доступа') || error.includes('permission') || error.includes('policy') ? (
-                  <div className="space-y-2">
-                    <p className="text-sm text-yellow-700 dark:text-yellow-300 font-medium">
-                      ⚠️ Таблицы созданы, но RLS политики блокируют доступ. Выполните:
-                    </p>
-                    <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
-                      <li>Откройте Supabase Dashboard → SQL Editor</li>
-                      <li>Скопируйте код из файла <strong>disable_rls.sql</strong></li>
-                      <li>Выполните SQL для отключения RLS</li>
-                      <li>Обновите эту страницу</li>
-                    </ol>
-                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
-                      <p className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                        💡 Быстрое решение: Выполните этот SQL в Supabase:
-                      </p>
-                      <code className="text-xs bg-white dark:bg-slate-800 p-2 rounded block mt-2">
-                        ALTER TABLE digital_skill_categories DISABLE ROW LEVEL SECURITY;
-                        <br />
-                        ALTER TABLE digital_skills DISABLE ROW LEVEL SECURITY;
-                        <br />
-                        ALTER TABLE regions DISABLE ROW LEVEL SECURITY;
-                        <br />
-                        ALTER TABLE professions DISABLE ROW LEVEL SECURITY;
-                      </code>
-                    </div>
-                  </div>
-                ) : (
-                  <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
-                    <li>Откройте Supabase Dashboard → SQL Editor</li>
-                    <li>Скопируйте ВЕСЬ код из файла <strong>setup_database_basic.sql</strong></li>
-                    <li>Вставьте в SQL Editor и нажмите "Run"</li>
-                    <li>Увидите "Успешно настроено!" с количеством записей</li>
-                    <li>Обновите эту страницу - ошибка исчезнет</li>
-                  </ol>
-                )}
+                <ol className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1 list-decimal list-inside">
+                  <li>Убедитесь, что ваша база данных Supabase настроена и миграции применены.</li>
+                  <li>Проверьте, что политики Row Level Security (RLS) правильно настроены для публичного чтения справочных данных и доступа пользователя к своим данным.</li>
+                  <li>Если вы только что настроили базу данных, попробуйте обновить страницу.</li>
+                </ol>
               </div>
             )}
-            
+
             <div className="flex gap-3 justify-center">
               <Button onClick={() => router.push('/dashboard')}>
                 Вернуться к дашборду
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => window.location.reload()}
               >
                 Попробовать снова
               </Button>
               {isDatabaseError && (
-                <>
-                  <Button 
-                    variant="outline"
-                    onClick={() => window.open('/api/database-status', '_blank')}
-                    className="text-blue-600 border-blue-600 hover:bg-blue-50"
-                  >
-                    Проверить статус БД
-                  </Button>
-                  {(error.includes('правами доступа') || error.includes('permission') || error.includes('policy')) && (
-                    <Button 
-                      variant="outline"
-                      onClick={async () => {
-                        try {
-                          const response = await fetch('/api/disable-rls', { method: 'POST' })
-                          const result = await response.json()
-                          if (result.success) {
-                            alert('RLS отключен! Обновите страницу.')
-                            window.location.reload()
-                          } else {
-                            alert('Ошибка отключения RLS: ' + result.error)
-                          }
-                        } catch (err) {
-                          alert('Ошибка: ' + err)
-                        }
-                      }}
-                      className="text-green-600 border-green-600 hover:bg-green-50"
-                    >
-                      🔧 Отключить RLS
-                    </Button>
-                  )}
-                </>
+                <Button
+                  variant="outline"
+                  onClick={() => window.open('/api/rls-status', '_blank')}
+                  className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                >
+                  Проверить статус RLS
+                </Button>
               )}
             </div>
           </CardContent>

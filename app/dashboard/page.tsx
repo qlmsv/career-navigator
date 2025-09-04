@@ -35,7 +35,7 @@ export default function Dashboard() {
       const supabase = createClient()
       try {
         const { count, error } = await supabase
-          .from('test_results')
+          .from('user_skill_assessments')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user.id)
 
