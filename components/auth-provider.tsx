@@ -23,6 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isInitialized, setIsInitialized] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 
@@ -39,9 +40,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(session)
         setUser(session?.user ?? null)
         setIsLoading(false)
+        setIsInitialized(true)
       } catch (error) {
         logger.error('Error initializing session', { error })
         setIsLoading(false)
+        setIsInitialized(true)
       }
     }
 
@@ -53,6 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setIsLoading(false)
+      setIsInitialized(true)
     })
 
     return () => {
@@ -61,23 +65,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (isLoading) return
+    if (!isInitialized) return
 
     const isAuthPage = pathname?.startsWith('/auth')
-    const isHomePage = pathname === '/'
+    const isAdminPage = pathname?.startsWith('/admin')
 
-    if (!session) {
-      if (!isAuthPage && !isHomePage) {
-        router.replace('/auth')
-      }
+    // Только для админских страниц требуется авторизация
+    if (isAdminPage && !session) {
+      router.replace('/auth')
       return
     }
 
-    if (session && (isAuthPage || isHomePage)) {
-      // Авторизованных пользователей направляем в дашборд
-      router.replace('/dashboard')
+    // Если авторизован и на странице авторизации - редирект на главную
+    if (session && isAuthPage) {
+      router.replace('/')
     }
-  }, [session, isLoading, pathname, router])
+  }, [session, isInitialized, pathname, router])
 
   const signOut = async () => {
     const supabase = createClient()

@@ -17,10 +17,16 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             <a
-              href="/auth"
+              href="/tests"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-lg hover:bg-accent/50"
             >
-              Вход / Регистрация
+              Тесты
+            </a>
+            <a
+              href="/admin"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-lg hover:bg-accent/50"
+            >
+              Админ
             </a>
             <ThemeToggle />
           </div>
@@ -35,10 +41,10 @@ export default function Home() {
             Навигация к успешной карьере
           </div>
           <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
-            Оцените свою конкурентоспособность на рынке труда
+            Проверьте свои знания с помощью тестов
           </h2>
           <p className="max-w-xl mx-auto text-lg text-slate-700 dark:text-slate-200">
-            Проведите самодиагностику цифровых навыков, сравните их с региональными требованиями и получите персональный план развития.
+            Выберите интересующий вас тест, пройдите его и получите детальный анализ результатов с рекомендациями.
           </p>
         </div>
 
@@ -48,30 +54,30 @@ export default function Home() {
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-xl flex items-center justify-center mb-4 group-hover:from-blue-500/20 group-hover:to-purple-600/20 transition-colors">
               <Brain className="h-6 w-6 text-blue-600" />
             </div>
-            <h3 className="text-xl font-semibold mb-3">Самодиагностика навыков</h3>
+            <h3 className="text-xl font-semibold mb-3">Прохождение тестов</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Комплексная оценка цифровых компетенций от базовой грамотности до работы с данными.
-              Объективная самооценка за 10 минут
+              Проходите различные тесты для оценки своих навыков и знаний.
+              Получайте мгновенные результаты и рекомендации
             </p>
           </div>
           <div className="group p-8 rounded-2xl border border-border/50 bg-card/50 hover:bg-card transition-all duration-300 hover:shadow-lg">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-xl flex items-center justify-center mb-4 group-hover:from-blue-500/20 group-hover:to-purple-600/20 transition-colors">
               <TrendingUp className="h-6 w-6 text-purple-600" />
             </div>
-            <h3 className="text-xl font-semibold mb-3">Сравнение с рынком</h3>
+            <h3 className="text-xl font-semibold mb-3">Анализ результатов</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Анализ ваших навыков в контексте регионального рынка труда, зарплат и требований
-              работодателей по вашей профессии
+              Получайте детальный анализ ваших ответов с объяснениями и рекомендациями
+              по улучшению ваших знаний и навыков
             </p>
           </div>
           <div className="group p-8 rounded-2xl border border-border/50 bg-card/50 hover:bg-card transition-all duration-300 hover:shadow-lg">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-xl flex items-center justify-center mb-4 group-hover:from-blue-500/20 group-hover:to-purple-600/20 transition-colors">
               <Target className="h-6 w-6 text-blue-500" />
             </div>
-            <h3 className="text-xl font-semibold mb-3">Персональные рекомендации</h3>
+            <h3 className="text-xl font-semibold mb-3">История попыток</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Конкретный план развития с курсами, сертификациями и шагами для повышения вашей
-              конкурентоспособности и зарплаты
+              Отслеживайте свой прогресс, просматривайте историю прохождения тестов
+              и сравнивайте результаты с предыдущими попытками
             </p>
           </div>
         </div>
@@ -81,18 +87,18 @@ export default function Home() {
           <div className="bg-gradient-to-br from-blue-500/5 to-purple-600/5 backdrop-blur-sm p-8 rounded-2xl border border-blue-500/20 shadow-xl">
             <div className="text-center mb-8">
               <h3 className="text-2xl font-semibold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Начать самодиагностику
+                Начать тестирование
               </h3>
-              <p className="text-muted-foreground">Оцените свои цифровые навыки и конкурентоспособность</p>
+              <p className="text-muted-foreground">Выберите тест и проверьте свои знания</p>
             </div>
             <div className="space-y-6">
               <div className="text-center space-y-4">
                 <div className="flex justify-center">
                                       <a
-                    href="/auth"
+                    href="/tests"
                     className="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 px-8 rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    Начать диагностику
+                    Пройти тесты
                     <TrendingUp className="h-4 w-4" />
                   </a>
                 </div>

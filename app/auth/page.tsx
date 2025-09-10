@@ -39,7 +39,7 @@ export default function AuthPage() {
   // Редирект если пользователь уже авторизован
   useEffect(() => {
     if (user && !isLoading) {
-      router.push('/dashboard')
+      router.push('/')
     }
   }, [user, isLoading, router])
 
@@ -64,7 +64,7 @@ export default function AuthPage() {
           title: 'Добро пожаловать!',
           description: 'Вы успешно вошли в систему'
         })
-        router.push('/dashboard')
+        router.push('/')
       } else {
         // Регистрация
         if (password !== confirmPassword) {
@@ -168,10 +168,10 @@ export default function AuthPage() {
             <CardTitle className="text-2xl font-bold">
               {isLogin ? 'Вход в систему' : 'Регистрация'}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-center">
               {isLogin 
-                ? 'Войдите в свой аккаунт для доступа к диагностике навыков' 
-                : 'Создайте аккаунт для начала самодиагностики'
+                ? 'Войдите в свой аккаунт для управления тестами' 
+                : 'Создайте аккаунт для доступа к админ панели'
               }
             </CardDescription>
           </CardHeader>
