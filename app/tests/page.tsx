@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -60,8 +60,7 @@ export default function PublicTestsCatalogPage() {
 
   const getTestIcon = (index: number) => {
     const icons = [BookOpen, TrendingUp, Award, Zap, Star, Users]
-    const IconComponent = icons[index % icons.length]
-    return IconComponent
+    return icons[index % icons.length]
   }
 
   const getTestColor = (index: number) => {
@@ -162,7 +161,7 @@ export default function PublicTestsCatalogPage() {
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className={`w-12 h-12 bg-gradient-to-r ${colorClass} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                        <IconComponent className="w-6 h-6 text-white" />
+                        {IconComponent && React.createElement(IconComponent, { className: "w-6 h-6 text-white" })}
                       </div>
                       <Badge variant="secondary" className="text-xs">
                         Новый

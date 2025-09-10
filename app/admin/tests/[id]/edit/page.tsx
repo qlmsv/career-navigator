@@ -110,7 +110,7 @@ export default function AdminEditTestPage() {
           if (!optionsByQuestion[option.question_id]) {
             optionsByQuestion[option.question_id] = []
           }
-          optionsByQuestion[option.question_id].push(option)
+          optionsByQuestion[option.question_id]!.push(option)
         })
         setAnswerOptions(optionsByQuestion)
       }

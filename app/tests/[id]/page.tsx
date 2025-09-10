@@ -407,7 +407,7 @@ export default function TakeTestPage() {
                       className={`w-8 h-8 rounded-full text-xs font-medium transition-all ${
                         index === currentQuestionIndex
                           ? 'bg-blue-500 text-white'
-                          : answers[questions[index]?.id]
+                          : questions[index]?.id && answers[questions[index].id]
                           ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
                           : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
                       }`}

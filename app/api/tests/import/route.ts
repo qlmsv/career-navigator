@@ -125,6 +125,8 @@ async function importFromJson(payload: ImportTestJson) {
   // Insert questions sequentially to preserve order
   for (let i = 0; i < questions.length; i++) {
     const q = questions[i]
+    if (!q) continue
+    
     const { data: qRow, error: qErr } = await supabaseAdmin!
       .from('questions')
       .insert({
@@ -172,6 +174,8 @@ async function importFromCsv(rows: CsvRow[], meta: Partial<ImportTestJson['test'
 
   // Expect columns: test_title,test_description,question_text,question_type,points,required,option_1_text,option_1_correct,... up to 6
   const first = rows[0]
+  if (!first) throw new Error('CSV file is empty')
+  
   const testTitle = (meta.title as string) || first['test_title']
   if (!testTitle) throw new Error('CSV must include test_title (or provide in meta.title)')
 
@@ -179,9 +183,9 @@ async function importFromCsv(rows: CsvRow[], meta: Partial<ImportTestJson['test'
     test: {
       title: testTitle,
       title_ru: (meta.title_ru as string) || first['test_title_ru'] || testTitle,
-      description: (meta.description as string) || first['test_description'] || undefined,
-      description_ru: (meta.description_ru as string) || first['test_description_ru'] || undefined,
-      category_id: (meta.category_id as string) || first['category_id'] || undefined,
+      ...(meta.description && { description: meta.description as string }),
+      ...(meta.description_ru && { description_ru: meta.description_ru as string }),
+      ...(meta.category_id && { category_id: meta.category_id as string }),
       time_limit_minutes: numberOrNull(meta.time_limit_minutes ?? first['time_limit_minutes']),
       passing_score: numberOrNull(meta.passing_score ?? first['passing_score']) ?? 70,
       max_attempts: numberOrNull(meta.max_attempts ?? first['max_attempts']) ?? 3,
@@ -189,9 +193,9 @@ async function importFromCsv(rows: CsvRow[], meta: Partial<ImportTestJson['test'
       shuffle_answers: booleanOr(meta.shuffle_answers ?? first['shuffle_answers'], false),
       is_public: booleanOr(meta.is_public ?? first['is_public'], true),
       requires_auth: booleanOr(meta.requires_auth ?? first['requires_auth'], true),
-      tags: parseJsonArray(meta.tags ?? first['tags']),
-      instructions: String(meta.instructions || first['instructions'] || '' ) || undefined,
-      instructions_ru: String(meta.instructions_ru || first['instructions_ru'] || '' ) || undefined,
+      tags: parseJsonArray(meta.tags ?? first['tags']) || [],
+      ...(meta.instructions && { instructions: meta.instructions as string }),
+      ...(meta.instructions_ru && { instructions_ru: meta.instructions_ru as string }),
     },
     questions: [],
   }
@@ -208,7 +212,7 @@ async function importFromCsv(rows: CsvRow[], meta: Partial<ImportTestJson['test'
       required: booleanOr(r['required'], true),
       order_index: numberOrNull(r['order_index']) ?? idx,
       difficulty_level: (r['difficulty_level'] as any) || 'medium',
-      tags: parseJsonArray(r['tags']),
+      tags: parseJsonArray(r['tags']) || [],
       options: [],
     }
 
@@ -221,8 +225,8 @@ async function importFromCsv(rows: CsvRow[], meta: Partial<ImportTestJson['test'
         is_correct: booleanOr(r[`option_${i}_correct`], false),
         points: numberOrNull(r[`option_${i}_points`]) ?? 0,
         order_index: i - 1,
-        explanation: r[`option_${i}_explanation`] || undefined,
-        explanation_ru: r[`option_${i}_explanation_ru`] || undefined,
+        ...(r[`option_${i}_explanation`] && { explanation: r[`option_${i}_explanation`] }),
+        ...(r[`option_${i}_explanation_ru`] && { explanation_ru: r[`option_${i}_explanation_ru`] }),
       })
     }
 
@@ -235,10 +239,14 @@ async function importFromCsv(rows: CsvRow[], meta: Partial<ImportTestJson['test'
 function parseCsv(text: string): CsvRow[] {
   const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0)
   if (!lines.length) return []
-  const headers = splitCsvRow(lines[0]).map(h => h.trim())
+  const firstLine = lines[0]
+  if (!firstLine) return []
+  const headers = splitCsvRow(firstLine).map(h => h.trim())
   const rows: CsvRow[] = []
   for (let i = 1; i < lines.length; i++) {
-    const cells = splitCsvRow(lines[i])
+    const line = lines[i]
+    if (!line) continue
+    const cells = splitCsvRow(line)
     const row: CsvRow = {}
     headers.forEach((h, idx) => {
       row[h] = cells[idx] ?? ''

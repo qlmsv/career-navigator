@@ -1,8 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 
 export async function POST() {
   try {
-    const supabase = createClient()
+    const supabase = createClient(
+      process.env['NEXT_PUBLIC_SUPABASE_URL']!,
+      process.env['SUPABASE_SERVICE_ROLE_KEY']!
+    )
     
     // Создаем bucket для медиа файлов тестов
     const { data, error } = await supabase.storage.createBucket('test-media', {
