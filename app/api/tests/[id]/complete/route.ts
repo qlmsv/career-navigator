@@ -6,10 +6,16 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+type RouteParams = {
+  params: {
+    id: string
+  }
+}
+
 // POST - завершение теста и расчет результатов
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: RouteParams
 ) {
   try {
     const testId = params.id
