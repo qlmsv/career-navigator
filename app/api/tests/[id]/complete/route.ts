@@ -80,7 +80,7 @@ export async function POST(
     const passed = percentage >= test.passing_score
 
     // Создаем попытку прохождения
-    const { data: attempt, error: attemptError } = await supabase
+    const { data: attempt, error: attemptError } = await supabaseAdmin
       .from('test_attempts')
       .insert({
         test_id: testId,
@@ -101,7 +101,7 @@ export async function POST(
 
     // Сохраняем ответы пользователя
     for (const result of questionResults) {
-      const { error: answerError } = await supabase
+      const { error: answerError } = await supabaseAdmin
         .from('user_answers')
         .insert({
           attempt_id: attempt.id,
@@ -118,7 +118,7 @@ export async function POST(
     }
 
     // Обновляем статистику теста
-    const { error: statsError } = await supabase
+    const { error: statsError } = await supabaseAdmin
       .from('tests')
       .update({
         total_attempts: test.total_attempts + 1,
