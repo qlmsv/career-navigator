@@ -56,7 +56,7 @@ export async function POST() {
     ]
 
     // Проверяем, есть ли уже категории
-    const { data: existingCategories } = await supabase
+    const { data: existingCategories } = await supabaseAdmin
       .from('test_categories')
       .select('id')
       .limit(1)
