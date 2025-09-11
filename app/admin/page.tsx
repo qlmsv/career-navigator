@@ -1,104 +1,194 @@
 'use client'
 
+import {
+  useState,
+  useEffect,
+  useCallback
+} from 'react'
 import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useToast } from '@/hooks/use-toast'
+import { Plus, Settings, BarChart3, Users } from 'lucide-react'
 
-export default function AdminLoginPage() {
-  const { user, signIn, isLoading } = useAuth()
+export default function AdminPage() {
+  const { user } = useAuth()
   const router = useRouter()
-  const { toast } = useToast()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (user && !isLoading) {
-      // Проверяем роль админа
-      checkAdminRole()
+    if (user === null) {
+      // Пользователь еще не загружен, ждем
+      return
     }
-  }, [user, isLoading])
+    if (!user) {
+      router.push('/auth')
+      return
+    }
 
-  const checkAdminRole = async () => {
-    if (!user) return
-    
-    // Любой зарегистрированный пользователь может войти в админку
-    router.push('/admin/tests')
-  }
+    // Проверяем, является ли пользователь админом
+    // В реальном приложении это должно проверяться через API
+    checkAdminStatus()
+  }, [user, router])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    
+  const checkAdminStatus = useCallback(async () => {
     try {
-      await signIn(email, password)
-      // checkAdminRole будет вызван в useEffect после успешного входа
-    } catch (error) {
-      toast({
-        title: "Ошибка входа",
-        description: error instanceof Error ? error.message : "Неизвестная ошибка",
-        variant: "destructive"
-      })
+      // Здесь должна быть проверка роли пользователя
+      // Пока что просто разрешаем доступ
+      setIsAdmin(true)
     } finally {
-      setIsSubmitting(false)
+      setIsLoading(false)
     }
-  }
+  }, [])
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-slate-600">Загрузка...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Загрузка...</p>
         </div>
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-800 flex items-center justify-center">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-center">Вход в админ-панель</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">Пароль</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Вход...' : 'Войти'}
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p>Перенаправление...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (isAdmin === false) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6 text-center">
+            <h2 className="text-xl font-semibold mb-2">Доступ запрещен</h2>
+            <p className="text-muted-foreground mb-4">
+              У вас нет прав для доступа к админ-панели
+            </p>
+            <Button onClick={() => router.push('/dashboard')}>
+              Вернуться к дашборду
             </Button>
-          </form>
-          <div className="mt-4 text-center">
-            <a href="/" className="text-sm text-blue-600 hover:underline">
-              ← Вернуться на главную
-            </a>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-6 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Админ-панель</h1>
+          <p className="text-muted-foreground">
+            Управление платформой тестирования
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Создание тестов */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => router.push('/admin/tests/create')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plus className="h-5 w-5 text-blue-600" />
+                Создать тест
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Создайте новый тест с вопросами и вариантами ответов
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Управление тестами */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => router.push('/admin/tests')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-green-600" />
+                Управление тестами
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Редактируйте, публикуйте и архивируйте тесты
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Аналитика */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => router.push('/admin/analytics')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-purple-600" />
+                Аналитика
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Статистика прохождений и результаты тестов
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Пользователи */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => router.push('/admin/users')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-orange-600" />
+                Пользователи
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Управление пользователями и их ролями
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Категории тестов */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => router.push('/admin/categories')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-indigo-600" />
+                Категории
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Управление категориями тестов
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Настройки */}
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => router.push('/admin/settings')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-gray-600" />
+                Настройки
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Общие настройки платформы
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }

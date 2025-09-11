@@ -1,261 +1,325 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import {
+  useState,
+  useEffect,
+  useMemo
+} from 'react'
+import { useAuth } from '@/components/auth-provider'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { 
-  Plus, 
-  Search, 
-  Settings, 
-  Eye, 
-  EyeOff, 
-  Edit, 
-  Download,
-  BarChart3,
-  Users,
-  FileText,
-  Calendar
-} from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { ArrowLeft, Plus, Edit, Eye, Trash2, BarChart3, Users, Clock } from 'lucide-react'
+import { createClient } from '@supabase/supabase-js'
 
-export default function AdminTestsListPage() {
+interface Test {
+  id: string
+  title_ru: string
+  description_ru: string
+  status: string
+  is_public: boolean
+  total_questions: number
+  total_attempts: number
+  average_score: number | null
+  created_at: string
+  updated_at: string
+  category: {
+    name_ru: string
+    color: string
+    icon: string
+  }
+}
+
+export default function AdminTestsPage() {
+  const { user } = useAuth()
   const router = useRouter()
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
-  const [tests, setTests] = useState<any[]>([])
-  const [search, setSearch] = useState('')
-  const supabase = createClient()
+  const [tests, setTests] = useState<Test[]>([])
+  const [loading, setLoading] = useState(true)
+  const [statusFilter, setStatusFilter] = useState<string>('')
+
+  const supabase = createClient(
+    process.env['NEXT_PUBLIC_SUPABASE_URL']!,
+    process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']!
+  )
 
   useEffect(() => {
-    ;(async () => {
-      const { data: sessionRes } = await supabase.auth.getSession()
-      const uid = sessionRes.session?.user?.id
-      if (!uid) {
-        router.replace('/admin')
+    if (user === null) {
+      // Пользователь еще не загружен, ждем
+      return
+    }
+    if (!user) {
+      router.push('/auth')
         return
+    }
+    loadTests()
+  }, [user, router, statusFilter])
+
+  const loadTests = useMemo(() => async () => {
+    try {
+      setLoading(true)
+      const response = await fetch(`/api/tests${statusFilter ? `?status=${statusFilter}` : ''}`)
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.error)
       }
-      setIsAdmin(true)
-      await loadTests()
-    })()
-  }, [])
 
-  async function loadTests() {
-    const query = supabase
+      setTests(result.data || [])
+    } catch (error) {
+      console.error('Ошибка загрузки тестов:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [statusFilter])
+
+  const updateTestStatus = async (testId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('tests')
+        .update({ status: newStatus })
+        .eq('id', testId)
+
+      if (error) throw error
+
+      // Обновляем локальное состояние
+      setTests(tests.map(test => 
+        test.id === testId ? { ...test, status: newStatus } : test
+      ))
+    } catch (error) {
+      console.error('Ошибка обновления статуса:', error)
+      alert('Ошибка при обновлении статуса теста')
+    }
+  }
+
+  const deleteTest = async (testId: string) => {
+    if (!confirm('Вы уверены, что хотите удалить этот тест?')) {
+      return
+    }
+
+    try {
+      const { error } = await supabase
       .from('tests')
-      .select('id,title,status,is_public,created_at,average_score,completion_rate')
-      .order('created_at', { ascending: false })
-      .limit(100)
-    const { data } = await query
-    setTests(data || [])
+        .delete()
+        .eq('id', testId)
+
+      if (error) throw error
+
+      // Обновляем локальное состояние
+      setTests(tests.filter(test => test.id !== testId))
+    } catch (error) {
+      console.error('Ошибка удаления теста:', error)
+      alert('Ошибка при удалении теста')
+    }
   }
 
-  async function updateTest(id: string, patch: any) {
-    await supabase.from('tests').update(patch).eq('id', id)
-    await loadTests()
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'published':
+        return 'default'
+      case 'draft':
+        return 'secondary'
+      case 'archived':
+        return 'destructive'
+      default:
+        return 'outline'
+    }
   }
 
-  const filtered = tests.filter(t => t.title.toLowerCase().includes(search.toLowerCase()))
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'published':
+        return 'Опубликован'
+      case 'draft':
+        return 'Черновик'
+      case 'archived':
+        return 'Архив'
+      default:
+        return status
+    }
+  }
 
-  if (isAdmin === null) {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  if (user === null || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-800 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full animate-spin opacity-25"></div>
-            <div className="absolute inset-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full animate-pulse"></div>
-          </div>
-          <p className="text-lg text-slate-600 dark:text-slate-400">Проверяем доступ...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Загрузка тестов...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-800">
-      {/* Header */}
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                <Settings className="w-6 h-6 text-white" />
-              </div>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-6 py-8">
+        <div className="mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => router.push('/admin')}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Назад к админ-панели
+          </Button>
+          <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Админ панель
-                </h1>
-                <p className="text-slate-600 dark:text-slate-400">
-                  Управление тестами
-                </p>
-              </div>
+              <h1 className="text-3xl font-bold">Управление тестами</h1>
+              <p className="text-muted-foreground">
+                Создавайте, редактируйте и управляйте тестами
+              </p>
             </div>
-            <div className="flex gap-3">
-              <Button 
-                onClick={() => router.push('/admin/tests/import')}
-                variant="outline"
-                className="hidden md:flex"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Импорт
-              </Button>
-              <Button 
-                onClick={() => router.push('/admin/tests/new')}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-              >
-                <Plus className="w-4 h-4 mr-2" />
+            <Button onClick={() => router.push('/admin/tests/create')}>
+              <Plus className="h-4 w-4 mr-2" />
                 Создать тест
               </Button>
             </div>
           </div>
 
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <Input
-              placeholder="Поиск тестов..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
-            />
+        {/* Filters */}
+        <div className="mb-6">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Статус:</span>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Все статусы" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Все статусы</SelectItem>
+                  <SelectItem value="draft">Черновики</SelectItem>
+                  <SelectItem value="published">Опубликованные</SelectItem>
+                  <SelectItem value="archived">Архив</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        </div>
-      </div>
+            </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {isAdmin === false ? (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900 dark:to-red-800 rounded-full flex items-center justify-center">
-              <Settings className="w-12 h-12 text-red-500" />
-            </div>
-            <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
-              Доступ запрещен
-            </h3>
-            <p className="text-slate-500 dark:text-slate-400">
-              У вас нет прав для доступа к админ панели
-            </p>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-full flex items-center justify-center">
-              <FileText className="w-12 h-12 text-slate-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
-              Тесты не найдены
-            </h3>
-            <p className="text-slate-500 dark:text-slate-400 mb-6">
-              Создайте первый тест или измените критерии поиска
-            </p>
-            <Button 
-              onClick={() => router.push('/admin/tests/new')}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Создать тест
-            </Button>
-          </div>
-        ) : (
+        {/* Tests List */}
           <div className="grid gap-6">
-            {filtered.map(test => (
-              <Card 
-                key={test.id} 
-                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 hover:shadow-xl transition-all duration-300"
-              >
-                <CardHeader className="pb-4">
+          {tests.map((test) => (
+            <Card key={test.id}>
+              <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">{test.category?.icon}</span>
                         <Badge 
-                          variant={test.status === 'published' ? 'default' : 'secondary'}
-                          className={test.status === 'published' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : ''}
+                        variant="secondary" 
+                        style={{ backgroundColor: test.category?.color + '20', color: test.category?.color }}
                         >
-                          {test.status === 'published' ? 'Опубликован' : 'Черновик'}
+                        {test.category?.name_ru}
                         </Badge>
-                        <Badge 
-                          variant={test.is_public ? 'outline' : 'destructive'}
-                          className={test.is_public ? 'border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300' : ''}
-                        >
-                          {test.is_public ? 'Публичный' : 'Приватный'}
+                      <Badge variant={getStatusBadgeVariant(test.status)}>
+                        {getStatusLabel(test.status)}
                         </Badge>
+                      {test.is_public && (
+                        <Badge variant="outline">Публичный</Badge>
+                      )}
                       </div>
-                      <CardTitle className="text-xl text-slate-800 dark:text-slate-200 mb-2">
-                        {test.title}
-                      </CardTitle>
-                      <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>{new Date(test.created_at).toLocaleDateString()}</span>
+                    <CardTitle className="text-xl">{test.title_ru}</CardTitle>
+                    {test.description_ru && (
+                      <p className="text-muted-foreground mt-2">{test.description_ru}</p>
+                    )}
                         </div>
                       </div>
-                    </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-4 gap-4 mb-4">
+                  <div className="flex items-center gap-2 text-sm">
+                    <BarChart3 className="h-4 w-4" />
+                    <span>{test.total_questions} вопросов</span>
                   </div>
-                </CardHeader>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Users className="h-4 w-4" />
+                    <span>{test.total_attempts} попыток</span>
+                  </div>
+                  {test.average_score && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <BarChart3 className="h-4 w-4" />
+                      <span>{test.average_score.toFixed(1)}% средний балл</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span>Создан {formatDate(test.created_at)}</span>
+                  </div>
+                </div>
                 
-                <CardContent className="pt-0">
-                  <div className="flex flex-wrap gap-2">
+                <div className="flex items-center gap-2">
                     <Button
+                    variant="outline"
                       size="sm"
-                      variant="outline"
-                      onClick={() => router.push(`/admin/tests/${test.id}/edit`)}
-                      className="hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-blue-900/20"
+                    onClick={() => router.push(`/tests/${test.id}`)}
                     >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Редактировать
+                    <Eye className="h-4 w-4 mr-2" />
+                    Просмотр
                     </Button>
                     
                     <Button
+                    variant="outline"
                       size="sm"
-                      variant={test.status === 'published' ? 'destructive' : 'default'}
-                      onClick={() => updateTest(test.id, { 
-                        status: test.status === 'published' ? 'draft' : 'published' 
-                      })}
-                      className={test.status === 'published' 
-                        ? '' 
-                        : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700'
-                      }
-                    >
-                      {test.status === 'published' ? (
-                        <>
-                          <EyeOff className="w-4 h-4 mr-1" />
-                          Скрыть
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="w-4 h-4 mr-1" />
-                          Опубликовать
-                        </>
-                      )}
+                    onClick={() => router.push(`/admin/tests/${test.id}/edit`)}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Редактировать
                     </Button>
                     
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => updateTest(test.id, { is_public: !test.is_public })}
-                      className="hover:bg-purple-50 hover:border-purple-300 dark:hover:bg-purple-900/20"
-                    >
-                      {test.is_public ? 'Сделать приватным' : 'Сделать публичным'}
-                    </Button>
+                  <Select
+                    value={test.status}
+                    onValueChange={(value) => updateTestStatus(test.id, value)}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Черновик</SelectItem>
+                      <SelectItem value="published">Опубликовать</SelectItem>
+                      <SelectItem value="archived">Архив</SelectItem>
+                    </SelectContent>
+                  </Select>
                     
                     <Button
+                    variant="destructive"
                       size="sm"
-                      variant="outline"
-                      onClick={() => window.open(`/api/tests/export?test_id=${test.id}`, '_blank')}
-                      className="hover:bg-green-50 hover:border-green-300 dark:hover:bg-green-900/20"
+                    onClick={() => deleteTest(test.id)}
                     >
-                      <Download className="w-4 h-4 mr-1" />
-                      Экспорт CSV
+                    <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             ))}
+        </div>
+
+        {tests.length === 0 && (
+          <div className="text-center py-12">
+            <h3 className="text-lg font-medium mb-2">Тесты не найдены</h3>
+            <p className="text-muted-foreground mb-4">
+              {statusFilter 
+                ? `Нет тестов со статусом "${getStatusLabel(statusFilter)}"`
+                : 'У вас пока нет созданных тестов'
+              }
+            </p>
+            <Button onClick={() => router.push('/admin/tests/create')}>
+              <Plus className="h-4 w-4 mr-2" />
+              Создать первый тест
+            </Button>
           </div>
         )}
       </div>
     </div>
   )
 }
-
-

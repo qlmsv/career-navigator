@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
@@ -92,14 +92,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = (email: string, password: string, metadata?: any) =>
     svcSignUp(email, password, metadata)
 
-  const value = {
-    user,
-    session,
-    isLoading,
-    signOut,
-    signIn,
-    signUp,
-  }
+  const value = useMemo(
+    () => ({
+      user,
+      session,
+      isLoading,
+      signOut,
+      signIn,
+      signUp,
+    }),
+    [user, session, isLoading]
+  )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
