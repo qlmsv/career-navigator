@@ -12,9 +12,12 @@
 1. Откройте [Supabase Dashboard](https://supabase.com/dashboard)
 2. Выберите ваш проект
 3. Перейдите в **SQL Editor**
-4. Скопируйте и выполните содержимое файла `database-setup-safe.sql`
+4. Скопируйте и выполните содержимое файла `database-setup-minimal.sql`
 
-**Примечание:** Если вы получили ошибку о том, что политики уже существуют, используйте `database-setup-safe.sql` - этот файл безопасно обрабатывает уже существующие элементы.
+**Примечание:** 
+- Если вы получили ошибку `ERROR: 42P10: there is no unique or exclusion constraint matching the ON CONFLICT specification`, используйте `database-setup-minimal.sql`
+- Если вы получили ошибку о том, что политики уже существуют, используйте `database-setup-safe.sql`
+- `database-setup-minimal.sql` - самый простой и надежный вариант
 
 ### 2. Проверка создания таблиц
 
