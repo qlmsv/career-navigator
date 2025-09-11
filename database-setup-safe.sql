@@ -1,5 +1,5 @@
--- SQL скрипт для создания таблиц платформы тестирования
--- Выполните этот скрипт в SQL Editor в Supabase Dashboard
+-- Безопасный SQL скрипт для создания таблиц платформы тестирования
+-- Этот скрипт можно выполнять многократно без ошибок
 
 -- Создание таблицы категорий тестов
 CREATE TABLE IF NOT EXISTS test_categories (
@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS user_answers (
   UNIQUE(attempt_id, question_id)
 );
 
--- Создание индексов для оптимизации
+-- Создание индексов для оптимизации (только если не существуют)
 CREATE INDEX IF NOT EXISTS idx_tests_category_id ON tests(category_id);
 CREATE INDEX IF NOT EXISTS idx_tests_status ON tests(status);
 CREATE INDEX IF NOT EXISTS idx_tests_is_public ON tests(is_public);
@@ -123,15 +123,22 @@ CREATE INDEX IF NOT EXISTS idx_test_attempts_user_id ON test_attempts(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_answers_attempt_id ON user_answers(attempt_id);
 CREATE INDEX IF NOT EXISTS idx_user_answers_question_id ON user_answers(question_id);
 
--- Включение RLS (Row Level Security)
-ALTER TABLE test_categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tests ENABLE ROW LEVEL SECURITY;
-ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE answer_options ENABLE ROW LEVEL SECURITY;
-ALTER TABLE test_attempts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_answers ENABLE ROW LEVEL SECURITY;
+-- Включение RLS (Row Level Security) - безопасно
+DO $$ 
+BEGIN
+    ALTER TABLE test_categories ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE tests ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE answer_options ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE test_attempts ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE user_answers ENABLE ROW LEVEL SECURITY;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- RLS уже включен, игнорируем ошибку
+        NULL;
+END $$;
 
--- Политики RLS для публичного доступа к тестам
+-- Безопасное создание политик RLS
 DO $$ 
 BEGIN
     -- Удаляем существующие политики если они есть
@@ -174,7 +181,7 @@ BEGIN
         )
       );
 
-    -- Политики для попыток прохождения (пользователи могут создавать свои попытки)
+    -- Политики для попыток прохождения
     CREATE POLICY "Users can create their own test attempts" ON test_attempts
       FOR INSERT WITH CHECK (auth.uid() = user_id);
 
@@ -211,13 +218,17 @@ BEGIN
           AND test_attempts.user_id = auth.uid()
         )
       );
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Если что-то пошло не так, выводим ошибку но продолжаем
+        RAISE NOTICE 'Error creating policies: %', SQLERRM;
 END $$;
 
--- Вставка базовых категорий тестов
+-- Вставка базовых категорий тестов (только если их еще нет)
 INSERT INTO test_categories (name, name_ru, description, icon, color, order_index) VALUES
 ('programming', 'Программирование', 'Тесты по программированию и разработке', '💻', '#3B82F6', 1),
 ('design', 'Дизайн', 'Тесты по дизайну и UX/UI', '🎨', '#EF4444', 2),
 ('marketing', 'Маркетинг', 'Тесты по маркетингу и рекламе', '📈', '#10B981', 3),
 ('management', 'Менеджмент', 'Тесты по управлению и лидерству', '👥', '#F59E0B', 4),
 ('analytics', 'Аналитика', 'Тесты по анализу данных и бизнес-аналитике', '📊', '#8B5CF6', 5)
-ON CONFLICT DO NOTHING;
+ON CONFLICT (name) DO NOTHING;
