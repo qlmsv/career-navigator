@@ -1,10 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-  process.env['SUPABASE_SERVICE_ROLE_KEY']!
-)
+import { supabaseAdmin } from '@/lib/supabase'
 
 // GET - получение списка тестов
 export async function GET(request: Request) {
@@ -14,7 +9,7 @@ export async function GET(request: Request) {
     const status = searchParams.get('status')
     const public_only = searchParams.get('public_only') === 'true'
 
-    let query = supabase
+    let query = supabaseAdmin
       .from('tests')
       .select(`
         *,

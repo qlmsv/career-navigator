@@ -1,10 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-  process.env['SUPABASE_SERVICE_ROLE_KEY']!
-)
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST() {
   try {
@@ -74,7 +69,7 @@ export async function POST() {
     }
 
     // Создаем категории
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('test_categories')
       .insert(categories)
       .select()

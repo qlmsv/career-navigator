@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-  process.env['SUPABASE_SERVICE_ROLE_KEY']!
-)
+import { supabaseAdmin } from '@/lib/supabase'
 
 // POST - завершение теста и расчет результатов
 export async function POST(
@@ -18,7 +13,7 @@ export async function POST(
     const { answers, timeSpent } = body
 
     // Получаем тест
-    const { data: test, error: testError } = await supabase
+    const { data: test, error: testError } = await supabaseAdmin
       .from('tests')
       .select('*')
       .eq('id', testId)
@@ -29,7 +24,7 @@ export async function POST(
     }
 
     // Получаем вопросы с правильными ответами
-    const { data: questions, error: questionsError } = await supabase
+    const { data: questions, error: questionsError } = await supabaseAdmin
       .from('questions')
       .select(`
         id,

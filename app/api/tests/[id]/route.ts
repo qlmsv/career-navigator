@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-  process.env['SUPABASE_SERVICE_ROLE_KEY']!
-)
+import { supabaseAdmin } from '@/lib/supabase'
 
 // GET - получение теста с вопросами и ответами
 export async function GET(
@@ -16,7 +11,7 @@ export async function GET(
     const testId = params.id
 
     // Получаем тест
-    const { data: test, error: testError } = await supabase
+    const { data: test, error: testError } = await supabaseAdmin
       .from('tests')
       .select(`
         *,
@@ -32,7 +27,7 @@ export async function GET(
     }
 
     // Получаем вопросы
-    const { data: questions, error: questionsError } = await supabase
+    const { data: questions, error: questionsError } = await supabaseAdmin
       .from('questions')
       .select(`
         *,
