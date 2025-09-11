@@ -16,8 +16,10 @@ interface Test {
   id: string
   title_ru: string
   description_ru: string
+  instructions_ru: string | null
   time_limit_minutes: number | null
   passing_score: number
+  max_attempts: number | null
   questions: Question[]
   category: {
     name_ru: string
@@ -55,15 +57,15 @@ export default function TestPage() {
   const [testStarted, setTestStarted] = useState(false)
 
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env['NEXT_PUBLIC_SUPABASE_URL']!,
+    process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']!
   )
 
   useEffect(() => {
-    if (params.id) {
-      loadTest(params.id as string)
+    if (params['id']) {
+      loadTest(params['id'] as string)
     }
-  }, [params.id])
+  }, [params['id']])
 
   useEffect(() => {
     if (testStarted && timeLeft !== null && timeLeft > 0) {
@@ -74,6 +76,7 @@ export default function TestPage() {
     } else if (timeLeft === 0) {
       finishTest()
     }
+    return undefined
   }, [timeLeft, testStarted])
 
   const loadTest = async (testId: string) => {
@@ -165,7 +168,7 @@ export default function TestPage() {
       </div>
     )
   }
-
+  
   if (!test) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -214,7 +217,7 @@ export default function TestPage() {
                   <div>
                     <span className="font-medium">Проходной балл:</span>
                     <span className="ml-2">{test.passing_score}%</span>
-                  </div>
+                </div>
                   {test.time_limit_minutes && (
                     <div>
                       <span className="font-medium">Время на прохождение:</span>
@@ -240,9 +243,9 @@ export default function TestPage() {
               </CardContent>
             </Card>
           </div>
-        </div>
-      </div>
-    )
+            </div>
+          </div>
+        )
   }
 
   const currentQuestion = test.questions[currentQuestionIndex]
@@ -251,10 +254,10 @@ export default function TestPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-6 py-8">
-        {/* Header */}
+      {/* Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <div>
+                <div>
               <h1 className="text-2xl font-bold">{test.title_ru}</h1>
               <p className="text-muted-foreground">
                 Вопрос {currentQuestionIndex + 1} из {test.questions.length}
@@ -266,8 +269,8 @@ export default function TestPage() {
                 {formatTime(timeLeft)}
               </div>
             )}
-          </div>
-          <Progress value={progress} className="h-2" />
+            </div>
+            <Progress value={progress} className="h-2" />
         </div>
 
         {/* Question */}
@@ -275,59 +278,59 @@ export default function TestPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                {currentQuestion.question_text_ru}
+                {currentQuestion?.question_text_ru}
               </CardTitle>
-              {currentQuestion.required && (
+              {currentQuestion?.required && (
                 <Badge variant="destructive" className="w-fit">
                   Обязательный вопрос
                 </Badge>
               )}
             </CardHeader>
             <CardContent className="space-y-4">
-              {currentQuestion.question_type === 'multiple_choice' && (
+              {currentQuestion?.question_type === 'multiple_choice' && (
                 <RadioGroup
-                  value={answers[currentQuestion.id] || ''}
-                  onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)}
+                  value={answers[currentQuestion?.id] || ''}
+                  onValueChange={(value) => handleAnswerChange(currentQuestion?.id, value)}
                 >
-                  {currentQuestion.answer_options.map((option) => (
+                  {currentQuestion?.answer_options.map((option) => (
                     <div key={option.id} className="flex items-center space-x-2">
                       <RadioGroupItem value={option.id} id={option.id} />
                       <Label htmlFor={option.id} className="flex-1 cursor-pointer">
                         {option.option_text_ru}
                       </Label>
-                    </div>
+      </div>
                   ))}
                 </RadioGroup>
               )}
 
-              {currentQuestion.question_type === 'multiple_select' && (
+              {currentQuestion?.question_type === 'multiple_select' && (
                 <div className="space-y-2">
-                  {currentQuestion.answer_options.map((option) => (
+                  {currentQuestion?.answer_options.map((option) => (
                     <div key={option.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={option.id}
-                        checked={(answers[currentQuestion.id] || []).includes(option.id)}
+                        checked={(answers[currentQuestion?.id] || []).includes(option.id)}
                         onCheckedChange={(checked) => {
-                          const currentAnswers = answers[currentQuestion.id] || []
+                          const currentAnswers = answers[currentQuestion?.id] || []
                           if (checked) {
-                            handleAnswerChange(currentQuestion.id, [...currentAnswers, option.id])
+                            handleAnswerChange(currentQuestion?.id, [...currentAnswers, option.id])
                           } else {
-                            handleAnswerChange(currentQuestion.id, currentAnswers.filter((id: string) => id !== option.id))
+                            handleAnswerChange(currentQuestion?.id, currentAnswers.filter((id: string) => id !== option.id))
                           }
                         }}
                       />
                       <Label htmlFor={option.id} className="flex-1 cursor-pointer">
                         {option.option_text_ru}
                       </Label>
-                    </div>
+                  </div>
                   ))}
                 </div>
               )}
 
-              {currentQuestion.question_type === 'true_false' && (
+              {currentQuestion?.question_type === 'true_false' && (
                 <RadioGroup
-                  value={answers[currentQuestion.id] || ''}
-                  onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)}
+                  value={answers[currentQuestion?.id] || ''}
+                  onValueChange={(value) => handleAnswerChange(currentQuestion?.id, value)}
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="true" id="true" />
@@ -336,38 +339,38 @@ export default function TestPage() {
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="false" id="false" />
                     <Label htmlFor="false" className="cursor-pointer">Ложь</Label>
-                  </div>
+              </div>
                 </RadioGroup>
               )}
             </CardContent>
           </Card>
-
-          {/* Navigation */}
+              
+              {/* Navigation */}
           <div className="flex justify-between mt-6">
-            <Button
+                <Button
               variant="outline"
               onClick={prevQuestion}
-              disabled={currentQuestionIndex === 0}
-            >
+                  disabled={currentQuestionIndex === 0}
+                >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Предыдущий
-            </Button>
-
-            <div className="flex gap-2">
+                  Предыдущий
+                </Button>
+                
+                <div className="flex gap-2">
               {currentQuestionIndex === test.questions.length - 1 ? (
                 <Button onClick={finishTest}>
                   <CheckCircle className="h-4 w-4 mr-2" />
-                  Завершить тест
-                </Button>
-              ) : (
+                        Завершить тест
+                  </Button>
+                ) : (
                 <Button onClick={nextQuestion}>
-                  Следующий
+                    Следующий
                   <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              )}
-            </div>
+                  </Button>
+                )}
+              </div>
           </div>
-        </div>
+              </div>
       </div>
     </div>
   )

@@ -1,17 +1,18 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env['NEXT_PUBLIC_SUPABASE_URL']!,
+  process.env['SUPABASE_SERVICE_ROLE_KEY']!
 )
 
 // GET - получение результатов попытки прохождения теста
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string; attemptId: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string; attemptId: string }> }
 ) {
   try {
+    const params = await context.params
     const testId = params.id
     const attemptId = params.attemptId
 

@@ -3,10 +3,10 @@ import { createClient } from '@supabase/supabase-js'
 
 export async function POST() {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+const supabase = createClient(
+  process.env['NEXT_PUBLIC_SUPABASE_URL']!,
+  process.env['SUPABASE_SERVICE_ROLE_KEY']!
+)
     
     // SQL для создания основных таблиц платформы тестирования
     const createTablesSQL = `

@@ -53,10 +53,10 @@ export default function TestResultsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (params.id && params.attemptId) {
-      loadTestResult(params.id as string, params.attemptId as string)
+    if (params['id'] && params['attemptId']) {
+      loadTestResult(params['id'] as string, params['attemptId'] as string)
     }
-  }, [params.id, params.attemptId])
+  }, [params['id'], params['attemptId']])
 
   const loadTestResult = async (testId: string, attemptId: string) => {
     try {

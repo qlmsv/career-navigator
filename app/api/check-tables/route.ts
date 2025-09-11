@@ -4,8 +4,8 @@ import { createClient } from '@supabase/supabase-js'
 export async function GET() {
   try {
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env['NEXT_PUBLIC_SUPABASE_URL']!,
+      process.env['SUPABASE_SERVICE_ROLE_KEY']!
     )
     
     // Проверяем существование таблицы tests
@@ -50,12 +50,6 @@ export async function GET() {
         test_categories: !categoriesError,
         questions: !questionsError,
         answer_options: !optionsError,
-      },
-      errors: {
-        tests: testsError?.message,
-        categories: categoriesError?.message,
-        questions: questionsError?.message,
-        options: optionsError?.message,
       }
     })
     

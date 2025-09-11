@@ -30,10 +30,10 @@ export default function TestsPage() {
   const [categories, setCategories] = useState<any[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('')
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+const supabase = createClient(
+  process.env['NEXT_PUBLIC_SUPABASE_URL']!,
+  process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']!
+)
 
   useEffect(() => {
     loadTests()
@@ -62,7 +62,14 @@ export default function TestsPage() {
 
       if (error) throw error
 
-      let filteredTests = data || []
+      let filteredTests = (data || []).map(test => {
+        const category = Array.isArray(test.category) ? test.category[0] : test.category
+        return {
+          ...test,
+          category: category || { name_ru: 'Без категории', color: '#6b7280', icon: '📝' }
+        }
+      })
+      
       if (selectedCategory) {
         // Фильтруем по категории (нужно будет добавить category_id в запрос)
       }
