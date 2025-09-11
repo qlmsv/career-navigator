@@ -1,10 +1,3 @@
-import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
-
-export async function POST() {
-  try {
-    // Читаем SQL из файла миграции
-    const migrationSQL = `
 -- Создание таблиц для платформы тестирования
 
 -- Создание таблицы категорий тестов
@@ -117,28 +110,88 @@ CREATE TABLE IF NOT EXISTS user_answers (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(attempt_id, question_id)
 );
-    `
-    
-    // Выполняем SQL через rpc функцию
-    const { data, error } = await supabaseAdmin.rpc('exec_sql', { sql: migrationSQL })
-    
-    if (error) {
-      return NextResponse.json({
-        success: false,
-        error: error.message
-      })
-    }
-    
-    return NextResponse.json({
-      success: true,
-      message: 'Tables created successfully',
-      data
-    })
-    
-  } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    })
-  }
-}
+
+-- Создание индексов для оптимизации
+CREATE INDEX IF NOT EXISTS idx_tests_category_id ON tests(category_id);
+CREATE INDEX IF NOT EXISTS idx_tests_status ON tests(status);
+CREATE INDEX IF NOT EXISTS idx_tests_is_public ON tests(is_public);
+CREATE INDEX IF NOT EXISTS idx_questions_test_id ON questions(test_id);
+CREATE INDEX IF NOT EXISTS idx_answer_options_question_id ON answer_options(question_id);
+CREATE INDEX IF NOT EXISTS idx_test_attempts_test_id ON test_attempts(test_id);
+CREATE INDEX IF NOT EXISTS idx_test_attempts_user_id ON test_attempts(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_answers_attempt_id ON user_answers(attempt_id);
+CREATE INDEX IF NOT EXISTS idx_user_answers_question_id ON user_answers(question_id);
+
+-- Включение RLS (Row Level Security)
+ALTER TABLE test_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE answer_options ENABLE ROW LEVEL SECURITY;
+ALTER TABLE test_attempts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_answers ENABLE ROW LEVEL SECURITY;
+
+-- Политики RLS для публичного доступа к тестам
+CREATE POLICY "Public tests are viewable by everyone" ON tests
+  FOR SELECT USING (is_public = true AND status = 'published');
+
+CREATE POLICY "Test categories are viewable by everyone" ON test_categories
+  FOR SELECT USING (is_active = true);
+
+CREATE POLICY "Questions are viewable for public tests" ON questions
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM tests 
+      WHERE tests.id = questions.test_id 
+      AND tests.is_public = true 
+      AND tests.status = 'published'
+    )
+  );
+
+CREATE POLICY "Answer options are viewable for public tests" ON answer_options
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM questions 
+      JOIN tests ON tests.id = questions.test_id
+      WHERE questions.id = answer_options.question_id 
+      AND tests.is_public = true 
+      AND tests.status = 'published'
+    )
+  );
+
+-- Политики для попыток прохождения (пользователи могут создавать свои попытки)
+CREATE POLICY "Users can create their own test attempts" ON test_attempts
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can view their own test attempts" ON test_attempts
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own test attempts" ON test_attempts
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- Политики для ответов пользователей
+CREATE POLICY "Users can create their own answers" ON user_answers
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM test_attempts 
+      WHERE test_attempts.id = user_answers.attempt_id 
+      AND test_attempts.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can view their own answers" ON user_answers
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM test_attempts 
+      WHERE test_attempts.id = user_answers.attempt_id 
+      AND test_attempts.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can update their own answers" ON user_answers
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM test_attempts 
+      WHERE test_attempts.id = user_answers.attempt_id 
+      AND test_attempts.user_id = auth.uid()
+    )
+  );
