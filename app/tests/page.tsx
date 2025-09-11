@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Clock, Users, Star, Play } from 'lucide-react'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
 interface Test {
@@ -30,10 +30,6 @@ export default function TestsPage() {
   const [categories, setCategories] = useState<any[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('')
 
-const supabase = createClient(
-  process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-  process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']!
-)
 
   useEffect(() => {
     loadTests()

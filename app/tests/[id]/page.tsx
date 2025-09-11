@@ -10,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Clock, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
 
 interface Test {
   id: string
@@ -56,10 +56,6 @@ export default function TestPage() {
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [testStarted, setTestStarted] = useState(false)
 
-  const supabase = createClient(
-    process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-    process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']!
-  )
 
   useEffect(() => {
     if (params['id']) {

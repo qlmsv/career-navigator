@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET() {
   try {
-    const supabase = createClient(
-      process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-      process.env['SUPABASE_SERVICE_ROLE_KEY']!
-    )
     
     // Проверяем существование таблицы tests
-    const { data: testsTable, error: testsError } = await supabase
+    const { data: testsTable, error: testsError } = await supabaseAdmin
       .from('tests')
       .select('id')
       .limit(1)
@@ -28,17 +24,17 @@ export async function GET() {
     }
     
     // Проверяем другие таблицы
-    const { data: categoriesTable, error: categoriesError } = await supabase
+    const { data: categoriesTable, error: categoriesError } = await supabaseAdmin
       .from('test_categories')
       .select('id')
       .limit(1)
     
-    const { data: questionsTable, error: questionsError } = await supabase
+    const { data: questionsTable, error: questionsError } = await supabaseAdmin
       .from('questions')
       .select('id')
       .limit(1)
     
-    const { data: optionsTable, error: optionsError } = await supabase
+    const { data: optionsTable, error: optionsError } = await supabaseAdmin
       .from('answer_options')
       .select('id')
       .limit(1)
