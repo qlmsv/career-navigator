@@ -51,12 +51,31 @@ export async function POST(request: Request) {
     const { test, questions } = body
 
     // Создаем тест
+    const safeTitle = (test?.title ?? test?.title_ru ?? 'Без названия') as string
+    const safeTitleRu = (test?.title_ru ?? test?.title ?? 'Без названия') as string
+    const authorId = (test?.author_id ?? '00000000-0000-0000-0000-000000000000') as string
+
+    const insertTest = {
+      title: safeTitle,
+      title_ru: safeTitleRu,
+      description: test?.description ?? test?.description_ru ?? null,
+      description_ru: test?.description_ru ?? test?.description ?? null,
+      category_id: test?.category_id ?? null,
+      author_id: authorId,
+      time_limit_minutes: test?.time_limit_minutes ?? null,
+      passing_score: test?.passing_score ?? 70,
+      max_attempts: test?.max_attempts ?? 3,
+      shuffle_questions: Boolean(test?.shuffle_questions),
+      shuffle_answers: Boolean(test?.shuffle_answers),
+      status: (test?.status ?? 'draft') as string,
+      is_public: test?.is_public ?? true,
+      requires_auth: test?.requires_auth ?? true,
+      total_questions: questions.length,
+    }
+
     const { data: newTest, error: testError } = await supabaseAdmin
       .from('tests')
-      .insert({
-        ...test,
-        total_questions: questions.length
-      })
+      .insert(insertTest)
       .select()
       .single()
 
@@ -71,11 +90,11 @@ export async function POST(request: Request) {
         .from('questions')
         .insert({
           test_id: newTest.id,
-          question_text: question.question_text_ru,
-          question_text_ru: question.question_text_ru,
-          question_type: question.question_type,
-          points: question.points,
-          required: question.required,
+          question_text: (question.question_text ?? question.question_text_ru ?? 'Вопрос') as string,
+          question_text_ru: (question.question_text_ru ?? question.question_text ?? 'Вопрос') as string,
+          question_type: (question.question_type ?? 'multiple_choice') as string,
+          points: question.points ?? 1,
+          required: question.required ?? true,
           order_index: i
         })
         .select()
@@ -93,10 +112,10 @@ export async function POST(request: Request) {
             .from('answer_options')
             .insert({
               question_id: savedQuestion.id,
-              option_text: option.option_text_ru,
-              option_text_ru: option.option_text_ru,
-              is_correct: option.is_correct,
-              points: option.points,
+              option_text: (option.option_text ?? option.option_text_ru ?? 'Вариант') as string,
+              option_text_ru: (option.option_text_ru ?? option.option_text ?? 'Вариант') as string,
+              is_correct: Boolean(option.is_correct),
+              points: option.points ?? 0,
               order_index: j
             })
 
