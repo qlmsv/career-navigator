@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     const { test, questions } = body
 
     // Создаем тест
-    const { data: newTest, error: testError } = await supabase
+    const { data: newTest, error: testError } = await supabaseAdmin
       .from('tests')
       .insert({
         ...test,
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     // Создаем вопросы
     for (let i = 0; i < questions.length; i++) {
       const question = questions[i]
-      const { data: savedQuestion, error: questionError } = await supabase
+      const { data: savedQuestion, error: questionError } = await supabaseAdmin
         .from('questions')
         .insert({
           test_id: newTest.id,
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
       if (question.answer_options && question.answer_options.length > 0) {
         for (let j = 0; j < question.answer_options.length; j++) {
           const option = question.answer_options[j]
-          const { error: optionError } = await supabase
+          const { error: optionError } = await supabaseAdmin
             .from('answer_options')
             .insert({
               question_id: savedQuestion.id,
