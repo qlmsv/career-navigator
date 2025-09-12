@@ -1,7 +1,7 @@
 'use server'
 
 import { NextResponse } from 'next/server'
-import { supabaseAdminAdmin } from '@/lib/supabaseAdmin-server'
+import { supabaseAdmin } from '@/lib/supabase-server'
 
 // Dev-only: confirm user email
 export async function POST(request: Request) {
