@@ -47,8 +47,8 @@ export default function TestsPage() {
       }
 
       let filteredTests = (result.data || [])
-        .filter(test => test.status === 'published' && test.is_public)
-        .map(test => {
+        .filter((test: any) => test.status === 'published' && test.is_public)
+        .map((test: any) => {
           const category = Array.isArray(test.category) ? test.category[0] : test.category
           return {
             ...test,
