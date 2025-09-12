@@ -9,6 +9,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Slider } from '@/components/ui/slider'
 import { Clock, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react'
 import { supabase } from '@/lib/supabase-browser'
 
@@ -337,6 +339,60 @@ export default function TestPage() {
                     <Label htmlFor="false" className="cursor-pointer">Ложь</Label>
               </div>
                 </RadioGroup>
+              )}
+
+              {currentQuestion?.question_type === 'rating_scale' && (
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary mb-2">
+                      {answers[currentQuestion?.id] || 5}
+                    </div>
+                    <Slider
+                      value={[parseInt(answers[currentQuestion?.id] || '5') || 5]}
+                      onValueChange={(value) => {
+                        if (currentQuestion?.id && value[0] !== undefined) {
+                          handleAnswerChange(currentQuestion.id, value[0].toString())
+                        }
+                      }}
+                      min={1}
+                      max={10}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-sm text-muted-foreground mt-2">
+                      <span>1 - Совсем не согласен</span>
+                      <span>10 - Полностью согласен</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {currentQuestion?.question_type === 'text_input' && (
+                <div className="space-y-2">
+                  <Label htmlFor={`text-${currentQuestion?.id}`}>Ваш ответ:</Label>
+                  <Input
+                    id={`text-${currentQuestion?.id}`}
+                    type="text"
+                    value={answers[currentQuestion?.id] || ''}
+                    onChange={(e) => handleAnswerChange(currentQuestion?.id, e.target.value)}
+                    placeholder="Введите ваш ответ..."
+                    className="w-full"
+                  />
+                </div>
+              )}
+
+              {currentQuestion?.question_type === 'number_input' && (
+                <div className="space-y-2">
+                  <Label htmlFor={`number-${currentQuestion?.id}`}>Ваш ответ:</Label>
+                  <Input
+                    id={`number-${currentQuestion?.id}`}
+                    type="number"
+                    value={answers[currentQuestion?.id] || ''}
+                    onChange={(e) => handleAnswerChange(currentQuestion?.id, e.target.value)}
+                    placeholder="Введите число..."
+                    className="w-full"
+                  />
+                </div>
               )}
             </CardContent>
           </Card>

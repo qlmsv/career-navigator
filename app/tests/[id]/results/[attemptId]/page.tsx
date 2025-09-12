@@ -248,54 +248,81 @@ export default function TestResultsPage() {
                     </div>
                   </div>
 
-                  {/* Answer Options */}
-                  <div className="space-y-2">
-                    {question.answer_options.map((option) => {
-                      const isUserAnswer = question.user_answer === option.id || 
-                        (Array.isArray(question.user_answer) && question.user_answer.includes(option.id))
-                      const isCorrect = option.is_correct
-                      
-                      return (
-                        <div 
-                          key={option.id} 
-                          className={`p-2 rounded border ${
-                            isUserAnswer && isCorrect 
-                              ? 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800'
-                              : isUserAnswer && !isCorrect
-                              ? 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800'
-                              : isCorrect
-                              ? 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800'
-                              : 'bg-muted'
-                          }`}
-                        >
+                  {/* Answer Display based on question type */}
+                  {question.question_type === 'multiple_choice' || question.question_type === 'multiple_select' || question.question_type === 'true_false' ? (
+                    <div className="space-y-2">
+                      {question.answer_options.map((option) => {
+                        const isUserAnswer = question.user_answer === option.id || 
+                          (Array.isArray(question.user_answer) && question.user_answer.includes(option.id))
+                        const isCorrect = option.is_correct
+                        
+                        return (
+                          <div 
+                            key={option.id} 
+                            className={`p-2 rounded border ${
+                              isUserAnswer && isCorrect 
+                                ? 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800'
+                                : isUserAnswer && !isCorrect
+                                ? 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800'
+                                : isCorrect
+                                ? 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800'
+                                : 'bg-muted'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              {isUserAnswer && isCorrect && (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              )}
+                              {isUserAnswer && !isCorrect && (
+                                <XCircle className="h-4 w-4 text-red-600" />
+                              )}
+                              {!isUserAnswer && isCorrect && (
+                                <CheckCircle className="h-4 w-4 text-green-600 opacity-50" />
+                              )}
+                              <span className={isUserAnswer ? 'font-medium' : ''}>
+                                {option.option_text_ru}
+                              </span>
+                              {isUserAnswer && (
+                                <Badge variant="outline" className="ml-auto">
+                                  Ваш ответ
+                                </Badge>
+                              )}
+                              {!isUserAnswer && isCorrect && (
+                                <Badge variant="outline" className="ml-auto">
+                                  Правильный ответ
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ) : question.question_type === 'rating_scale' ? (
+                    <div className="space-y-2">
+                      <div className="p-3 bg-muted rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">Ваша оценка:</span>
                           <div className="flex items-center gap-2">
-                            {isUserAnswer && isCorrect && (
-                              <CheckCircle className="h-4 w-4 text-green-600" />
-                            )}
-                            {isUserAnswer && !isCorrect && (
-                              <XCircle className="h-4 w-4 text-red-600" />
-                            )}
-                            {!isUserAnswer && isCorrect && (
-                              <CheckCircle className="h-4 w-4 text-green-600 opacity-50" />
-                            )}
-                            <span className={isUserAnswer ? 'font-medium' : ''}>
-                              {option.option_text_ru}
-                            </span>
-                            {isUserAnswer && (
-                              <Badge variant="outline" className="ml-auto">
-                                Ваш ответ
-                              </Badge>
-                            )}
-                            {!isUserAnswer && isCorrect && (
-                              <Badge variant="outline" className="ml-auto">
-                                Правильный ответ
-                              </Badge>
-                            )}
+                            <div className="text-2xl font-bold text-primary">
+                              {question.user_answer || 'Не отвечено'}
+                            </div>
+                            <span className="text-sm text-muted-foreground">из 10</span>
                           </div>
                         </div>
-                      )
-                    })}
-                  </div>
+                      </div>
+                    </div>
+                  ) : question.question_type === 'text_input' || question.question_type === 'number_input' ? (
+                    <div className="space-y-2">
+                      <div className="p-3 bg-muted rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">Ваш ответ:</span>
+                          <span className="text-sm">
+                            {question.user_answer || 'Не отвечено'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               ))}
             </CardContent>

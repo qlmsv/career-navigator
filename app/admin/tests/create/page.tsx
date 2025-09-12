@@ -360,6 +360,7 @@ export default function CreateTestPage() {
                             <SelectItem value="true_false">Правда/Ложь</SelectItem>
                             <SelectItem value="rating_scale">Шкала оценки</SelectItem>
                             <SelectItem value="text_input">Текстовый ввод</SelectItem>
+                            <SelectItem value="number_input">Числовой ввод</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
