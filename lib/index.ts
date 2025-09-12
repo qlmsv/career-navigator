@@ -6,8 +6,8 @@ export * from './utils'
 export * from './logger'
 
 // Supabase
-export * from './supabase'
-export * from './supabase/client'
+export * from './supabase-browser'
+export * from './supabase-server'
 
 // Career Assessment System
 export * from './services/career-assessment'
