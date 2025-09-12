@@ -39,26 +39,14 @@ export default function TestsPage() {
   const loadTests = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from('tests')
-        .select(`
-          id,
-          title_ru,
-          description_ru,
-          time_limit_minutes,
-          passing_score,
-          total_questions,
-          total_attempts,
-          average_score,
-          category:test_categories(name_ru, color, icon)
-        `)
-        .eq('status', 'published')
-        .eq('is_public', true)
-        .order('created_at', { ascending: false })
+      const response = await fetch('/api/tests?public_only=true')
+      const result = await response.json()
 
-      if (error) throw error
+      if (!result.success) {
+        throw new Error(result.error)
+      }
 
-      let filteredTests = (data || []).map(test => {
+      let filteredTests = (result.data || []).map(test => {
         const category = Array.isArray(test.category) ? test.category[0] : test.category
         return {
           ...test,

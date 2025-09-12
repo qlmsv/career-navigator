@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     }
 
     if (public_only) {
-      query = query.eq('is_public', true)
+      query = query.eq('is_public', true).eq('status', 'published')
     }
 
     const { data, error } = await query
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       max_attempts: test?.max_attempts ?? 3,
       shuffle_questions: Boolean(test?.shuffle_questions),
       shuffle_answers: Boolean(test?.shuffle_answers),
-      status: (test?.status ?? 'draft') as string,
+      status: (test?.status ?? 'published') as string,
       is_public: test?.is_public ?? true,
       requires_auth: test?.requires_auth ?? true,
       total_questions: questions.length,
