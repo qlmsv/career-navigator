@@ -192,12 +192,15 @@ export default function AdminTestsPage() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Статус:</span>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select
+                value={statusFilter || 'all'}
+                onValueChange={(value) => setStatusFilter(value === 'all' ? '' : value)}
+              >
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Все статусы" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Все статусы</SelectItem>
+                  <SelectItem value="all">Все статусы</SelectItem>
                   <SelectItem value="draft">Черновики</SelectItem>
                   <SelectItem value="published">Опубликованные</SelectItem>
                   <SelectItem value="archived">Архив</SelectItem>
