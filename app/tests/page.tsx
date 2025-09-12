@@ -39,20 +39,22 @@ export default function TestsPage() {
   const loadTests = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/tests?public_only=true')
+      const response = await fetch('/api/tests')
       const result = await response.json()
 
       if (!result.success) {
         throw new Error(result.error)
       }
 
-      let filteredTests = (result.data || []).map(test => {
-        const category = Array.isArray(test.category) ? test.category[0] : test.category
-        return {
-          ...test,
-          category: category || { name_ru: 'Без категории', color: '#6b7280', icon: '📝' }
-        }
-      })
+      let filteredTests = (result.data || [])
+        .filter(test => test.status === 'published' && test.is_public)
+        .map(test => {
+          const category = Array.isArray(test.category) ? test.category[0] : test.category
+          return {
+            ...test,
+            category: category || { name_ru: 'Без категории', color: '#6b7280', icon: '📝' }
+          }
+        })
       
       if (selectedCategory) {
         // Фильтруем по категории (нужно будет добавить category_id в запрос)
