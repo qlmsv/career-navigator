@@ -1,7 +1,7 @@
 'use server'
 
 import { NextResponse } from 'next/server'
-import { supabaseAdminAdmin } from '@/lib/supabaseAdmin-server'
+import { supabaseAdmin } from '@/lib/supabase-server'
 
 // Dev-only: setup missing tables
 export async function POST() {
