@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-server'
 
 // POST - завершение теста и расчет результатов
 export async function POST(

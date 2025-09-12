@@ -1,7 +1,7 @@
 'use server'
 
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-server'
 
 // Dev-only endpoint to make all existing users admins
 export async function POST() {

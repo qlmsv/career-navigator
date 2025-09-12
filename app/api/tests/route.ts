@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-server'
 
 // GET - получение списка тестов
 export async function GET(request: Request) {
