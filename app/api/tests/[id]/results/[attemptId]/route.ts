@@ -29,7 +29,7 @@ export async function GET(
     }
 
     // Получаем попытку прохождения
-    const { data: attempt, error: attemptError } = await supabase
+    const { data: attempt, error: attemptError } = await supabaseAdmin
       .from('test_attempts')
       .select('*')
       .eq('id', attemptId)
@@ -41,7 +41,7 @@ export async function GET(
     }
 
     // Получаем вопросы с ответами пользователя
-    const { data: questions, error: questionsError } = await supabase
+    const { data: questions, error: questionsError } = await supabaseAdmin
       .from('questions')
       .select(`
         id,
