@@ -220,25 +220,44 @@ export async function POST() {
       }
     ]
     
-    for (const table of tables) {
-      try {
-        // Пытаемся выполнить SQL через rpc
-        const { data, error } = await supabaseAdmin.rpc('exec', { sql: table.sql })
-        
-        if (error) {
-          // Если rpc не работает, пробуем другой способ
-          console.log(`Trying alternative method for ${table.name}`)
-          results.push({ table: table.name, success: false, error: error.message })
-        } else {
-          results.push({ table: table.name, success: true })
+    // Объединяем все SQL в один запрос
+    const allSQL = tables.map(table => table.sql).join('\n\n')
+    
+    try {
+      const { data, error } = await supabaseAdmin.rpc('exec_sql', { sql: allSQL })
+      
+      if (error) {
+        console.error('Ошибка выполнения миграции:', error)
+        results.push({ table: 'all_tables', success: false, error: error.message })
+      } else {
+        // Проверяем каждую таблицу
+        for (const table of tables) {
+          try {
+            const { data: checkData, error: checkError } = await supabaseAdmin
+              .from(table.name)
+              .select('*')
+              .limit(1)
+            
+            results.push({
+              table: table.name,
+              success: !checkError,
+              error: checkError?.message || null
+            })
+          } catch (err) {
+            results.push({
+              table: table.name,
+              success: false,
+              error: err instanceof Error ? err.message : 'Unknown error'
+            })
+          }
         }
-      } catch (err) {
-        results.push({ 
-          table: table.name, 
-          success: false, 
-          error: err instanceof Error ? err.message : 'Unknown error' 
-        })
       }
+    } catch (err) {
+      results.push({ 
+        table: 'all_tables', 
+        success: false, 
+        error: err instanceof Error ? err.message : 'Unknown error' 
+      })
     }
     
     return NextResponse.json({
