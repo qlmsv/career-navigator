@@ -1,0 +1,154 @@
+{
+  "testType": {
+    "name": "big5",
+    "displayName": "BIG 5 - Пятифакторная модель личности",
+    "description": "Тест для оценки пяти основных факторов личности: открытость опыту, добросовестность, экстраверсия, доброжелательность и нейротизм",
+    "version": "1.0"
+  },
+  "factors": [
+    {
+      "name": "openness",
+      "displayName": "Открытость опыту",
+      "description": "Склонность к новому опыту, творчеству и интеллектуальному любопытству",
+      "orderIndex": 1
+    },
+    {
+      "name": "conscientiousness", 
+      "displayName": "Добросовестность",
+      "description": "Степень организованности, самодисциплины и стремления к достижению целей",
+      "orderIndex": 2
+    },
+    {
+      "name": "extraversion",
+      "displayName": "Экстраверсия", 
+      "description": "Склонность к общению, активности и получению энергии от социального взаимодействия",
+      "orderIndex": 3
+    },
+    {
+      "name": "agreeableness",
+      "displayName": "Доброжелательность",
+      "description": "Склонность к сотрудничеству, доверию и альтруизму",
+      "orderIndex": 4
+    },
+    {
+      "name": "neuroticism",
+      "displayName": "Нейротизм",
+      "description": "Склонность к переживанию негативных эмоций, тревожности и эмоциональной нестабильности",
+      "orderIndex": 5
+    }
+  ],
+  "ratingScale": {
+    "name": "likert_5",
+    "displayName": "Шкала Лайкерта 5-балльная",
+    "minValue": 1,
+    "maxValue": 5,
+    "labels": {
+      "1": "Совсем не согласен",
+      "2": "Скорее не согласен", 
+      "3": "Нейтрально",
+      "4": "Скорее согласен",
+      "5": "Полностью согласен"
+    }
+  },
+  "questions": [
+    {
+      "text": "Я легко нахожу общий язык с людьми",
+      "factor": "extraversion",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я предпочитаю оставаться в тени",
+      "factor": "extraversion", 
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я часто испытываю тревогу",
+      "factor": "neuroticism",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я спокойно переношу стрессовые ситуации",
+      "factor": "neuroticism",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я люблю изучать новые вещи",
+      "factor": "openness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я предпочитаю проверенные методы",
+      "factor": "openness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я всегда выполняю свои обещания",
+      "factor": "conscientiousness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я часто откладываю дела на потом",
+      "factor": "conscientiousness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я готов помочь другим людям",
+      "factor": "agreeableness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я ставлю свои интересы выше интересов других",
+      "factor": "agreeableness",
+      "isReverse": true,
+      "weight": 1.0
+    }
+  ],
+  "scoringConfig": {
+    "method": "factor_average",
+    "normalize": true,
+    "reverseScoring": true
+  },
+  "interpretationConfig": {
+    "ranges": {
+      "low": {"min": 0, "max": 40},
+      "medium": {"min": 40, "max": 60}, 
+      "high": {"min": 60, "max": 100}
+    },
+    "descriptions": {
+      "openness": {
+        "low": "Предпочитаете традиционные подходы и проверенные методы",
+        "medium": "Балансируете между традиционным и инновационным",
+        "high": "Открыты к новому опыту и творческим решениям"
+      },
+      "conscientiousness": {
+        "low": "Гибко подходите к планированию и организации",
+        "medium": "Умеренно организованы и дисциплинированы", 
+        "high": "Высоко организованы и целеустремлены"
+      },
+      "extraversion": {
+        "low": "Предпочитаете спокойную обстановку и небольшой круг общения",
+        "medium": "Балансируете между общением и уединением",
+        "high": "Энергичны в общении и социально активны"
+      },
+      "agreeableness": {
+        "low": "Прямолинейны и отстаиваете свои интересы",
+        "medium": "Балансируете между сотрудничеством и конкуренцией",
+        "high": "Доброжелательны и склонны к сотрудничеству"
+      },
+      "neuroticism": {
+        "low": "Эмоционально стабильны и спокойны",
+        "medium": "Умеренно реагируете на стресс",
+        "high": "Чувствительны к стрессу и эмоционально реактивны"
+      }
+    }
+  }
+}
