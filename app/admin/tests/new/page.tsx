@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase-browser'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 
 export default function AdminCreateTestPage() {
   const router = useRouter()
-  const supabase = createClient()
+  // Using centralized browser client
   const [saving, setSaving] = useState(false)
   const [test, setTest] = useState({
     title: '',

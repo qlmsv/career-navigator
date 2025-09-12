@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase-browser'
 
 export default function AttemptResultsPage() {
   const params = useParams() as { attemptId: string }
@@ -26,7 +26,7 @@ export default function AttemptResultsPage() {
           setAnswers(attempt.answers || [])
           
           // Загружаем вопросы для отображения
-          const supabase = createClient()
+          // Using centralized browser client
           supabase
             .from('questions')
             .select('id,question_text,points')

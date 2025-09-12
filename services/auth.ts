@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase-browser'
 import { logger } from '@/lib/logger'
 
 export const signUp = async (email: string, password: string, metadata?: any) => {
-  const supabase = createClient()
+  // Using centralized browser client
   try {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -26,7 +26,7 @@ export const signUp = async (email: string, password: string, metadata?: any) =>
 }
 
 export const signIn = async (email: string, password: string) => {
-  const supabase = createClient()
+  // Using centralized browser client
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -47,7 +47,7 @@ export const signIn = async (email: string, password: string) => {
 }
 
 export const signOut = async () => {
-  const supabase = createClient()
+  // Using centralized browser client
   try {
     const { error } = await supabase.auth.signOut()
     if (error) {

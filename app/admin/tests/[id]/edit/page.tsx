@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase-browser'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -51,7 +51,7 @@ const QUESTION_TYPES = [
 export default function AdminEditTestPage() {
   const params = useParams() as { id: string }
   const router = useRouter()
-  const supabase = createClient()
+  // Using centralized browser client
   const [test, setTest] = useState<any>(null)
   const [questions, setQuestions] = useState<any[]>([])
   const [answerOptions, setAnswerOptions] = useState<Record<string, any[]>>({})

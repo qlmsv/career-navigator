@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, useMemo } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import type { Session, SupabaseClient } from '@supabase/supabase-js'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase-browser'
 import { logger } from '@/lib/logger'
 import type { User } from '@supabase/supabase-js'
 import { signIn as svcSignIn, signUp as svcSignUp } from '@/services/auth'
@@ -28,7 +28,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   useEffect(() => {
-    const supabase = createClient()
     
     // Initialize session immediately
     const initializeSession = async () => {
@@ -83,7 +82,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [session, isInitialized, pathname, router])
 
   const signOut = async () => {
-    const supabase = createClient()
     await supabase.auth.signOut()
     router.replace('/auth')
   }

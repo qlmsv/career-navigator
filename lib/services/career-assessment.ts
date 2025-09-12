@@ -1,5 +1,5 @@
 // СЕРВИС для работы с системой самодиагностики карьеры
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase-browser'
 import type {
   DigitalSkillCategory,
   DigitalSkill,
@@ -16,13 +16,8 @@ import type {
 } from '@/lib/types/career-navigator'
 
 export class CareerAssessmentService {
-  private _supabase: any = null
-
-  private get supabase() {
-    if (!this._supabase) {
-      this._supabase = createClient()
-    }
-    return this._supabase
+  private get supabaseClient() {
+    return supabase
   }
 
   // ========== ПОЛУЧЕНИЕ СПРАВОЧНЫХ ДАННЫХ ==========
@@ -34,7 +29,7 @@ export class CareerAssessmentService {
     try {
       console.log('CareerAssessmentService: Загрузка категорий навыков...')
       
-      const { data, error } = await this.supabase
+      const { data, error } = await this.supabaseClient
         .from('digital_skill_categories')
         .select('*')
         .eq('is_active', true)
@@ -70,7 +65,7 @@ export class CareerAssessmentService {
    * Получить навыки по категории
    */
   async getSkillsByCategory(categoryId?: string): Promise<DigitalSkill[]> {
-    let query = this.supabase
+    let query = this.supabaseClient
       .from('digital_skills')
       .select(`
         *,
@@ -94,7 +89,7 @@ export class CareerAssessmentService {
    */
   async getAllSkills(): Promise<DigitalSkill[]> {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.supabaseClient
         .from('digital_skills')
         .select(`
           *,
@@ -129,7 +124,7 @@ export class CareerAssessmentService {
    */
   async getRegions(): Promise<Region[]> {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.supabaseClient
         .from('regions')
         .select('*')
         .eq('is_active', true)
@@ -160,7 +155,7 @@ export class CareerAssessmentService {
    */
   async getProfessions(): Promise<Profession[]> {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.supabaseClient
         .from('professions')
         .select('*')
         .eq('is_active', true)
@@ -208,7 +203,7 @@ export class CareerAssessmentService {
     }
     console.log('createAssessment: Подготовленные данные:', assessmentData)
 
-    const { data, error } = await this.supabase
+    const { data, error } = await this.supabaseClient
       .from('user_skill_assessments')
       .insert(assessmentData)
       .select('id')
@@ -241,7 +236,7 @@ export class CareerAssessmentService {
     }
     console.log(`saveSkillScores: Подготовлено ${scores.length} записей для вставки.`)
 
-    const { error } = await this.supabase
+    const { error } = await this.supabaseClient
       .from('user_skill_scores')
       .insert(scores)
 
@@ -266,7 +261,7 @@ export class CareerAssessmentService {
     const results = await this.calculateAssessmentResults(assessment)
 
     // Обновляем статус оценки
-    await this.supabase
+    await this.supabaseClient
       .from('user_skill_assessments')
       .update({
         is_completed: true,
@@ -283,7 +278,7 @@ export class CareerAssessmentService {
    * Получить оценку по ID
    */
   async getAssessmentById(assessmentId: string): Promise<UserSkillAssessment | null> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this.supabaseClient
       .from('user_skill_assessments')
       .select(`
         *,
@@ -312,7 +307,7 @@ export class CareerAssessmentService {
    * Получить оценки пользователя
    */
   async getUserAssessments(userId: string): Promise<UserSkillAssessment[]> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this.supabaseClient
       .from('user_skill_assessments')
       .select(`
         *,
@@ -423,7 +418,7 @@ export class CareerAssessmentService {
     professionId: string,
     regionId: string
   ): Promise<ProfessionSkillRequirement[]> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this.supabaseClient
       .from('profession_skill_requirements')
       .select(`
         *,
@@ -445,7 +440,7 @@ export class CareerAssessmentService {
    * Получить данные о зарплатах
    */
   async getSalaryData(professionId: string, regionId: string): Promise<RegionalSalaryData | null> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this.supabaseClient
       .from('regional_salary_data')
       .select('*')
       .eq('profession_id', professionId)
@@ -517,7 +512,7 @@ export class CareerAssessmentService {
     expected_improvement: number
     roi_estimate: number
   }>> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this.supabaseClient
       .from('learning_resources')
       .select('*')
       .eq('is_active', true)

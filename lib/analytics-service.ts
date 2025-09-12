@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase-browser'
 import { logger } from '@/lib/logger'
 
 export interface AnalyticsEvent {
@@ -30,7 +30,7 @@ export interface TestComparison {
 }
 
 class AnalyticsService {
-  private supabase = createClient()
+  private supabaseClient = supabase
 
   // Track user events
   async trackEvent(
@@ -50,7 +50,7 @@ class AnalyticsService {
         session_id: sessionId
       }
 
-      const { error } = await this.supabase
+      const { error } = await this.supabaseClient
         .from('analytics_events')
         .insert(event)
 
@@ -93,7 +93,7 @@ class AnalyticsService {
   async generateUserInsights(userId: string): Promise<UserInsights> {
     try {
       // Get user's test history
-      const { data: testResults, error } = await this.supabase
+      const { data: testResults, error } = await this.supabaseClient
         .from('test_results')
         .select('*')
         .eq('user_id', userId)
@@ -135,7 +135,7 @@ class AnalyticsService {
   // Compare test results
   async compareTestResults(userId: string): Promise<TestComparison | null> {
     try {
-      const { data: testResults, error } = await this.supabase
+      const { data: testResults, error } = await this.supabaseClient
         .from('test_results')
         .select('*')
         .eq('user_id', userId)

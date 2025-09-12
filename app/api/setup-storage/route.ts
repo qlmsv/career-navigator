@@ -1,14 +1,11 @@
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdminAdmin } from '@/lib/supabaseAdmin-server'
 
 export async function POST() {
   try {
-    const supabase = createClient(
-      process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-      process.env['SUPABASE_SERVICE_ROLE_KEY']!
-    )
+    // Using centralized server admin client
     
     // Создаем bucket для медиа файлов тестов
-    const { data, error } = await supabase.storage.createBucket('test-media', {
+    const { data, error } = await supabaseAdmin.storage.createBucket('test-media', {
       public: true,
       allowedMimeTypes: [
         'image/jpeg',

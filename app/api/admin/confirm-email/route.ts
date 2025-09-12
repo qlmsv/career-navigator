@@ -1,7 +1,7 @@
 'use server'
 
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdminAdmin } from '@/lib/supabaseAdmin-server'
 
 // Dev-only: confirm user email
 export async function POST(request: Request) {
@@ -16,13 +16,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email required' }, { status: 400 })
     }
 
-    const supabase = createClient(
-      process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-      process.env['SUPABASE_SERVICE_ROLE_KEY']!
-    )
+    // Using centralized server admin client
 
     // Get user by email
-    const { data: users, error: listError } = await supabase.auth.admin.listUsers()
+    const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers()
     if (listError) {
       return NextResponse.json({ error: listError.message }, { status: 500 })
     }
@@ -33,7 +30,7 @@ export async function POST(request: Request) {
     }
 
     // Update user to confirm email
-    const { data: updateData, error: updateError } = await supabase.auth.admin.updateUserById(
+    const { data: updateData, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
       user.id,
       { email_confirm: true }
     )

@@ -10,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Clock, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase-browser'
 
 interface Test {
   id: string

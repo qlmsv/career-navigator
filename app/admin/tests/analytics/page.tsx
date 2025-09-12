@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase-browser'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function AdminAnalyticsPage() {
-  const supabase = createClient()
+  // Using centralized browser client
   const router = useRouter()
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const [stats, setStats] = useState<any>({ tests: 0, attempts: 0, avgPercentage: 0, completionRate: 0 })

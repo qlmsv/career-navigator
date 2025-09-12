@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Mail, Lock, Eye, EyeOff, Chrome } from 'lucide-react'
 import { ThemeToggle } from './theme-toggle'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase-browser'
 
 interface AuthFormProps {
   mode: 'signin' | 'signup'
@@ -93,7 +93,7 @@ export function AuthForm({ mode, userType, onToggleMode, onSuccess }: AuthFormPr
     setError('')
 
     try {
-      const supabase = createClient()
+      // Using centralized browser client
       const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
       logger.info('📝 OAuth response:', { data, error })
 

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { createClient } from '@/lib/supabase/client'
+import { supabase } from '@/lib/supabase-browser'
 
 export default function AdminTestsImportPage() {
   const router = useRouter()
@@ -23,7 +23,7 @@ export default function AdminTestsImportPage() {
   // Load recent tests for any authenticated user
   useState(() => {
     (async () => {
-      const supabase = createClient()
+      // Using centralized browser client
       const { data: sessionRes } = await supabase.auth.getSession()
       const userId = sessionRes.session?.user?.id
       if (!userId) {

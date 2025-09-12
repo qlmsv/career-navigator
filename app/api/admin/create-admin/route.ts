@@ -1,7 +1,7 @@
 'use server'
 
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdminAdmin } from '@/lib/supabaseAdmin-server'
 
 // Dev-only: create admin user directly
 export async function POST(request: Request) {
@@ -16,13 +16,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 })
     }
 
-    const supabase = createClient(
-      process.env['NEXT_PUBLIC_SUPABASE_URL']!,
-      process.env['SUPABASE_SERVICE_ROLE_KEY']!
-    )
+    // Using centralized server admin client
 
     // Create user
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true, // Auto-confirm email
@@ -40,7 +37,7 @@ export async function POST(request: Request) {
     }
 
     // Grant admin role
-    const { error: roleError } = await supabase
+    const { error: roleError } = await supabaseAdmin
       .from('user_roles')
       .upsert({ 
         user_id: authData.user.id, 
