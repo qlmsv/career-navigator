@@ -173,9 +173,10 @@ export async function POST(
             if (!factorScores[factor]) {
               factorScores[factor] = { score: 0, maxScore: 0, count: 0 }
             }
-            factorScores[factor].score += ratingValue
-            factorScores[factor].maxScore += 5 // максимальная оценка по шкале
-            factorScores[factor].count += 1
+            const factorData = factorScores[factor]
+            factorData.score += ratingValue
+            factorData.maxScore += 5 // максимальная оценка по шкале
+            factorData.count += 1
           }
         } else {
           // Обычные тесты с вариантами ответов
