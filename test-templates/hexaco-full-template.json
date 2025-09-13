@@ -1,0 +1,705 @@
+{
+  "testType": {
+    "name": "hexaco_full",
+    "displayName": "HEXACO - Полный тест личности (100 вопросов)",
+    "description": "Полный тест HEXACO для оценки шести основных факторов личности: честность-скромность, эмоциональность, экстраверсия, доброжелательность, добросовестность и открытость опыту",
+    "version": "1.0"
+  },
+  "factors": [
+    {
+      "name": "honesty_humility",
+      "displayName": "Честность-скромность",
+      "description": "Склонность к честности, скромности и отсутствию жадности",
+      "orderIndex": 1
+    },
+    {
+      "name": "emotionality",
+      "displayName": "Эмоциональность", 
+      "description": "Склонность к переживанию страха, тревоги и потребности в эмоциональной поддержке",
+      "orderIndex": 2
+    },
+    {
+      "name": "extraversion",
+      "displayName": "Экстраверсия",
+      "description": "Склонность к общению, активности и получению энергии от социального взаимодействия",
+      "orderIndex": 3
+    },
+    {
+      "name": "agreeableness",
+      "displayName": "Доброжелательность",
+      "description": "Склонность к прощению, терпимости и сотрудничеству",
+      "orderIndex": 4
+    },
+    {
+      "name": "conscientiousness",
+      "displayName": "Добросовестность",
+      "description": "Степень организованности, самодисциплины и стремления к достижению целей",
+      "orderIndex": 5
+    },
+    {
+      "name": "openness",
+      "displayName": "Открытость опыту",
+      "description": "Склонность к новому опыту, творчеству и интеллектуальному любопытству",
+      "orderIndex": 6
+    }
+  ],
+  "ratingScale": {
+    "name": "likert_5",
+    "displayName": "Шкала Лайкерта 5-балльная",
+    "minValue": 1,
+    "maxValue": 5,
+    "labels": {
+      "1": "Полностью не согласен",
+      "2": "Не согласен",
+      "3": "Нейтрально",
+      "4": "Согласен", 
+      "5": "Полностью согласен"
+    }
+  },
+  "questions": [
+    {
+      "text": "Мне было бы скучно в художественной галерее",
+      "factor": "openness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я довольно часто навожу порядок на работе и дома",
+      "factor": "conscientiousness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я редко держу зло на людей, даже на тех, кто доставил мне серьезные неприятности",
+      "factor": "agreeableness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "В целом я вполне доволен (довольна) собой",
+      "factor": "extraversion",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне было бы страшно, если бы мне пришлось куда-то ехать в очень плохую погоду",
+      "factor": "emotionality",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я буду очень любезен с человеком, от которого мне надо чего-то добиться, даже если он мне не нравится",
+      "factor": "honesty_humility",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне интересно знакомиться с историей и политикой других стран",
+      "factor": "openness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Когда я работаю, я ставлю перед собой масштабные цели",
+      "factor": "conscientiousness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Иногда мне говорят, что я слишком критичен (критична) по отношению к другим",
+      "factor": "agreeableness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я редко высказываю свое мнение на общих собраниях",
+      "factor": "extraversion",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Иногда я беспокоюсь из-за мелочей, и ничего не могу с этим поделать",
+      "factor": "emotionality",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Если бы я знал, что меня не поймают, я мог бы (могла бы) украсть миллион долларов",
+      "factor": "honesty_humility",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне бы больше понравилась работа, которая требует соблюдения определенных правил, проявления творческих способностей",
+      "factor": "openness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Обычно я не один раз перепроверяю свою работу, чтобы избежать ошибок",
+      "factor": "conscientiousness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Иногда мне говорят, что я слишком упрям(а)",
+      "factor": "agreeableness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я избегаю «светских» бесед",
+      "factor": "extraversion",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Когда я переживаю из-за неприятностей, мне надо, чтобы кто-нибудь меня поддержал",
+      "factor": "emotionality",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Для меня не особенно важно иметь много денег",
+      "factor": "honesty_humility",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я считаю, что увлечение радикальными идеями – это пустая трата времени",
+      "factor": "openness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я принимаю решения скорее под влиянием момента, чем в результате тщательного обдумывания",
+      "factor": "conscientiousness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Меня считают вспыльчивым человеком",
+      "factor": "agreeableness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я почти всегда полон (полна) энергии",
+      "factor": "extraversion",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне хочется плакать, когда я вижу, как плачут другие",
+      "factor": "emotionality",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я обычный человек, ничем не лучше других",
+      "factor": "honesty_humility",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я бы не стал тратить время на чтение стихов",
+      "factor": "openness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я заранее все планирую и организовываю, чтобы избежать неразберихи в последний момент",
+      "factor": "conscientiousness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "К людям, которые плохо со мной обошлись, я отношусь по принципу «прости и забудь»",
+      "factor": "agreeableness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я думаю, во мне есть что-то такое, что нравится большинству людей",
+      "factor": "extraversion",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я не против того, чтобы выполнять опасную работу",
+      "factor": "emotionality",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я бы не стал(а) льстить, даже если бы считал(а), что это приведет к повышению зарплаты или продвижению по службе",
+      "factor": "honesty_humility",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне нравится рассматривать разные географические карты",
+      "factor": "openness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Часто я из кожи вон лезу, стараясь достичь своей цели",
+      "factor": "conscientiousness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Недостатки других людей не вызывают у меня особых нареканий",
+      "factor": "agreeableness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "В ситуации общения обычно именно я делаю первый шаг",
+      "factor": "extraversion",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я гораздо меньше, чем другие люди, склонен (склонна) к волнениям",
+      "factor": "emotionality",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Если бы у меня были проблемы с деньгами, я бы не устоял (не устояла) перед соблазном купить краденое",
+      "factor": "honesty_humility",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне бы понравилась творческая работа, например, сочинять романы, писать песни, рисовать",
+      "factor": "openness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Работая над чем-то, я не обращаю особого внимания на мелочи",
+      "factor": "conscientiousness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Обычно я готов(а) изменить свое мнение, если с ним не согласны другие",
+      "factor": "agreeableness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне нравится, когда вокруг много людей, с которыми можно поговорить",
+      "factor": "extraversion",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я могу справиться с трудными ситуациями и не нуждаюсь ни в чьей эмоциональной поддержке",
+      "factor": "emotionality",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я бы хотел(а) жить в очень дорогом престижном районе",
+      "factor": "honesty_humility",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне нравятся люди, чьи взгляды отличаются от общепринятых",
+      "factor": "openness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я совершаю множество ошибок из-за того, что вначале делаю, а потом думаю",
+      "factor": "conscientiousness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я редко злюсь, даже когда со мной плохо обращаются",
+      "factor": "agreeableness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я почти всегда бодрый и оптимистичный (бодрая и оптимистичная)",
+      "factor": "extraversion",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Когда страдает близкий мне человек, мне почти так же плохо, как и ему",
+      "factor": "emotionality",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне бы не хотелось, чтобы другие думали, что я лучше их",
+      "factor": "honesty_humility",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "При возможности, я бы с удовольствием сходил(а) на концерт классической музыки",
+      "factor": "openness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Надо мною часто подшучивают из-за беспорядка в моей комнате и на рабочем столе",
+      "factor": "conscientiousness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я всегда буду с подозрением относиться к тому, кто меня однажды обманул",
+      "factor": "agreeableness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне кажется, что я непопулярный человек",
+      "factor": "extraversion",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "В ситуации физической угрозы мне очень страшно",
+      "factor": "emotionality",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Если мне что-то нужно от человека, я буду смеяться даже над его неудачными шутками",
+      "factor": "honesty_humility",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне было бы скучно читать книгу по истории науки и техники",
+      "factor": "openness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Часто мне не хватает упорства для того, чтобы достичь поставленной цели",
+      "factor": "conscientiousness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Оценивая других людей, я стараюсь быть снисходительным(ой)",
+      "factor": "agreeableness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Часто именно я говорю от имени группы людей, среди которых нахожусь",
+      "factor": "extraversion",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "У меня практически не бывает проблем со сном из-за стресса или волнений",
+      "factor": "emotionality",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я бы никогда не стал(а) брать взятку, даже если бы она была очень большой",
+      "factor": "honesty_humility",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне часто говорили, что у меня богатое воображение",
+      "factor": "openness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я всегда стараюсь тщательно выполнять свою работу, даже если это отнимает слишком много времени",
+      "factor": "conscientiousness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Когда мне говорят, что я неправ(а), моя первая реакция – постараться переубедить",
+      "factor": "agreeableness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне больше нравится работать в коллективе, чем в одиночестве",
+      "factor": "extraversion",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Когда я о чем-то беспокоюсь, мне надо с кем-то поделиться своими заботами",
+      "factor": "emotionality",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я бы хотел(а), чтобы меня увидели за рулем очень дорогого автомобиля",
+      "factor": "honesty_humility",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я считаю себя несколько эксцентричным человеком",
+      "factor": "openness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я не позволяю себе действовать импульсивно",
+      "factor": "conscientiousness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Меня гораздо труднее разозлить, чем других людей",
+      "factor": "agreeableness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне часто говорят, что я должен (должна) взбодриться",
+      "factor": "extraversion",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я сильно переживаю, когда близкий мне человек надолго уезжает",
+      "factor": "emotionality",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я считаю, что я заслуживаю большего уважения, чем обычные люди",
+      "factor": "honesty_humility",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Иногда мне нравится просто смотреть, как ветер колышет кроны деревьев",
+      "factor": "openness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Из-за моей неорганизованности у меня бывают трудности на работе",
+      "factor": "conscientiousness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне трудно до конца простить того, кто сделал мне что-то плохое",
+      "factor": "agreeableness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Иногда я ощущаю себя бесполезным человеком",
+      "factor": "extraversion",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я не стану паниковать даже в чрезвычайной ситуации",
+      "factor": "emotionality",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я не буду делать вид, что человек мне нравится, только для того, чтобы добиться его расположения",
+      "factor": "honesty_humility",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне никогда не доставляло удовольствия листать энциклопедии",
+      "factor": "openness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "На работе я делаю только то, что требуется, и не больше",
+      "factor": "conscientiousness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Даже когда люди допускают много ошибок, я редко говорю что-нибудь неодобрительное",
+      "factor": "agreeableness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я очень смущаюсь, когда мне приходится выступать",
+      "factor": "extraversion",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я очень нервничаю в ожидании решения важного вопроса",
+      "factor": "emotionality",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "У меня возникло бы искушение использовать фальшивые деньги, если бы я был уверен (была уверена), что это сойдет мне с рук",
+      "factor": "honesty_humility",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я не считаю себя художественно одаренным или творческим человеком",
+      "factor": "openness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Меня считают человеком, который стремится сделать все идеально",
+      "factor": "conscientiousness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне трудно пойти на компромисс, если я действительно уверен(а) в своей правоте",
+      "factor": "agreeableness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Первое, что я всегда делаю на новом месте - это завожу друзей",
+      "factor": "extraversion",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я редко обсуждаю свои проблемы с другими людьми",
+      "factor": "emotionality",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне доставило бы большое удовольствие владеть предметами роскоши",
+      "factor": "honesty_humility",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я нахожу скучным обсуждение философских вопросов",
+      "factor": "openness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я предпочитаю делать первое, что приходит в голову, а не то, что было запланировано",
+      "factor": "conscientiousness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Мне трудно сохранять самообладание, когда меня оскорбляют",
+      "factor": "agreeableness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Большинство людей более жизнерадостные и активные, чем я",
+      "factor": "extraversion",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я остаюсь бесстрастным даже тогда, когда все вокруг испытывают сильные эмоции",
+      "factor": "emotionality",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я хочу, чтобы люди знали, что я особенный человек и имею положение в обществе",
+      "factor": "honesty_humility",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Я сочувствую людям, которые менее удачливы, чем я",
+      "factor": "agreeableness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я стараюсь помогать тем, кто в этом нуждается",
+      "factor": "agreeableness",
+      "isReverse": false,
+      "weight": 1.0
+    },
+    {
+      "text": "Я не буду переживать, если причиню вред человеку, который мне не нравится",
+      "factor": "agreeableness",
+      "isReverse": true,
+      "weight": 1.0
+    },
+    {
+      "text": "Люди воспринимают меня как человека черствого и нечуткого",
+      "factor": "agreeableness",
+      "isReverse": true,
+      "weight": 1.0
+    }
+  ],
+  "scoringConfig": {
+    "method": "factor_average",
+    "normalize": true,
+    "reverseScoring": true
+  },
+  "interpretationConfig": {
+    "ranges": {
+      "low": {"min": 0, "max": 40},
+      "medium": {"min": 40, "max": 60},
+      "high": {"min": 60, "max": 100}
+    },
+    "descriptions": {
+      "honesty_humility": {
+        "low": "Склонны к манипуляциям и преследованию личных интересов",
+        "medium": "Умеренно честны и скромны",
+        "high": "Высоко честны, скромны и альтруистичны"
+      },
+      "emotionality": {
+        "low": "Эмоционально стабильны и независимы",
+        "medium": "Умеренно эмоциональны",
+        "high": "Высоко эмоциональны и нуждаетесь в поддержке"
+      },
+      "extraversion": {
+        "low": "Предпочитаете спокойную обстановку",
+        "medium": "Балансируете между общением и уединением",
+        "high": "Энергичны в общении и социально активны"
+      },
+      "agreeableness": {
+        "low": "Прямолинейны и критичны",
+        "medium": "Умеренно терпимы и прощающи",
+        "high": "Высоко терпимы и склонны к прощению"
+      },
+      "conscientiousness": {
+        "low": "Гибко подходите к планированию",
+        "medium": "Умеренно организованы",
+        "high": "Высоко организованы и дисциплинированы"
+      },
+      "openness": {
+        "low": "Предпочитаете традиционные подходы",
+        "medium": "Балансируете между традиционным и новым",
+        "high": "Открыты к новому опыту и идеям"
+      }
+    }
+  }
+}
