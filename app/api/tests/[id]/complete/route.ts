@@ -173,7 +173,7 @@ export async function POST(
             if (!factorScores[factor]) {
               factorScores[factor] = { score: 0, maxScore: 0, count: 0 }
             }
-            const factorData = factorScores[factor]
+            const factorData = factorScores[factor]!
             factorData.score += ratingValue
             factorData.maxScore += 5 // максимальная оценка по шкале
             factorData.count += 1
