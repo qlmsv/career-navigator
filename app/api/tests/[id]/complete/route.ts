@@ -216,7 +216,7 @@ export async function POST(
       }
     }
 
-    // Создаем попытку прохождения
+    // Создаем попытку прохождения (временно без factor_scores)
     const { data: attempt, error: attemptError } = await supabaseAdmin
       .from('test_attempts')
       .insert({
@@ -227,8 +227,8 @@ export async function POST(
         percentage: percentage,
         passed: passed,
         time_spent_seconds: timeSpent || 0,
-        completed_at: new Date().toISOString(),
-        factor_scores: factorAverages
+        completed_at: new Date().toISOString()
+        // factor_scores: factorAverages // Временно закомментировано до добавления колонки
       })
       .select()
       .single()
