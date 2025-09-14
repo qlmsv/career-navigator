@@ -216,8 +216,12 @@ export async function POST(
       }
     }
 
-    // Создаем попытку прохождения (временно без factor_scores)
-    const { data: attempt, error: attemptError } = await supabaseAdmin
+    // Создаем попытку прохождения
+    let attempt
+    let attemptError
+    
+    // Пытаемся создать попытку с factor_scores
+    const { data: attemptWithFactors, error: errorWithFactors } = await supabaseAdmin
       .from('test_attempts')
       .insert({
         test_id: testId,
@@ -227,11 +231,35 @@ export async function POST(
         percentage: percentage,
         passed: passed,
         time_spent_seconds: timeSpent || 0,
-        completed_at: new Date().toISOString()
-        // factor_scores: factorAverages // Временно закомментировано до добавления колонки
+        completed_at: new Date().toISOString(),
+        factor_scores: factorAverages
       })
       .select()
       .single()
+    
+    if (errorWithFactors && errorWithFactors.message.includes('factor_scores')) {
+      // Если колонка factor_scores не существует, создаем без неё
+      const { data: attemptWithoutFactors, error: errorWithoutFactors } = await supabaseAdmin
+        .from('test_attempts')
+        .insert({
+          test_id: testId,
+          status: 'completed',
+          score: totalScore,
+          max_possible_score: maxPossibleScore,
+          percentage: percentage,
+          passed: passed,
+          time_spent_seconds: timeSpent || 0,
+          completed_at: new Date().toISOString()
+        })
+        .select()
+        .single()
+      
+      attempt = attemptWithoutFactors
+      attemptError = errorWithoutFactors
+    } else {
+      attempt = attemptWithFactors
+      attemptError = errorWithFactors
+    }
 
     if (attemptError) {
       return NextResponse.json({ success: false, error: attemptError.message }, { status: 400 })
