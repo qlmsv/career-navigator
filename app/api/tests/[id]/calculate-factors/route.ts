@@ -103,11 +103,11 @@ export async function POST(
     // Определяем интерпретацию результатов
     const interpretation = generateInterpretation(factorScores, test.interpretation_config)
 
-    // Обновляем попытку с результатами по факторам
+    // Обновляем попытку с результатами по факторам (временно без factor_scores)
     const { error: updateError } = await supabaseAdmin
       .from('test_attempts')
       .update({
-        factor_scores: factorScores,
+        // factor_scores: factorScores, // Временно закомментировано
         personality_profile: interpretation,
         status: 'completed',
         completed_at: new Date().toISOString()
