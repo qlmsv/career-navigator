@@ -14,7 +14,7 @@ export default function TestResultsPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   
-  const testId = params.id as string
+  const testId = params['id'] as string
   const responseId = searchParams.get('responseId')
 
   const [results, setResults] = useState<any>(null)

@@ -12,7 +12,7 @@ import type { Test } from '@/lib/types'
 export default function TakeTestPage() {
   const params = useParams()
   const router = useRouter()
-  const testId = params.id as string
+  const testId = params['id'] as string
 
   const [test, setTest] = useState<Test | null>(null)
   const [loading, setLoading] = useState(true)
