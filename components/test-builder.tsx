@@ -18,7 +18,7 @@ interface Question {
   title: string
   description?: string
   required: boolean
-  options?: Array<{ label: string; value: string }>
+  options?: Array<{ label: string; value: string }> | undefined
   correctAnswer?: any
   points?: number
   min?: number
@@ -40,14 +40,14 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
 
   // Добавить новый вопрос
   const addQuestion = (type: QuestionType) => {
+    const hasOptions = type === 'radio' || type === 'checkbox' || type === 'select' || type === 'image_choice'
+    
     const newQuestion: Question = {
       id: `q_${Date.now()}`,
       type,
       title: '',
       required: false,
-      options: type === 'radio' || type === 'checkbox' || type === 'select' 
-        ? [{ label: 'Вариант 1', value: 'opt1' }] 
-        : undefined
+      options: hasOptions ? [{ label: 'Вариант 1', value: 'opt1' }] : undefined
     }
     setQuestions([...questions, newQuestion])
   }
