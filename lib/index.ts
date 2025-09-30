@@ -10,7 +10,6 @@ export * from './supabase-browser'
 export * from './supabase-server'
 
 // Career Assessment System
-export * from './services/career-assessment'
 export type {
   DigitalSkillCategory,
   DigitalSkill,
@@ -30,9 +29,6 @@ export type {
   COMPETITIVENESS_LEVEL_NAMES,
   DEMAND_LEVEL_NAMES
 } from './types/career-navigator'
-
-// PDF processing (если еще используется)
-export * from './pdf-processor'
 
 // Database types
 export * from './database.types'

@@ -83,7 +83,14 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
     setQuestions(questions.map(q => {
       if (q.id === questionId && q.options) {
         const newOptions = [...q.options]
-        newOptions[optionIndex] = { ...newOptions[optionIndex], label }
+        const currentOption = newOptions[optionIndex]
+        if (currentOption) {
+          newOptions[optionIndex] = { 
+            ...currentOption, 
+            label,
+            value: currentOption.value || `opt${optionIndex + 1}`
+          }
+        }
         return { ...q, options: newOptions }
       }
       return q
