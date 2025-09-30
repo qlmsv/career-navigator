@@ -1,6 +1,0 @@
-test_title,test_title_ru,test_description,test_description_ru,time_limit_minutes,passing_score,shuffle_questions,shuffle_answers,tags,question_text,question_text_ru,question_type,points,required,order_index,option_1_text,option_1_text_ru,option_1_correct,option_2_text,option_2_text_ru,option_2_correct,option_3_text,option_3_text_ru,option_3_correct
-Sample Digital Literacy Test,Пример теста цифровой грамотности,A simple example test,Простой пример теста,15,60,true,true,["digital","sample"],What does CPU stand for?,Что означает CPU?,multiple_choice,2,true,0,Central Processing Unit,Central Processing Unit,true,Central Program Unit,Central Program Unit,false,Control Processing Utility,Control Processing Utility,false
-,,,,,,,,,Rate your proficiency with spreadsheets (1-5),Оцените навыки работы с таблицами (1-5),rating_scale,1,false,1,,,,,,,,,
-,,,,,,,,,The internet and the web are the same thing.,Интернет и веб — одно и то же.,true_false,1,true,2,True,True,false,False,False,true,,,
-
-

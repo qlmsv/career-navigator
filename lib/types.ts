@@ -1,139 +1,124 @@
-// PROGRESS: Step 1/1 done – Cleaned up types
+// ============================================================================
+// Типы для новой системы тестирования с Formily
+// ============================================================================
 
-/**
- * ==================================================================
- *                          Core User Types
- * ==================================================================
- */
+import { ISchema } from '@formily/react'
 
-import type { User as SupabaseUser } from '@supabase/supabase-js'
+// Типы вопросов (расширенный список как в Qualtrics)
+export type QuestionType = 
+  // Базовые типы
+  | 'text'              // Текстовый ввод (короткий)
+  | 'textarea'          // Многострочный текст
+  | 'number'            // Числовой ввод
+  | 'email'             // Email адрес
+  | 'phone'             // Телефон
+  | 'url'               // URL адрес
+  
+  // Выбор из вариантов
+  | 'radio'             // Один выбор (Radio)
+  | 'checkbox'          // Множественный выбор
+  | 'select'            // Dropdown (выпадающий список)
+  | 'image_choice'      // Выбор изображений
+  
+  // Шкалы и рейтинги
+  | 'rating'            // Звездочки / рейтинг
+  | 'scale'             // Шкала Лайкерта (1-5, 1-7, 1-10)
+  | 'slider'            // Слайдер
+  | 'nps'               // Net Promoter Score (0-10)
+  
+  // Даты и время
+  | 'date'              // Дата
+  | 'time'              // Время
+  | 'datetime'          // Дата и время
+  
+  // Булевы
+  | 'boolean'           // Да/Нет (switch)
+  | 'yes_no'            // Да/Нет (radio)
+  
+  // Сложные типы
+  | 'matrix'            // Матричная таблица
+  | 'ranking'           // Ранжирование (drag & drop)
+  | 'constant_sum'      // Постоянная сумма (сумма должна быть N)
+  | 'upload'            // Загрузка файла
+  | 'signature'         // Подпись
+  | 'location'          // Выбор местоположения
+  
+  // Специальные
+  | 'divider'           // Разделитель (только текст)
+  | 'html'              // Произвольный HTML
 
-// Расширяем стандартный тип Supabase, если нужно
-export interface AppUser extends SupabaseUser {}
-
-export interface UserProfile {
+export interface Admin {
   id: string
-  user_id: string
-  full_name?: string
-  first_name?: string
-  last_name?: string
-  email?: string
-  phone?: string
-  location?: string
-  age?: number
-  current_position?: string
-  current_company?: string
-  industry?: string
-  preferred_industries?: string[]
-  experience_level?: 'Junior' | 'Middle' | 'Senior' | 'Lead'
-  total_experience?: string
-  total_experience_months?: number
-  salary_expectations?: string
-  work_format?: 'remote' | 'office' | 'hybrid'
-  relocation_readiness?: boolean
-  university?: string
-  degree?: string
-  education_level?: string
-  specialization?: string
-  graduation_year?: number
-  key_skills?: string[]
-  technical_skills?: string[]
-  languages?: Array<{ name: string; level: string }>
-  soft_skills?: string[]
-  career_goals?: string
-  summary?: string
-  resume_uploaded?: boolean
-  resume_analyzed?: boolean
-  profile_completeness?: number
-  data_source?: string
-}
-
-/**
- * ==================================================================
- *                       Test Engine Types
- * ==================================================================
- */
-
-export interface TestQuestion {
-  id: string
-  text: string
-  type: 'big5' | 'jungian'
-  facet?: string
-  options: Array<{
-    text: string
-    score?: number
-    archetype?: string
-  }>
-}
-
-export interface TestResult {
-  id: string
-  user_id: string
-  test_date: string
-  big_five_scores: Record<string, number>
-  dominant_archetype: string
-  all_answers: Record<string, any>
-  ai_analysis: string
+  email: string
+  name?: string
   created_at: string
 }
 
-/**
- * ==================================================================
- *                       API & Error Handling
- * ==================================================================
- */
-
-export interface ApiResponse<T = unknown> {
-  success: boolean
-  data: T | null
-  error: string | null
-}
-
-export interface ResumeAnalysis {
-  personal_info?: {
-    full_name?: string
-    first_name?: string
-    last_name?: string
-    phone?: string
-    email?: string
-    location?: string
-  }
-  professional_info?: {
-    current_position?: string
-    current_company?: string
-    industry?: string
-    experience_level?: 'Junior' | 'Middle' | 'Senior' | 'Lead'
-    total_experience?: string
-    total_experience_months?: number
-    salary_expectations?: any
-    work_format?: string
-  }
-  experience?: WorkExperience[]
-  education?: Education[]
-  skills?: {
-    technical_skills?: string[]
-    soft_skills?: string[]
-    languages?: string[]
-  }
-}
-
-export interface WorkExperience {
-  company?: string
-  position?: string
-  start_date?: string
-  end_date?: string
-  duration_months?: number
-  location?: string
-  industry?: string
+export interface Test {
+  id: string
+  title: string
   description?: string
-  achievements?: string[]
-  technologies?: string[]
+  formily_schema: ISchema
+  status: 'draft' | 'published' | 'archived'
+  show_results: boolean
+  allow_multiple_attempts: boolean
+  time_limit_minutes?: number
+  created_by?: string
+  created_at: string
+  updated_at: string
+  total_responses: number
 }
 
-export interface Education {
-  institution?: string
-  degree?: string
-  specialization?: string
-  graduation_year?: number
-  grade?: string
+export interface TestResponse {
+  id: string
+  test_id: string
+  response_data: Record<string, any>
+  user_identifier?: string
+  ip_address?: string
+  user_agent?: string
+  started_at: string
+  completed_at: string
+  time_spent_seconds?: number
+  score?: number
+  results_data?: any
+}
+
+export interface ApiResponse<T = any> {
+  success: boolean
+  data?: T
+  error?: string
+  message?: string
+}
+
+// Типы для создания теста
+export interface CreateTestInput {
+  title: string
+  description?: string
+  formily_schema: ISchema
+  show_results?: boolean
+  allow_multiple_attempts?: boolean
+  time_limit_minutes?: number
+}
+
+// Типы для отправки ответа
+export interface SubmitResponseInput {
+  test_id: string
+  response_data: Record<string, any>
+  user_identifier?: string
+  time_spent_seconds?: number
+}
+
+// Настройки вопроса в схеме
+export interface QuestionSettings {
+  questionType?: QuestionType
+  correctAnswer?: any
+  points?: number
+  required?: boolean
+  placeholder?: string
+  min?: number
+  max?: number
+  step?: number
+  options?: Array<{ label: string; value: any }>
+  rows?: number
+  maxLength?: number
 }

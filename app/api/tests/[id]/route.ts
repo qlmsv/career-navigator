@@ -1,56 +1,96 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 
-// GET - получение теста с вопросами и ответами
+// GET - получить конкретный тест
 export async function GET(
-  request: NextRequest,
+  request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params
-    const testId = params.id
+    const { id } = await context.params
 
-    // Получаем тест
-    const { data: test, error: testError } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from('tests')
-      .select(`
-        *,
-        category:test_categories(name_ru, color, icon)
-      `)
-      .eq('id', testId)
-      .eq('status', 'published')
-      .eq('is_public', true)
+      .select('*')
+      .eq('id', id)
       .single()
 
-    if (testError || !test) {
-      return NextResponse.json({ success: false, error: 'Test not found' }, { status: 404 })
+    if (error) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 404 }
+      )
     }
 
-    // Получаем вопросы
-    const { data: questions, error: questionsError } = await supabaseAdmin
-      .from('questions')
-      .select(`
-        *,
-        answer_options(*)
-      `)
-      .eq('test_id', testId)
-      .order('order_index')
-
-    if (questionsError) {
-      return NextResponse.json({ success: false, error: questionsError.message }, { status: 400 })
-    }
-
-    return NextResponse.json({ 
-      success: true, 
-      data: {
-        ...test,
-        questions: questions || []
-      }
-    })
+    return NextResponse.json({ success: true, data })
   } catch (error) {
-    return NextResponse.json({ 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Unknown error' 
-    }, { status: 500 })
+    console.error('Get test error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+// PATCH - обновить тест
+export async function PATCH(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await context.params
+    const updates = await request.json()
+
+    const { data, error } = await supabaseAdmin
+      .from('tests')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json({ success: true, data })
+  } catch (error) {
+    console.error('Update test error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE - удалить тест
+export async function DELETE(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await context.params
+
+    const { error } = await supabaseAdmin
+      .from('tests')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Delete test error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    )
   }
 }
