@@ -616,7 +616,8 @@ function QuestionEditor({
                       value={row.label}
                       onChange={(e) => {
                         const next = [...(question.rowsOptions || [])]
-                        next[rowIndex] = { ...next[rowIndex], label: e.target.value, value: next[rowIndex].value || `row${rowIndex + 1}` }
+                        const prev = next[rowIndex] || { label: '', value: `row${rowIndex + 1}` }
+                        next[rowIndex] = { ...prev, label: e.target.value, value: prev.value || `row${rowIndex + 1}` }
                         onUpdate({ rowsOptions: next })
                       }}
                       placeholder={`Строка ${rowIndex + 1}`}
@@ -661,7 +662,8 @@ function QuestionEditor({
                       value={col.label}
                       onChange={(e) => {
                         const next = [...(question.columnsOptions || [])]
-                        next[colIndex] = { ...next[colIndex], label: e.target.value, value: next[colIndex].value || `col${colIndex + 1}` }
+                        const prev = next[colIndex] || { label: '', value: `col${colIndex + 1}` }
+                        next[colIndex] = { ...prev, label: e.target.value, value: prev.value || `col${colIndex + 1}` }
                         onUpdate({ columnsOptions: next })
                       }}
                       placeholder={`Колонка ${colIndex + 1}`}
