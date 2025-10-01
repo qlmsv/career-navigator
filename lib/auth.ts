@@ -81,6 +81,7 @@ export function logoutAdmin(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(ADMIN_SESSION_KEY)
   }
+  console.log('[AUTH] Admin logged out')
 }
 
 // Генерация простого токена

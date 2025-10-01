@@ -9,6 +9,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
 import { Card, CardContent } from '@/components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 
 interface TestViewerProps {
   schema: any
@@ -39,8 +41,51 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
     const properties = schema.properties || {}
 
     Object.entries(properties).forEach(([key, field]: [string, any]) => {
-      if (field.required && !answers[key] && field.type !== 'void') {
-        newErrors[key] = 'Обязательное поле'
+      if (field.required && field.type !== 'void') {
+        const component = field['x-component']
+        const value = answers[key]
+        if (component === 'Matrix') {
+          const rows = (field['x-component-props']?.rows || []) as Array<any>
+          const filledCount = Array.isArray(value) ? rows.filter((r) => value.find((v: any) => v?.row === r.value)).length : 0
+          if (filledCount < rows.length) {
+            newErrors[key] = 'Заполните выбор по каждой строке'
+          }
+        } else if (component === 'Checkbox.Group' || component === 'Ranking') {
+          if (!Array.isArray(value) || value.length === 0) {
+            newErrors[key] = 'Выберите хотя бы один вариант'
+          }
+        } else if (component === 'Input' || component === 'Input.Email' || component === 'Input.Phone' || component === 'Input.URL' || component === 'Input.TextArea' || component === 'Signature' || component === 'Location' || component === 'DatePicker' || component === 'TimePicker' || component === 'DateTimePicker') {
+          if (typeof value !== 'string' || value.trim() === '') {
+            newErrors[key] = 'Поле не должно быть пустым'
+          }
+        } else if (component === 'InputNumber' || component === 'Slider' || component === 'Rate' || component === 'NPS') {
+          if (value === undefined || value === null || Number.isNaN(value)) {
+            newErrors[key] = 'Укажите значение'
+          }
+        } else if (component === 'Radio.Group' || component === 'Select' || component === 'ImageChoice') {
+          if (value === undefined || value === null || value === '') {
+            newErrors[key] = 'Сделайте выбор'
+          }
+        } else if (component === 'Switch') {
+          if (typeof value !== 'boolean') {
+            newErrors[key] = 'Сделайте выбор'
+          }
+        } else if (component === 'Upload') {
+          if (!value) {
+            newErrors[key] = 'Загрузите файл'
+          }
+        } else if (component === 'ConstantSum') {
+          const items = field['x-component-props']?.items || []
+          const total = Number(field['x-component-props']?.total ?? 100)
+          const obj = value || {}
+          const sum = Object.values(obj).reduce((a: number, b: any) => a + Number(b || 0), 0)
+          if (items.length === 0 || sum !== total) {
+            newErrors[key] = `Сумма должна быть равна ${total}`
+          }
+        } else if (!value) {
+          // Фолбэк на случай неизвестного компонента
+          newErrors[key] = 'Обязательное поле'
+        }
       }
     })
 
@@ -88,6 +133,39 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
             value={value || ''}
             onChange={(e) => handleChange(key, e.target.value)}
             placeholder={componentProps.placeholder}
+            className={hasError ? 'border-red-500' : ''}
+          />
+        )}
+
+        {/* Email */}
+        {component === 'Input.Email' && (
+          <Input
+            type="email"
+            value={value || ''}
+            onChange={(e) => handleChange(key, e.target.value)}
+            placeholder={componentProps.placeholder || 'name@example.com'}
+            className={hasError ? 'border-red-500' : ''}
+          />
+        )}
+
+        {/* Phone */}
+        {component === 'Input.Phone' && (
+          <Input
+            type="tel"
+            value={value || ''}
+            onChange={(e) => handleChange(key, e.target.value)}
+            placeholder={componentProps.placeholder || '+7 900 000-00-00'}
+            className={hasError ? 'border-red-500' : ''}
+          />
+        )}
+
+        {/* URL */}
+        {component === 'Input.URL' && (
+          <Input
+            type="url"
+            value={value || ''}
+            onChange={(e) => handleChange(key, e.target.value)}
+            placeholder={componentProps.placeholder || 'https://...'}
             className={hasError ? 'border-red-500' : ''}
           />
         )}
@@ -160,6 +238,30 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
           </div>
         )}
 
+        {/* Select */}
+        {component === 'Select' && (
+          <Select value={value || ''} onValueChange={(val) => handleChange(key, val)}>
+            <SelectTrigger className={hasError ? 'border-red-500' : ''}>
+              <SelectValue placeholder={componentProps.placeholder || 'Выберите...'} />
+            </SelectTrigger>
+            <SelectContent>
+              {(field.enum || []).map((option: any) => (
+                <SelectItem key={option.value} value={String(option.value)}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {/* Switch */}
+        {component === 'Switch' && (
+          <div className="flex items-center gap-2">
+            <Switch checked={!!value} onCheckedChange={(v) => handleChange(key, v)} />
+            <span className="text-sm text-muted-foreground">{componentProps.helpText}</span>
+          </div>
+        )}
+
         {/* Slider (ШКАЛА) */}
         {component === 'Slider' && (
           <div className="space-y-4">
@@ -208,6 +310,194 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
             {value && (
               <p className="text-sm text-muted-foreground">
                 Ваша оценка: {value} из {componentProps.count || 5}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* DatePicker */}
+        {component === 'DatePicker' && (
+          <Input type="date" value={value || ''} onChange={(e) => handleChange(key, e.target.value)} />
+        )}
+
+        {/* TimePicker */}
+        {component === 'TimePicker' && (
+          <Input type="time" value={value || ''} onChange={(e) => handleChange(key, e.target.value)} />
+        )}
+
+        {/* DateTimePicker */}
+        {component === 'DateTimePicker' && (
+          <Input type="datetime-local" value={value || ''} onChange={(e) => handleChange(key, e.target.value)} />
+        )}
+
+        {/* Image Choice */}
+        {component === 'ImageChoice' && (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {(field.enum || []).map((option: any) => {
+              const selected = value === option.value
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleChange(key, option.value)}
+                  className={`border rounded-lg overflow-hidden text-left ${selected ? 'border-primary ring-2 ring-primary/30' : 'border-muted'}`}
+                >
+                  {option.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={option.image} alt={option.label} className="w-full h-28 object-cover" />
+                  )}
+                  <div className="p-2 text-sm">{option.label}</div>
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        {/* NPS 0-10 */}
+        {component === 'NPS' && (
+          <div className="space-y-2">
+            <div className="flex flex-wrap gap-2">
+              {Array.from({ length: 11 }, (_, i) => i).map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  className={`px-3 py-2 rounded border ${value === n ? 'bg-primary text-primary-foreground border-primary' : 'border-muted'}`}
+                  onClick={() => handleChange(key, n)}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+            {typeof value === 'number' && (
+              <p className="text-xs text-muted-foreground">Вероятность рекомендации: {value}</p>
+            )}
+          </div>
+        )}
+
+        {/* Upload */}
+        {component === 'Upload' && (
+          <Input
+            type="file"
+            onChange={(e) => handleChange(key, e.target.files?.[0] || null)}
+          />
+        )}
+
+        {/* Signature (простая текстовая) */}
+        {component === 'Signature' && (
+          <Input
+            placeholder={componentProps.placeholder || 'Введите ФИО'}
+            value={value || ''}
+            onChange={(e) => handleChange(key, e.target.value)}
+          />
+        )}
+
+        {/* Location (строкой) */}
+        {component === 'Location' && (
+          <Input
+            placeholder={componentProps.placeholder || 'Город, адрес или координаты'}
+            value={value || ''}
+            onChange={(e) => handleChange(key, e.target.value)}
+          />
+        )}
+
+        {/* Matrix (упрощенная) */}
+        {component === 'Matrix' && (
+          <div className="overflow-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr>
+                  <th className="text-left py-2"></th>
+                  {(componentProps.columns || []).map((col: any) => (
+                    <th key={col.value} className="text-center px-2 py-2">{col.label}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(componentProps.rows || []).map((row: any) => (
+                  <tr key={row.value} className="border-t">
+                    <td className="py-2 pr-2">{row.label}</td>
+                    {(componentProps.columns || []).map((col: any) => {
+                      const selected = Array.isArray(value) ? value.find((v: any) => v?.row === row.value)?.col === col.value : false
+                      return (
+                        <td key={col.value} className="text-center py-2">
+                          <input
+                            type="radio"
+                            name={`${key}-${row.value}`}
+                            checked={selected}
+                            onChange={() => {
+                              const current = Array.isArray(value) ? value : []
+                              const filtered = current.filter((v: any) => v?.row !== row.value)
+                              handleChange(key, [...filtered, { row: row.value, col: col.value }])
+                            }}
+                          />
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Ranking (упрощенная без DnD) */}
+        {component === 'Ranking' && (
+          <div className="space-y-2">
+            {((field.enum as any[]) || []).map((opt) => (
+              <div key={opt.value} className="flex items-center justify-between border rounded px-3 py-2">
+                <span>{opt.label}</span>
+                <div className="flex items-center gap-2">
+                  <Button type="button" size="sm" variant="outline" onClick={() => {
+                    const current = Array.isArray(value) ? value : []
+                    const idx = current.indexOf(opt.value)
+                    if (idx > 0) {
+                      const cp = [...current]
+                      ;[cp[idx-1], cp[idx]] = [cp[idx], cp[idx-1]]
+                      handleChange(key, cp)
+                    }
+                  }}>↑</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={() => {
+                    const current = Array.isArray(value) ? value : []
+                    const idx = current.indexOf(opt.value)
+                    if (idx >= 0 && idx < current.length - 1) {
+                      const cp = [...current]
+                      ;[cp[idx+1], cp[idx]] = [cp[idx], cp[idx+1]]
+                      handleChange(key, cp)
+                    }
+                  }}>↓</Button>
+                  <Button type="button" size="sm" onClick={() => {
+                    const current = Array.isArray(value) ? value : []
+                    if (!current.includes(opt.value)) handleChange(key, [...current, opt.value])
+                  }}>Добавить</Button>
+                </div>
+              </div>
+            ))}
+            {Array.isArray(value) && value.length > 0 && (
+              <p className="text-xs text-muted-foreground">Текущий порядок: {value.join(', ')}</p>
+            )}
+          </div>
+        )}
+
+        {/* Constant Sum */}
+        {component === 'ConstantSum' && (
+          <div className="space-y-2">
+            {(componentProps.items || []).map((item: any, idx: number) => (
+              <div key={item.value} className="flex items-center gap-2">
+                <span className="w-40 text-sm">{item.label}</span>
+                <Input
+                  type="number"
+                  value={(value?.[item.value] ?? 0).toString()}
+                  onChange={(e) => {
+                    const num = Number(e.target.value || 0)
+                    const current = value || {}
+                    handleChange(key, { ...current, [item.value]: num })
+                  }}
+                />
+              </div>
+            ))}
+            {value && (
+              <p className="text-xs text-muted-foreground">
+                Сумма: {Object.values(value).reduce((a: any, b: any) => Number(a) + Number(b), 0)} / {componentProps.total || 100}
               </p>
             )}
           </div>

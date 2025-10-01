@@ -19,6 +19,8 @@ interface Question {
   description?: string
   required: boolean
   options?: Array<{ label: string; value: string }> | undefined
+  rowsOptions?: Array<{ label: string; value: string }>
+  columnsOptions?: Array<{ label: string; value: string }>
   correctAnswer?: any
   points?: number
   min?: number
@@ -47,7 +49,19 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
       type,
       title: '',
       required: false,
-      options: hasOptions ? [{ label: 'Вариант 1', value: 'opt1' }] : undefined
+      options: hasOptions ? [{ label: 'Вариант 1', value: 'opt1' }] : undefined,
+      ...(type === 'matrix'
+        ? {
+            rowsOptions: [
+              { label: 'Строка 1', value: 'row1' },
+              { label: 'Строка 2', value: 'row2' }
+            ],
+            columnsOptions: [
+              { label: 'Колонка 1', value: 'col1' },
+              { label: 'Колонка 2', value: 'col2' }
+            ]
+          }
+        : {})
     }
     setQuestions([...questions, newQuestion])
   }
@@ -154,6 +168,30 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
           }
           break
 
+        case 'email':
+          fieldSchema.type = 'string'
+          fieldSchema['x-component'] = 'Input.Email'
+          fieldSchema['x-component-props'] = {
+            placeholder: 'name@example.com'
+          }
+          break
+
+        case 'phone':
+          fieldSchema.type = 'string'
+          fieldSchema['x-component'] = 'Input.Phone'
+          fieldSchema['x-component-props'] = {
+            placeholder: '+7 900 000-00-00'
+          }
+          break
+
+        case 'url':
+          fieldSchema.type = 'string'
+          fieldSchema['x-component'] = 'Input.URL'
+          fieldSchema['x-component-props'] = {
+            placeholder: 'https://...'
+          }
+          break
+
         case 'radio':
           fieldSchema.type = 'string'
           fieldSchema['x-component'] = 'Radio.Group'
@@ -172,14 +210,39 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
           fieldSchema.enum = question.options?.map(opt => ({ label: opt.label, value: opt.value }))
           break
 
+        case 'image_choice':
+          fieldSchema.type = 'string'
+          fieldSchema['x-component'] = 'ImageChoice'
+          fieldSchema.enum = question.options?.map(opt => ({ label: opt.label, value: opt.value, image: (opt as any).image }))
+          break
+
         case 'boolean':
           fieldSchema.type = 'boolean'
           fieldSchema['x-component'] = 'Switch'
           break
 
+        case 'yes_no':
+          fieldSchema.type = 'string'
+          fieldSchema['x-component'] = 'Radio.Group'
+          fieldSchema.enum = [
+            { label: 'Да', value: 'yes' },
+            { label: 'Нет', value: 'no' }
+          ]
+          break
+
         case 'date':
           fieldSchema.type = 'string'
           fieldSchema['x-component'] = 'DatePicker'
+          break
+
+        case 'time':
+          fieldSchema.type = 'string'
+          fieldSchema['x-component'] = 'TimePicker'
+          break
+
+        case 'datetime':
+          fieldSchema.type = 'string'
+          fieldSchema['x-component'] = 'DateTimePicker'
           break
 
         case 'rating':
@@ -208,6 +271,65 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
             min: question.min || 0,
             max: question.max || 100
           }
+          break
+
+        case 'nps':
+          fieldSchema.type = 'number'
+          fieldSchema['x-component'] = 'NPS'
+          fieldSchema['x-component-props'] = {
+            min: 0,
+            max: 10
+          }
+          break
+
+        case 'matrix':
+          fieldSchema.type = 'array'
+          fieldSchema['x-component'] = 'Matrix'
+          // ожидаем, что options содержит строки и колонки
+          fieldSchema['x-component-props'] = {
+            rows: question.rowsOptions || [],
+            columns: question.columnsOptions || []
+          }
+          break
+
+        case 'ranking':
+          fieldSchema.type = 'array'
+          fieldSchema['x-component'] = 'Ranking'
+          fieldSchema.enum = question.options?.map(opt => ({ label: opt.label, value: opt.value }))
+          break
+
+        case 'constant_sum':
+          fieldSchema.type = 'array'
+          fieldSchema['x-component'] = 'ConstantSum'
+          fieldSchema['x-component-props'] = {
+            total: (question as any).max || 100,
+            items: question.options?.map(opt => ({ label: opt.label, value: opt.value })) || []
+          }
+          break
+
+        case 'upload':
+          fieldSchema.type = 'string'
+          fieldSchema['x-component'] = 'Upload'
+          break
+
+        case 'signature':
+          fieldSchema.type = 'string'
+          fieldSchema['x-component'] = 'Signature'
+          break
+
+        case 'location':
+          fieldSchema.type = 'string'
+          fieldSchema['x-component'] = 'Location'
+          break
+
+        case 'divider':
+          fieldSchema.type = 'void'
+          fieldSchema['x-content'] = question.title || '—'
+          break
+
+        case 'html':
+          fieldSchema.type = 'void'
+          fieldSchema['x-content'] = question.description || ''
           break
       }
 
@@ -410,6 +532,7 @@ function QuestionEditor({
   const hasOptions = ['radio', 'checkbox', 'select'].includes(question.type)
   const hasMinMax = ['number', 'scale', 'slider'].includes(question.type)
   const canHaveCorrectAnswer = ['radio', 'checkbox', 'text', 'number'].includes(question.type)
+  const isMatrix = question.type === 'matrix'
 
   return (
     <Card>
@@ -476,6 +599,101 @@ function QuestionEditor({
                 <Plus className="h-4 w-4 mr-2" />
                 Добавить вариант
               </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Matrix configuration */}
+        {isMatrix && (
+          <div className="grid grid-cols-2 gap-6">
+            {/* Rows */}
+            <div>
+              <Label>Строки</Label>
+              <div className="space-y-2 mt-2">
+                {(question.rowsOptions || []).map((row, rowIndex) => (
+                  <div key={rowIndex} className="flex items-center gap-2">
+                    <Input
+                      value={row.label}
+                      onChange={(e) => {
+                        const next = [...(question.rowsOptions || [])]
+                        next[rowIndex] = { ...next[rowIndex], label: e.target.value, value: next[rowIndex].value || `row${rowIndex + 1}` }
+                        onUpdate({ rowsOptions: next })
+                      }}
+                      placeholder={`Строка ${rowIndex + 1}`}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const next = (question.rowsOptions || []).filter((_, i) => i !== rowIndex)
+                        onUpdate({ rowsOptions: next })
+                      }}
+                      disabled={(question.rowsOptions || []).length <= 1}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const next = [
+                      ...(question.rowsOptions || []),
+                      { label: `Строка ${(question.rowsOptions || []).length + 1}`, value: `row${(question.rowsOptions || []).length + 1}` }
+                    ]
+                    onUpdate({ rowsOptions: next })
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Добавить строку
+                </Button>
+              </div>
+            </div>
+
+            {/* Columns */}
+            <div>
+              <Label>Колонки</Label>
+              <div className="space-y-2 mt-2">
+                {(question.columnsOptions || []).map((col, colIndex) => (
+                  <div key={colIndex} className="flex items-center gap-2">
+                    <Input
+                      value={col.label}
+                      onChange={(e) => {
+                        const next = [...(question.columnsOptions || [])]
+                        next[colIndex] = { ...next[colIndex], label: e.target.value, value: next[colIndex].value || `col${colIndex + 1}` }
+                        onUpdate({ columnsOptions: next })
+                      }}
+                      placeholder={`Колонка ${colIndex + 1}`}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const next = (question.columnsOptions || []).filter((_, i) => i !== colIndex)
+                        onUpdate({ columnsOptions: next })
+                      }}
+                      disabled={(question.columnsOptions || []).length <= 1}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const next = [
+                      ...(question.columnsOptions || []),
+                      { label: `Колонка ${(question.columnsOptions || []).length + 1}`, value: `col${(question.columnsOptions || []).length + 1}` }
+                    ]
+                    onUpdate({ columnsOptions: next })
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Добавить колонку
+                </Button>
+              </div>
             </div>
           </div>
         )}

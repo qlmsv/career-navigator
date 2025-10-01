@@ -6,11 +6,18 @@ export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
+  const startTime = Date.now()
+  console.log('[TEST-SUBMIT] Starting submission process')
+
   try {
     const { id } = await context.params
+    console.log('[TEST-SUBMIT] Processing test ID:', id)
+
     const input: Omit<SubmitResponseInput, 'test_id'> = await request.json()
+    console.log('[TEST-SUBMIT] Input data size:', JSON.stringify(input).length, 'characters')
 
     if (!input.response_data) {
+      console.log('[TEST-SUBMIT] Missing response data')
       return NextResponse.json(
         { success: false, error: 'Response data required' },
         { status: 400 }
@@ -58,6 +65,9 @@ export async function POST(
       )
     }
 
+    const duration = Date.now() - startTime
+    console.log(`[TEST-SUBMIT] Successfully processed test ${id} in ${duration}ms, score: ${score}`)
+
     return NextResponse.json({
       success: true,
       data: {
@@ -68,7 +78,8 @@ export async function POST(
       }
     })
   } catch (error) {
-    console.error('Submit response error:', error)
+    const duration = Date.now() - startTime
+    console.error(`[TEST-SUBMIT] Error after ${duration}ms:`, error)
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
