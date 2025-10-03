@@ -13,13 +13,18 @@ export async function POST() {
           'x-content': '📊 Оцените каждое утверждение по шкале от 1 до 5\n\n1 = Абсолютно не согласен | 5 = Полностью согласен'
         }
       }
+      const big5Constructs = ['Extraversion', 'Agreeableness', 'Conscientiousness', 'Neuroticism', 'Openness']
       for (let i = 1; i <= 50; i += 1) {
+        const construct = big5Constructs[(i - 1) % big5Constructs.length]
+        const subconstruct = `${construct} Facet ${(Math.floor((i - 1) / 5) % 6) + 1}`
+        const skill = `${construct} Skill ${(i % 2) + 1}`
         properties[`q${i}`] = {
           type: 'number',
           title: `${i}. Утверждение Big Five №${i}`,
           'x-decorator': 'FormItem',
           'x-component': 'Slider',
           'x-component-props': { min: 1, max: 5, step: 1, marks: makeMarks },
+          'x-meta': { construct, subconstruct, skill, reverse: (i % 5) === 0 },
           required: true
         }
       }
@@ -34,13 +39,18 @@ export async function POST() {
           'x-content': '⭐ Оцените каждое утверждение звездочками от 1 до 5\n\n1 звезда = Совершенно не согласен | 5 звезд = Совершенно согласен'
         }
       }
+      const hexacoConstructs = ['Honesty-Humility', 'Emotionality', 'eXtraversion', 'Agreeableness', 'Conscientiousness', 'Openness']
       for (let i = 1; i <= 60; i += 1) {
+        const construct = hexacoConstructs[(i - 1) % hexacoConstructs.length]
+        const subconstruct = `${construct} Facet ${(Math.floor((i - 1) / 6) % 6) + 1}`
+        const skill = `${construct} Skill ${(i % 3) + 1}`
         properties[`h${i}`] = {
           type: 'number',
           title: `${i}. Утверждение HEXACO №${i}`,
           'x-decorator': 'FormItem',
           'x-component': 'Rate',
           'x-component-props': { count: 5 },
+          'x-meta': { construct, subconstruct, skill, reverse: (i % 6) === 0 },
           required: true
         }
       }

@@ -92,6 +92,9 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
   let totalScore = 0
   let maxScore = 0
   const results: Record<string, any> = {}
+  const aggregates: Record<string, { sum: number; count: number }> = {}
+  const aggregatesSub: Record<string, { sum: number; count: number }> = {}
+  const aggregatesSkill: Record<string, { sum: number; count: number }> = {}
 
   if (!schema.properties) {
     return { score: 0, results: {} }
@@ -100,6 +103,7 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
   // Проходим по всем вопросам в схеме
   Object.entries(schema.properties).forEach(([key, field]: [string, any]) => {
     const componentProps = field['x-component-props'] || {}
+    const meta = field['x-meta'] || {}
     const correctAnswer = componentProps.correctAnswer
     const points = componentProps.points || 0
 
@@ -128,6 +132,31 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
         maxPoints: points
       }
     }
+
+    // Агрегации по конструктам (для шкал 1-5)
+    const component = field['x-component']
+    const userAnswer = responseData[key]
+    if ((component === 'Slider' || component === 'Rate' || component === 'NPS') && typeof userAnswer === 'number') {
+      const value = meta.reverse ? (component === 'NPS' ? 10 - userAnswer : 6 - userAnswer) : userAnswer
+      if (meta.construct) {
+        const k = String(meta.construct)
+        aggregates[k] = aggregates[k] || { sum: 0, count: 0 }
+        aggregates[k].sum += value
+        aggregates[k].count += 1
+      }
+      if (meta.subconstruct) {
+        const k = String(meta.subconstruct)
+        aggregatesSub[k] = aggregatesSub[k] || { sum: 0, count: 0 }
+        aggregatesSub[k].sum += value
+        aggregatesSub[k].count += 1
+      }
+      if (meta.skill) {
+        const k = String(meta.skill)
+        aggregatesSkill[k] = aggregatesSkill[k] || { sum: 0, count: 0 }
+        aggregatesSkill[k].sum += value
+        aggregatesSkill[k].count += 1
+      }
+    }
   })
 
   const percentage = maxScore > 0 ? (totalScore / maxScore) * 100 : 0
@@ -138,7 +167,10 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
       totalScore,
       maxScore,
       percentage: Math.round(percentage * 10) / 10,
-      details: results
+      details: results,
+      constructs: Object.fromEntries(Object.entries(aggregates).map(([k, v]) => [k, Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100])),
+      subconstructs: Object.fromEntries(Object.entries(aggregatesSub).map(([k, v]) => [k, Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100])),
+      skills: Object.fromEntries(Object.entries(aggregatesSkill).map(([k, v]) => [k, Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100]))
     }
   }
 }
