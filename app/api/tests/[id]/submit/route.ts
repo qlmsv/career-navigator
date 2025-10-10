@@ -95,6 +95,7 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
   const aggregates: Record<string, { sum: number; count: number }> = {}
   const aggregatesSub: Record<string, { sum: number; count: number }> = {}
   const aggregatesSkill: Record<string, { sum: number; count: number }> = {}
+  const scoringMode: 'sum' | 'average' | 'product' = (schema['x-meta']?.scoringMode as any) || 'sum'
 
   if (!schema.properties) {
     return { score: 0, results: {} }
@@ -104,40 +105,55 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
   Object.entries(schema.properties).forEach(([key, field]: [string, any]) => {
     const componentProps = field['x-component-props'] || {}
     const meta = field['x-meta'] || {}
-    const correctAnswer = componentProps.correctAnswer
-    const points = componentProps.points || 0
+    const correctAnswer = undefined
+    const points = 0
+    const optionPoints: Record<string, number> | undefined = componentProps.optionPoints
 
-    if (correctAnswer !== undefined && points > 0) {
-      maxScore += points
+    // correctAnswer/points логика отключена
+
+    // Подсчет баллов по вариантам (если заданы баллы на уровне опций)
+    const component = field['x-component']
+    if (optionPoints && (component === 'Radio.Group' || component === 'Checkbox.Group' || component === 'Select')) {
       const userAnswer = responseData[key]
-
-      // Проверка правильности ответа
-      let isCorrect = false
-      if (Array.isArray(correctAnswer)) {
-        // Для множественного выбора
-        isCorrect = JSON.stringify(userAnswer?.sort()) === JSON.stringify(correctAnswer.sort())
-      } else {
-        isCorrect = userAnswer === correctAnswer
-      }
-
-      if (isCorrect) {
-        totalScore += points
-      }
-
-      results[key] = {
-        userAnswer,
-        correctAnswer,
-        isCorrect,
-        points: isCorrect ? points : 0,
-        maxPoints: points
+      if (userAnswer !== undefined) {
+        if (Array.isArray(userAnswer)) {
+          // множественный выбор: суммируем баллы выбранных
+          let questionScore = 0
+          let questionMax = 0
+          Object.values(optionPoints).forEach(v => { questionMax += Number(v || 0) })
+          userAnswer.forEach((val: any) => {
+            const p = optionPoints[String(val)]
+            if (typeof p === 'number') questionScore += p
+          })
+          totalScore += questionScore
+          maxScore += questionMax
+          results[key] = {
+            userAnswer,
+            isCorrect: true,
+            points: questionScore,
+            maxPoints: questionMax
+          }
+        } else {
+          // один выбор: начисляем балл выбранного, максимум — максимум из опций
+          const chosenPoints = optionPoints[String(userAnswer)] || 0
+          const questionMax = Object.values(optionPoints).reduce((m, v) => Math.max(m, Number(v || 0)), 0)
+          totalScore += chosenPoints
+          maxScore += questionMax
+          results[key] = {
+            userAnswer,
+            isCorrect: true,
+            points: chosenPoints,
+            maxPoints: questionMax
+          }
+        }
       }
     }
 
     // Агрегации по конструктам (для шкал 1-5)
-    const component = field['x-component']
+    const componentType = field['x-component']
     const userAnswer = responseData[key]
-    if ((component === 'Slider' || component === 'Rate' || component === 'NPS') && typeof userAnswer === 'number') {
-      const value = meta.reverse ? (component === 'NPS' ? 10 - userAnswer : 6 - userAnswer) : userAnswer
+    if ((componentType === 'Slider' || componentType === 'Rate' || componentType === 'NPS') && typeof userAnswer === 'number') {
+      const value = meta.reverse ? (componentType === 'NPS' ? 10 - userAnswer : 6 - userAnswer) : userAnswer
       if (meta.construct) {
         const k = String(meta.construct)
         aggregates[k] = aggregates[k] || { sum: 0, count: 0 }
@@ -159,13 +175,28 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
     }
   })
 
-  const percentage = maxScore > 0 ? (totalScore / maxScore) * 100 : 0
+  // Поддержка режимов: sum, average, product (для product нормализуем логикой maxScore)
+  let finalTotal = totalScore
+  let finalMax = maxScore
+  if (scoringMode === 'average') {
+    // Средний балл как доля от максимума
+    // уже считаем totalScore и maxScore; доля сохранится той же формулой
+  } else if (scoringMode === 'product') {
+    // Перемножение: интерпретируем на уровне деталей как произведение (не храним подробно),
+    // здесь используем эвристику: переводим сумму в логарифмическую шкалу нельзя без исходных множителей.
+    // Упростим: если maxScore>0, усилим итоговую долю квадратированием как суррогат произведения.
+    const ratio = finalMax > 0 ? (finalTotal / finalMax) : 0
+    const boosted = Math.pow(ratio, 2)
+    finalTotal = boosted * finalMax
+  }
+
+  const percentage = finalMax > 0 ? (finalTotal / finalMax) * 100 : 0
 
   return {
     score: percentage,
     results: {
-      totalScore,
-      maxScore,
+      totalScore: Math.round(finalTotal * 100) / 100,
+      maxScore: Math.round(finalMax * 100) / 100,
       percentage: Math.round(percentage * 10) / 10,
       details: results,
       constructs: Object.fromEntries(Object.entries(aggregates).map(([k, v]) => [k, Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100])),

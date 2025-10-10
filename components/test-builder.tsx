@@ -18,15 +18,20 @@ interface Question {
   title: string
   description?: string
   required: boolean
-  options?: Array<{ label: string; value: string }> | undefined
+  options?: Array<{ label: string; value: string; points?: number }> | undefined
   rowsOptions?: Array<{ label: string; value: string }>
   columnsOptions?: Array<{ label: string; value: string }>
+  // correct answer and question-level points removed from UI and schema
   correctAnswer?: any
   points?: number
   min?: number
   max?: number
   step?: number
   rows?: number
+  construct?: string
+  subconstruct?: string
+  skill?: string
+  reverse?: boolean
 }
 
 interface TestBuilderProps {
@@ -39,6 +44,14 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
   const [description, setDescription] = useState('')
   const [questions, setQuestions] = useState<Question[]>([])
   const [saving, setSaving] = useState(false)
+  const [constructs, setConstructs] = useState<string[]>([])
+  const [subconstructs, setSubconstructs] = useState<string[]>([])
+  const [skills, setSkills] = useState<string[]>([])
+  const [scoringMode, setScoringMode] = useState<'sum' | 'average' | 'product'>('sum')
+  // raw inputs to allow typing commas without immediate parsing side effects
+  const [constructsInput, setConstructsInput] = useState<string>('')
+  const [subconstructsInput, setSubconstructsInput] = useState<string>('')
+  const [skillsInput, setSkillsInput] = useState<string>('')
 
   // Добавить новый вопрос
   const addQuestion = (type: QuestionType) => {
@@ -49,7 +62,7 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
       type,
       title: '',
       required: false,
-      options: hasOptions ? [{ label: 'Вариант 1', value: 'opt1' }] : undefined,
+      options: hasOptions ? [{ label: 'Вариант 1', value: 'opt1', points: undefined }] : undefined,
       ...(type === 'matrix'
         ? {
             rowsOptions: [
@@ -84,7 +97,7 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
           ...q,
           options: [
             ...q.options,
-            { label: `Вариант ${q.options.length + 1}`, value: `opt${q.options.length + 1}` }
+            { label: `Вариант ${q.options.length + 1}`, value: `opt${q.options.length + 1}`, points: 0 }
           ]
         }
       }
@@ -103,6 +116,23 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
             ...currentOption, 
             label,
             value: currentOption.value || `opt${optionIndex + 1}`
+          }
+        }
+        return { ...q, options: newOptions }
+      }
+      return q
+    }))
+  }
+  
+  const updateOptionPoints = (questionId: string, optionIndex: number, points: number | undefined) => {
+    setQuestions(questions.map(q => {
+      if (q.id === questionId && q.options) {
+        const newOptions = [...q.options]
+        const currentOption = newOptions[optionIndex]
+        if (currentOption) {
+          newOptions[optionIndex] = {
+            ...currentOption,
+            points
           }
         }
         return { ...q, options: newOptions }
@@ -333,12 +363,30 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
           break
       }
 
-      // Добавляем правильный ответ и баллы если указаны
-      if (question.correctAnswer !== undefined || question.points !== undefined) {
+      // Правильный ответ и баллы за весь вопрос больше не используются
+
+      // Добавляем баллы на уровне вариантов, если есть
+      if (question.options && question.options.some(o => typeof o.points === 'number')) {
+        const optionPoints: Record<string, number> = {}
+        question.options.forEach(opt => {
+          if (opt.value !== undefined && typeof opt.points === 'number') {
+            optionPoints[String(opt.value)] = Number(opt.points)
+          }
+        })
         fieldSchema['x-component-props'] = {
           ...fieldSchema['x-component-props'],
-          correctAnswer: question.correctAnswer,
-          points: question.points
+          optionPoints
+        }
+      }
+
+      // Добавляем метаданные конструкта/субконструкта/скилла/реверса
+      if (question.construct || question.subconstruct || question.skill || typeof question.reverse === 'boolean') {
+        fieldSchema['x-meta'] = {
+          ...(fieldSchema['x-meta'] || {}),
+          ...(question.construct ? { construct: question.construct } : {}),
+          ...(question.subconstruct ? { subconstruct: question.subconstruct } : {}),
+          ...(question.skill ? { skill: question.skill } : {}),
+          ...(typeof question.reverse === 'boolean' ? { reverse: !!question.reverse } : {})
         }
       }
 
@@ -347,7 +395,13 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
 
     return {
       type: 'object',
-      properties
+      properties,
+      'x-meta': {
+        constructs,
+        subconstructs,
+        skills,
+        scoringMode
+      }
     }
   }
 
@@ -375,47 +429,16 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
     }
   }
 
-  // Типы вопросов (расширенный список как в Qualtrics - 25 типов!)
+  // Типы вопросов (оставлены только простые)
   const questionTypes: Array<{ value: QuestionType; label: string; icon: string; category: string }> = [
-    // Базовые (6)
     { value: 'text', label: 'Текст', icon: '📝', category: 'basic' },
     { value: 'textarea', label: 'Длинный текст', icon: '📄', category: 'basic' },
     { value: 'number', label: 'Число', icon: '🔢', category: 'basic' },
-    { value: 'email', label: 'Email', icon: '📧', category: 'basic' },
-    { value: 'phone', label: 'Телефон', icon: '📱', category: 'basic' },
-    { value: 'url', label: 'URL ссылка', icon: '🔗', category: 'basic' },
-    
-    // Выбор (4)
     { value: 'radio', label: 'Один выбор', icon: '⭕', category: 'choice' },
     { value: 'checkbox', label: 'Множественный', icon: '☑️', category: 'choice' },
     { value: 'select', label: 'Dropdown', icon: '📋', category: 'choice' },
-    { value: 'image_choice', label: 'Выбор картинки', icon: '🖼️', category: 'choice' },
-    
-    // Шкалы (4)
     { value: 'rating', label: 'Звезды', icon: '⭐', category: 'scale' },
     { value: 'scale', label: 'Шкала 1-5', icon: '📊', category: 'scale' },
-    { value: 'slider', label: 'Слайдер', icon: '🎚️', category: 'scale' },
-    { value: 'nps', label: 'NPS (0-10)', icon: '💯', category: 'scale' },
-    
-    // Даты (3)
-    { value: 'date', label: 'Дата', icon: '📅', category: 'datetime' },
-    { value: 'time', label: 'Время', icon: '⏰', category: 'datetime' },
-    { value: 'datetime', label: 'Дата и время', icon: '📆', category: 'datetime' },
-    
-    // Булевы (2)
-    { value: 'boolean', label: 'Переключатель', icon: '🔘', category: 'boolean' },
-    { value: 'yes_no', label: 'Да/Нет', icon: '✓✗', category: 'boolean' },
-    
-    // Сложные (5)
-    { value: 'matrix', label: 'Матрица', icon: '⚡', category: 'advanced' },
-    { value: 'ranking', label: 'Ранжирование', icon: '🔢', category: 'advanced' },
-    { value: 'constant_sum', label: 'Сумма = N', icon: '➕', category: 'advanced' },
-    { value: 'upload', label: 'Файл', icon: '📎', category: 'advanced' },
-    { value: 'signature', label: 'Подпись', icon: '✍️', category: 'advanced' },
-    
-    // Специальные (2)
-    { value: 'divider', label: 'Разделитель', icon: '━', category: 'special' },
-    { value: 'html', label: 'HTML блок', icon: '💻', category: 'special' },
   ]
 
   return (
@@ -445,6 +468,67 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
               rows={3}
             />
           </div>
+
+          {/* Списки конструктов/субконструктов/навыков */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label>Конструкты (через запятую)</Label>
+              <Input
+                value={constructsInput !== '' ? constructsInput : constructs.join(', ')}
+                onChange={(e) => setConstructsInput(e.target.value)}
+                onBlur={() => {
+                  const list = (constructsInput !== '' ? constructsInput : constructs.join(', '))
+                    .split(',')
+                    .map(s => s.trim())
+                  setConstructs(list.filter(s => s !== ''))
+                }}
+                placeholder="Extraversion, Agreeableness"
+              />
+            </div>
+            <div>
+              <Label>Субконструкты (через запятую)</Label>
+              <Input
+                value={subconstructsInput !== '' ? subconstructsInput : subconstructs.join(', ')}
+                onChange={(e) => setSubconstructsInput(e.target.value)}
+                onBlur={() => {
+                  const list = (subconstructsInput !== '' ? subconstructsInput : subconstructs.join(', '))
+                    .split(',')
+                    .map(s => s.trim())
+                  setSubconstructs(list.filter(s => s !== ''))
+                }}
+                placeholder="Facet 1, Facet 2"
+              />
+            </div>
+            <div>
+              <Label>Навыки (через запятую)</Label>
+              <Input
+                value={skillsInput !== '' ? skillsInput : skills.join(', ')}
+                onChange={(e) => setSkillsInput(e.target.value)}
+                onBlur={() => {
+                  const list = (skillsInput !== '' ? skillsInput : skills.join(', '))
+                    .split(',')
+                    .map(s => s.trim())
+                  setSkills(list.filter(s => s !== ''))
+                }}
+                placeholder="Skill A, Skill B"
+              />
+            </div>
+          </div>
+
+          {/* Режим подсчета */}
+          <div>
+            <Label>Система подсчета</Label>
+            <Select value={scoringMode} onValueChange={(v) => setScoringMode(v as any)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите систему подсчета" />
+              </SelectTrigger>
+              <SelectContent className="bg-background">
+                <SelectItem value="sum">Суммирование</SelectItem>
+                <SelectItem value="average">Средний балл</SelectItem>
+                <SelectItem value="product">Перемножение</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardContent>
       </Card>
 
@@ -463,6 +547,10 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
               onAddOption={() => addOption(question.id)}
               onUpdateOption={(optionIndex, label) => updateOption(question.id, optionIndex, label)}
               onDeleteOption={(optionIndex) => deleteOption(question.id, optionIndex)}
+              constructsList={constructs}
+              subconstructsList={subconstructs}
+              skillsList={skills}
+              onUpdateOptionPoints={(optionIndex, pts) => updateOptionPoints(question.id, optionIndex, pts)}
             />
             {/* Add button after each question */}
             <div className="my-4">
@@ -518,6 +606,10 @@ interface QuestionEditorProps {
   onAddOption: () => void
   onUpdateOption: (index: number, label: string) => void
   onDeleteOption: (index: number) => void
+  constructsList: string[]
+  subconstructsList: string[]
+  skillsList: string[]
+  onUpdateOptionPoints: (index: number, points: number | undefined) => void
 }
 
 function QuestionEditor({ 
@@ -527,11 +619,15 @@ function QuestionEditor({
   onDelete,
   onAddOption,
   onUpdateOption,
-  onDeleteOption
+  onDeleteOption,
+  constructsList,
+  subconstructsList,
+  skillsList,
+  onUpdateOptionPoints
 }: QuestionEditorProps) {
   const hasOptions = ['radio', 'checkbox', 'select'].includes(question.type)
   const hasMinMax = ['number', 'scale', 'slider'].includes(question.type)
-  const canHaveCorrectAnswer = ['radio', 'checkbox', 'text', 'number'].includes(question.type)
+  const canHaveCorrectAnswer = false
   const isMatrix = question.type === 'matrix'
 
   return (
@@ -579,20 +675,39 @@ function QuestionEditor({
             <Label>Варианты ответов</Label>
             <div className="space-y-2 mt-2">
               {question.options.map((option, optIndex) => (
-                <div key={optIndex} className="flex items-center gap-2">
-                  <Input
-                    value={option.label}
-                    onChange={(e) => onUpdateOption(optIndex, e.target.value)}
-                    placeholder={`Вариант ${optIndex + 1}`}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDeleteOption(optIndex)}
-                    disabled={question.options!.length <= 1}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                <div key={optIndex} className="grid grid-cols-12 gap-2 items-center">
+                  <div className="col-span-7">
+                    <Input
+                      value={option.label}
+                      onChange={(e) => onUpdateOption(optIndex, e.target.value)}
+                      placeholder={`Вариант ${optIndex + 1}`}
+                    />
+                  </div>
+                  <div className="col-span-3">
+                    <Input
+                      type="number"
+                      min={0}
+                      step={1}
+                      inputMode="numeric"
+                      value={option.points !== undefined ? String(option.points) : ''}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        const num = val === '' ? undefined : Number.parseFloat(val)
+                        onUpdateOptionPoints(optIndex, Number.isNaN(num as any) ? undefined : (num as number | undefined))
+                      }}
+                      placeholder="Баллы"
+                    />
+                  </div>
+                  <div className="col-span-2 flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDeleteOption(optIndex)}
+                      disabled={question.options!.length <= 1}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
               <Button variant="outline" size="sm" onClick={onAddOption}>
@@ -602,6 +717,59 @@ function QuestionEditor({
             </div>
           </div>
         )}
+
+        {/* Meta fields: construct/subconstruct/skill/reverse */}
+        <div className="grid grid-cols-4 gap-4">
+          <div>
+            <Label>Конструкт</Label>
+            <Select value={question.construct || ''} onValueChange={(v) => onUpdate({ construct: v })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите конструкт" />
+              </SelectTrigger>
+              <SelectContent className="bg-background">
+                {constructsList.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Субконструкт</Label>
+            <Select value={question.subconstruct || ''} onValueChange={(v) => onUpdate({ subconstruct: v })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите субконструкт" />
+              </SelectTrigger>
+              <SelectContent className="bg-background">
+                {subconstructsList.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Навык</Label>
+            <Select value={question.skill || ''} onValueChange={(v) => onUpdate({ skill: v })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите навык" />
+              </SelectTrigger>
+              <SelectContent className="bg-background">
+                {skillsList.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-end">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`reverse-${question.id}`}
+                checked={!!question.reverse}
+                onCheckedChange={(checked) => onUpdate({ reverse: !!checked })}
+              />
+              <Label htmlFor={`reverse-${question.id}`} className="cursor-pointer">Реверс</Label>
+            </div>
+          </div>
+        </div>
 
         {/* Matrix configuration */}
         {isMatrix && (
@@ -732,46 +900,7 @@ function QuestionEditor({
           </div>
         )}
 
-        {/* Correct Answer & Points */}
-        {canHaveCorrectAnswer && (
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Правильный ответ (для подсчета баллов)</Label>
-              {question.type === 'radio' && question.options ? (
-                <Select
-                  value={question.correctAnswer}
-                  onValueChange={(value) => onUpdate({ correctAnswer: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Выберите правильный ответ" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {question.options.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  value={question.correctAnswer || ''}
-                  onChange={(e) => onUpdate({ correctAnswer: e.target.value })}
-                  placeholder="Введите правильный ответ"
-                />
-              )}
-            </div>
-            <div>
-              <Label>Баллы за правильный ответ</Label>
-              <Input
-                type="number"
-                value={question.points || ''}
-                onChange={(e) => onUpdate({ points: Number(e.target.value) })}
-                placeholder="0"
-              />
-            </div>
-          </div>
-        )}
+        {/* Correct Answer & Points removed */}
 
         {/* Required checkbox */}
         <div className="flex items-center space-x-2">
@@ -810,99 +939,15 @@ function QuickAddButtons({ questionTypes, onAdd, compact }: QuickAddButtonsProps
     special: questionTypes.filter(t => t.category === 'special'),
   }
 
+  // Убираем выпадающее меню в компактном режиме
   if (compact) {
-    return (
-      <div className="flex justify-center relative">
-        <Button
-          variant="outline"
-          onClick={() => setIsOpen(!isOpen)}
-          className="border-dashed"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          {isOpen ? 'Закрыть' : 'Добавить вопрос здесь'}
-        </Button>
-        
-        {isOpen && (
-          <div className="absolute z-50 mt-12 bg-background border rounded-lg shadow-2xl p-4 w-[600px]">
-            <div className="max-h-96 overflow-y-auto space-y-4">
-              {/* Популярные */}
-              <div>
-                <h4 className="text-sm font-semibold mb-2 text-muted-foreground">Популярные</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {[...categories.basic.slice(0, 2), ...categories.choice.slice(0, 2)].map((type) => (
-                    <Button
-                      key={type.value}
-                      variant="outline"
-                      size="sm"
-                      className="h-auto py-2 px-2 flex flex-col items-center gap-1 hover:bg-primary hover:text-primary-foreground"
-                      onClick={() => {
-                        onAdd(type.value)
-                        setIsOpen(false)
-                      }}
-                    >
-                      <span className="text-xl">{type.icon}</span>
-                      <span className="text-xs text-center leading-tight">{type.label}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Шкалы */}
-              <div>
-                <h4 className="text-sm font-semibold mb-2 text-muted-foreground">Шкалы и рейтинги</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {categories.scale.map((type) => (
-                    <Button
-                      key={type.value}
-                      variant="outline"
-                      size="sm"
-                      className="h-auto py-2 px-2 flex flex-col items-center gap-1"
-                      onClick={() => {
-                        onAdd(type.value)
-                        setIsOpen(false)
-                      }}
-                    >
-                      <span className="text-xl">{type.icon}</span>
-                      <span className="text-xs text-center leading-tight">{type.label}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Остальные */}
-              <div>
-                <h4 className="text-sm font-semibold mb-2 text-muted-foreground">Все типы</h4>
-                <div className="grid grid-cols-5 gap-2">
-                  {questionTypes.map((type) => (
-                    <Button
-                      key={type.value}
-                      variant="ghost"
-                      size="sm"
-                      className="h-auto py-1 px-1 flex flex-col items-center gap-1 text-xs"
-                      onClick={() => {
-                        onAdd(type.value)
-                        setIsOpen(false)
-                      }}
-                    >
-                      <span className="text-lg">{type.icon}</span>
-                      <span className="text-[10px] text-center leading-tight">{type.label}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    )
+    return null
   }
 
   // Популярные типы для sticky панели
-  const popularTypes = [
-    ...categories.basic.slice(0, 2),
-    ...categories.choice.slice(0, 2),
-    ...categories.scale.slice(0, 2),
-  ]
+  // Показываем только 6 простых типов
+  const allowed = ['text', 'textarea', 'radio', 'checkbox', 'rating', 'scale']
+  const popularTypes = questionTypes.filter(t => allowed.includes(t.value as any))
 
   return (
     <Card className="sticky top-4 z-20 shadow-lg bg-background/95 backdrop-blur border-2">
@@ -912,7 +957,6 @@ function QuickAddButtons({ questionTypes, onAdd, compact }: QuickAddButtonsProps
             <Plus className="h-5 w-5" />
             Быстрое добавление
           </CardTitle>
-          <span className="text-xs text-muted-foreground">26 типов доступно</span>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -930,49 +974,6 @@ function QuickAddButtons({ questionTypes, onAdd, compact }: QuickAddButtonsProps
             </Button>
           ))}
         </div>
-        
-        {/* Все типы (компактно) */}
-        <details className="group">
-          <summary className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors flex items-center gap-2">
-            <span>Показать все {questionTypes.length} типов</span>
-            <span className="group-open:rotate-180 transition-transform">▼</span>
-          </summary>
-          <div className="mt-3 space-y-3">
-            {Object.entries(categories).map(([catKey, catTypes]) => {
-              if (catTypes.length === 0) return null
-              const categoryNames = {
-                basic: 'Базовые',
-                choice: 'Выбор из вариантов',
-                scale: 'Шкалы',
-                datetime: 'Дата и время',
-                boolean: 'Да/Нет',
-                advanced: 'Сложные',
-                special: 'Специальные'
-              }
-              return (
-                <div key={catKey}>
-                  <h4 className="text-xs font-semibold text-muted-foreground mb-2">
-                    {categoryNames[catKey as keyof typeof categoryNames]}
-                  </h4>
-                  <div className="grid grid-cols-4 md:grid-cols-6 gap-1">
-                    {catTypes.map((type) => (
-                      <Button
-                        key={type.value}
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto py-2 px-1 flex flex-col items-center gap-1 hover:bg-accent"
-                        onClick={() => onAdd(type.value)}
-                      >
-                        <span className="text-lg">{type.icon}</span>
-                        <span className="text-[10px] text-center leading-tight">{type.label}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </details>
       </CardContent>
     </Card>
   )
