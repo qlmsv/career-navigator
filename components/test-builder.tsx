@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -36,12 +36,114 @@ interface Question {
 
 interface TestBuilderProps {
   initialSchema?: ISchema
+  initialTitle?: string
+  initialDescription?: string
   onSave: (schema: ISchema, metadata: any) => void | Promise<void>
 }
 
-export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps) {
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
+function parseSchema(schema: ISchema): { questions: Question[], constructs: string[], subconstructs: string[], skills: string[], scoringMode: 'sum' | 'average' | 'product' } {
+    const questions: Question[] = [];
+    const properties = schema.properties || {};
+
+    for (const id in properties) {
+        const fieldSchema = properties[id];
+        if (!fieldSchema) continue;
+
+        let question: Partial<Question> = {
+            id,
+            title: fieldSchema.title || '',
+            description: fieldSchema.description || '',
+            required: !!fieldSchema.required,
+        };
+
+        const componentType = fieldSchema['x-component'] || '';
+        const typeMapping: { [key: string]: QuestionType } = {
+            'Input': 'text',
+            'Input.TextArea': 'textarea',
+            'InputNumber': 'number',
+            'Input.Email': 'email',
+            'Input.Phone': 'phone',
+            'Input.URL': 'url',
+            'Radio.Group': 'radio',
+            'Checkbox.Group': 'checkbox',
+            'Select': 'select',
+            'ImageChoice': 'image_choice',
+            'Switch': 'boolean',
+            'DatePicker': 'date',
+            'TimePicker': 'time',
+            'DateTimePicker': 'datetime',
+            'Rate': 'rating',
+            'Slider': 'slider',
+            'NPS': 'nps',
+            'Matrix': 'matrix',
+            'Ranking': 'ranking',
+            'ConstantSum': 'constant_sum',
+            'Upload': 'upload',
+            'Signature': 'signature',
+            'Location': 'location',
+            'Divider': 'divider',
+            'HTML': 'html'
+        };
+        
+        let qType: QuestionType = 'text';
+        if (componentType === 'Radio.Group' && fieldSchema.enum?.length === 2 && fieldSchema.enum[0].value === 'yes') {
+            qType = 'yes_no';
+        } else if (componentType === 'Slider' && (fieldSchema['x-component-props']?.marks)) {
+             qType = 'scale';
+        } else {
+            qType = typeMapping[componentType] || 'text';
+        }
+
+        question.type = qType;
+
+        if (fieldSchema.enum) {
+            const optionPoints = fieldSchema['x-component-props']?.optionPoints || {};
+            question.options = fieldSchema.enum.map((opt: { label: string, value: any }) => ({
+                label: opt.label,
+                value: String(opt.value),
+                points: optionPoints[String(opt.value)]
+            }));
+        }
+        
+        if (qType === 'matrix') {
+            question.rowsOptions = fieldSchema['x-component-props']?.rows || [];
+            question.columnsOptions = fieldSchema['x-component-props']?.columns || [];
+        }
+
+        const props = fieldSchema['x-component-props'] || {};
+        question.min = props.min;
+        question.max = props.max;
+        question.step = props.step;
+        if (qType === 'rating') {
+            question.max = props.count;
+        }
+        if (qType === 'textarea') {
+            question.rows = props.rows;
+        }
+
+        const meta = fieldSchema['x-meta'] || {};
+        question.construct = meta.construct;
+        question.subconstruct = meta.subconstruct;
+        question.skill = meta.skill;
+        question.reverse = meta.reverse;
+
+        questions.push(question as Question);
+    }
+    
+    const meta = schema['x-meta'] || {};
+
+    return {
+        questions,
+        constructs: meta.constructs || [],
+        subconstructs: meta.subconstructs || [],
+        skills: meta.skills || [],
+        scoringMode: meta.scoringMode || 'sum',
+    };
+}
+
+export default function TestBuilder({ initialSchema, initialTitle, initialDescription, onSave }: TestBuilderProps) {
+  const [title, setTitle] = useState(initialTitle || '')
+  const [description, setDescription] = useState(initialDescription || '')
   const [questions, setQuestions] = useState<Question[]>([])
   const [saving, setSaving] = useState(false)
   const [constructs, setConstructs] = useState<string[]>([])
@@ -52,6 +154,17 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
   const [constructsInput, setConstructsInput] = useState<string>('')
   const [subconstructsInput, setSubconstructsInput] = useState<string>('')
   const [skillsInput, setSkillsInput] = useState<string>('')
+
+  useEffect(() => {
+    if (initialSchema) {
+        const parsed = parseSchema(initialSchema);
+        setQuestions(parsed.questions);
+        setConstructs(parsed.constructs);
+        setSubconstructs(parsed.subconstructs);
+        setSkills(parsed.skills);
+        setScoringMode(parsed.scoringMode);
+    }
+  }, [initialSchema]);
 
   // Добавить новый вопрос
   const addQuestion = (type: QuestionType) => {

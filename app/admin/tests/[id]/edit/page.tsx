@@ -89,6 +89,8 @@ export default function EditTestPage() {
           ) : test ? (
             <TestBuilder
               initialSchema={test.formily_schema as ISchema}
+              initialTitle={test.title}
+              initialDescription={test.description}
               onSave={handleSave}
             />
           ) : null}
