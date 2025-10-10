@@ -130,9 +130,14 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
         const newOptions = [...q.options]
         const currentOption = newOptions[optionIndex]
         if (currentOption) {
-          newOptions[optionIndex] = {
-            ...currentOption,
-            points
+          if (points === undefined) {
+            const { points: _omit, ...rest } = currentOption as any
+            newOptions[optionIndex] = rest
+          } else {
+            newOptions[optionIndex] = {
+              ...currentOption,
+              points
+            }
           }
         }
         return { ...q, options: newOptions }
