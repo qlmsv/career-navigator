@@ -62,7 +62,7 @@ export default function TestBuilder({ initialSchema, onSave }: TestBuilderProps)
       type,
       title: '',
       required: false,
-      options: hasOptions ? [{ label: 'Вариант 1', value: 'opt1', points: undefined }] : undefined,
+      options: hasOptions ? [{ label: 'Вариант 1', value: 'opt1' }] : undefined,
       ...(type === 'matrix'
         ? {
             rowsOptions: [
