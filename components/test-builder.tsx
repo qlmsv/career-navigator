@@ -37,7 +37,7 @@ interface Question {
 interface TestBuilderProps {
   initialSchema?: ISchema
   initialTitle?: string
-  initialDescription?: string
+  initialDescription?: string | undefined
   onSave: (schema: ISchema, metadata: any) => void | Promise<void>
 }
 
