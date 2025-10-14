@@ -11,7 +11,7 @@ interface TestResultPageProps {
     id: string;
     attemptId: string;
   }>;
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 declare module 'next' {
