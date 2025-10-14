@@ -1030,6 +1030,12 @@ function SortableQuestionEditor(props: QuestionEditorProps & { id: string }) {
   );
 }
 
+interface QuickAddButtonsProps {
+  questionTypes: Array<{ value: QuestionType; label: string; icon: string; category: string }>
+  onAdd: (type: QuestionType) => void
+  compact?: boolean
+}
+
 
 function QuickAddButtons({ questionTypes, onAdd, compact }: QuickAddButtonsProps) {
   const [isOpen, setIsOpen] = useState(false)
