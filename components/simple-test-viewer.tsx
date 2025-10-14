@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,8 @@ import { Slider } from '@/components/ui/slider'
 import { Card, CardContent } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { useToast } from '@/hooks/use-toast'
+import { Progress } from './ui/progress'
 
 interface TestViewerProps {
   schema: any
@@ -18,9 +20,55 @@ interface TestViewerProps {
   submitting?: boolean
 }
 
+const simpleHash = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
+
 export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestViewerProps) {
+  const { toast } = useToast()
   const [answers, setAnswers] = useState<Record<string, any>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const storageKey = useMemo(() => {
+    try {
+      const schemaString = JSON.stringify(schema);
+      const hash = simpleHash(schemaString);
+      return `test-answers-${hash}`;
+    } catch (e) {
+      return `test-answers-fallback`;
+    }
+  }, [schema]);
+
+
+  // Загрузка ответов из localStorage при монтировании
+  useEffect(() => {
+    try {
+      const savedAnswers = localStorage.getItem(storageKey)
+      if (savedAnswers) {
+        setAnswers(JSON.parse(savedAnswers))
+        toast({ title: 'Прогресс восстановлен', description: 'Ваши предыдущие ответы были загружены.' })
+      }
+    } catch (error) {
+      console.error('Failed to load answers from localStorage', error)
+    }
+  }, [storageKey, toast])
+
+  // Сохранение ответов в localStorage при изменении
+  useEffect(() => {
+    try {
+      if (Object.keys(answers).length > 0) {
+        localStorage.setItem(storageKey, JSON.stringify(answers))
+      }
+    } catch (error) {
+      console.error('Failed to save answers to localStorage', error)
+    }
+  }, [answers, storageKey])
 
   const handleChange = (fieldName: string, value: any) => {
     setAnswers(prev => ({ ...prev, [fieldName]: value }))
@@ -36,67 +84,43 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Валидация обязательных полей
     const newErrors: Record<string, string> = {}
     const properties = schema.properties || {}
 
     Object.entries(properties).forEach(([key, field]: [string, any]) => {
       if (field.required && field.type !== 'void') {
-        const component = field['x-component']
         const value = answers[key]
-        if (component === 'Matrix') {
-          const rows = (field['x-component-props']?.rows || []) as Array<any>
-          const filledCount = Array.isArray(value) ? rows.filter((r) => value.find((v: any) => v?.row === r.value)).length : 0
-          if (filledCount < rows.length) {
-            newErrors[key] = 'Заполните выбор по каждой строке'
-          }
-        } else if (component === 'Checkbox.Group' || component === 'Ranking') {
-          if (!Array.isArray(value) || value.length === 0) {
-            newErrors[key] = 'Выберите хотя бы один вариант'
-          }
-        } else if (component === 'Input' || component === 'Input.Email' || component === 'Input.Phone' || component === 'Input.URL' || component === 'Input.TextArea' || component === 'Signature' || component === 'Location' || component === 'DatePicker' || component === 'TimePicker' || component === 'DateTimePicker') {
-          if (typeof value !== 'string' || value.trim() === '') {
-            newErrors[key] = 'Поле не должно быть пустым'
-          }
-        } else if (component === 'InputNumber' || component === 'Slider' || component === 'Rate' || component === 'NPS') {
-          if (value === undefined || value === null || Number.isNaN(value)) {
-            newErrors[key] = 'Укажите значение'
-          }
-        } else if (component === 'Radio.Group' || component === 'Select' || component === 'ImageChoice') {
-          if (value === undefined || value === null || value === '') {
-            newErrors[key] = 'Сделайте выбор'
-          }
-        } else if (component === 'Switch') {
-          if (typeof value !== 'boolean') {
-            newErrors[key] = 'Сделайте выбор'
-          }
-        } else if (component === 'Upload') {
-          if (!value) {
-            newErrors[key] = 'Загрузите файл'
-          }
-        } else if (component === 'ConstantSum') {
-          const items = field['x-component-props']?.items || []
-          const total = Number(field['x-component-props']?.total ?? 100)
-          const obj = value || {}
-          const sum = Object.values(obj).reduce((a: number, b: any) => a + Number(b || 0), 0)
-          if (items.length === 0 || sum !== total) {
-            newErrors[key] = `Сумма должна быть равна ${total}`
-          }
-        } else if (!value) {
-          // Фолбэк на случай неизвестного компонента
-          newErrors[key] = 'Обязательное поле'
+        if (value === undefined || value === null || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && value.trim() === '')) {
+          newErrors[key] = 'Это обязательный вопрос'
         }
       }
     })
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
-      alert('Пожалуйста, ответьте на все обязательные вопросы')
+      toast({
+        variant: 'destructive',
+        title: 'Не все поля заполнены',
+        description: 'Пожалуйста, ответьте на все обязательные вопросы.',
+      })
       return
     }
 
     await onSubmit(answers)
   }
+
+  const properties = schema.properties || {}
+
+  const { totalQuestions, answeredQuestions } = useMemo(() => {
+    const questionKeys = Object.keys(properties).filter(key => properties[key].type !== 'void');
+    const answeredCount = questionKeys.filter(key => {
+      const answer = answers[key];
+      return answer !== undefined && answer !== null && answer !== '' && (!Array.isArray(answer) || answer.length > 0);
+    }).length;
+    return { totalQuestions: questionKeys.length, answeredQuestions: answeredCount };
+  }, [answers, properties]);
+
+  const progressPercentage = totalQuestions > 0 ? (answeredQuestions / totalQuestions) * 100 : 0;
 
   const renderField = (key: string, field: any) => {
     // Пропускаем void поля (информационные блоки)
@@ -510,10 +534,21 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
     )
   }
 
-  const properties = schema.properties || {}
-
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      <Card className="sticky top-4 z-20 shadow-lg bg-background/95 backdrop-blur-sm p-4 border-2">
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-muted-foreground">Прогресс</p>
+            <Progress value={progressPercentage} className="mt-1 h-2" />
+          </div>
+          <div className="text-right">
+            <p className="text-xl font-bold">{answeredQuestions}/{totalQuestions}</p>
+            <p className="text-xs text-muted-foreground">вопросов</p>
+          </div>
+        </div>
+      </Card>
+
       {Object.entries(properties).map(([key, field]) => renderField(key, field))}
 
       <div className="flex justify-center pt-8">

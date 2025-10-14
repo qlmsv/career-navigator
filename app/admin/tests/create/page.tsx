@@ -7,9 +7,11 @@ import Link from 'next/link'
 import TestBuilder from '@/components/test-builder'
 import AdminGuard from '@/components/admin-guard'
 import type { ISchema } from '@formily/react'
+import { useToast } from '@/hooks/use-toast'
 
 export default function CreateTestPage() {
   const router = useRouter()
+  const { toast } = useToast()
 
   const handleSave = async (schema: ISchema, metadata: any) => {
     try {
@@ -28,16 +30,26 @@ export default function CreateTestPage() {
       const result = await response.json()
 
       if (result.success) {
-        alert(`✅ Тест "${metadata.title}" успешно создан!\n\nСтатус: Черновик\nВы можете опубликовать его в панели управления.`)
-        // Принудительный редирект с обновлением
-        window.location.href = '/admin'
+        toast({
+          title: '✅ Тест успешно создан!',
+          description: `Тест "${metadata.title}" сохранен как черновик.`,
+        })
+        router.push('/admin')
       } else {
-        alert('❌ Ошибка: ' + result.error)
+        toast({
+          variant: 'destructive',
+          title: '❌ Ошибка сохранения',
+          description: result.error || 'Произошла неизвестная ошибка на сервере.',
+        })
         console.error('API Error:', result)
       }
     } catch (error) {
       console.error('Error creating test:', error)
-      alert('❌ Ошибка при создании теста. Проверьте консоль.')
+      toast({
+        variant: 'destructive',
+        title: '❌ Ошибка при создании теста',
+        description: 'Произошла непредвиденная ошибка. Проверьте консоль.',
+      })
     }
   }
 
