@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CheckCircle, ArrowLeft, TrendingUp, Star } from 'lucide-react'
@@ -17,8 +17,8 @@ declare module 'next' {
   interface PageProps extends TestResultPageProps {}
 }
 
-async function getResponseDetails(responseId: string, userId: string) {
-  const supabase = createClient()
+async function getResponseDetails(testId: string, responseId: string) {
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('test_responses')
     .select(
@@ -26,12 +26,13 @@ async function getResponseDetails(responseId: string, userId: string) {
       *,
       tests (
         title,
-        description
+        description,
+        show_results
       )
     `
     )
     .eq('id', responseId)
-    .eq('user_identifier', userId)
+    .eq('test_id', testId)
     .single()
 
   if (error) {
@@ -55,13 +56,6 @@ function ConstructScore({ name, value }: { name: string; value: number }) {
 }
 
 export default async function TestResultPage({ params, searchParams }: TestResultPageProps) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    notFound()
-  }
-
   const resolvedParams = await params
   const resolvedSearchParams = searchParams ? await searchParams : {}
   const rawResponseId = resolvedSearchParams['responseId']
@@ -71,10 +65,28 @@ export default async function TestResultPage({ params, searchParams }: TestResul
     notFound()
   }
 
-  const response = await getResponseDetails(responseId, user.id)
+  const response = await getResponseDetails(resolvedParams.id, responseId)
 
   if (!response || !response.tests) {
     notFound()
+  }
+
+  if (response.tests.show_results === false) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <Card className="max-w-lg w-full text-center">
+          <CardHeader>
+            <CardTitle className="text-2xl">Результаты недоступны</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-muted-foreground">
+            <p>Для этого теста просмотр результатов отключен. Свяжитесь с организатором для получения дополнительной информации.</p>
+            <Button asChild variant="secondary">
+              <Link href={`/tests/${resolvedParams.id}`}>Вернуться к тесту</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   const test = response.tests
