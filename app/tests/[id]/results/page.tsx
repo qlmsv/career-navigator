@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 
-// Упрощаем определение пропсов для страницы
 type TestResultPageProps = {
   params: {
     id: string;
@@ -39,7 +38,7 @@ async function getResponseDetails(responseId: string, userId: string) {
 }
 
 function ConstructScore({ name, value }: { name: string; value: number }) {
-  const percentage = (value / 5) * 100 // Предполагаем, что средний балл по шкале от 1 до 5
+  const percentage = (value / 5) * 100;
   return (
     <div className="space-y-1">
       <div className="flex justify-between items-center text-sm">
@@ -102,7 +101,7 @@ export default async function TestResultPage({ params }: TestResultPageProps) {
                 <p className="text-sm text-muted-foreground">Процент правильных ответов</p>
                 <p className="text-6xl font-bold">{results.percentage?.toFixed(1) || '0.0'}%</p>
               </div>
-               <div className="text-center text-sm text-muted-foreground">
+              <div className="text-center text-sm text-muted-foreground">
                 (Набрано {results.totalScore?.toFixed(1)} из {results.maxScore?.toFixed(1)} возможных баллов)
               </div>
             </CardContent>
