@@ -9,7 +9,6 @@ import { Progress } from '@/components/ui/progress'
 interface TestResultPageProps {
   params: Promise<{
     id: string;
-    attemptId: string;
   }>;
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
@@ -55,7 +54,7 @@ function ConstructScore({ name, value }: { name: string; value: number }) {
   )
 }
 
-export default async function TestResultPage({ params }: TestResultPageProps) {
+export default async function TestResultPage({ params, searchParams }: TestResultPageProps) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -64,7 +63,15 @@ export default async function TestResultPage({ params }: TestResultPageProps) {
   }
 
   const resolvedParams = await params
-  const response = await getResponseDetails(resolvedParams.attemptId, user.id)
+  const resolvedSearchParams = searchParams ? await searchParams : {}
+  const rawResponseId = resolvedSearchParams.responseId
+  const responseId = Array.isArray(rawResponseId) ? rawResponseId[0] : rawResponseId
+
+  if (!responseId) {
+    notFound()
+  }
+
+  const response = await getResponseDetails(responseId, user.id)
 
   if (!response || !response.tests) {
     notFound()
