@@ -38,6 +38,29 @@ export async function POST(
       )
     }
 
+    if (!test.allow_multiple_attempts && input.user_identifier) {
+      const { count, error: checkError } = await supabaseAdmin
+        .from('test_responses')
+        .select('*', { count: 'exact', head: true })
+        .eq('test_id', id)
+        .eq('user_identifier', input.user_identifier)
+
+      if (checkError) {
+        console.error('[TEST-SUBMIT] Failed to verify attempts:', checkError)
+        return NextResponse.json(
+          { success: false, error: 'Failed to verify attempts' },
+          { status: 400 }
+        )
+      }
+
+      if ((count || 0) > 0) {
+        return NextResponse.json(
+          { success: false, error: 'Повторное прохождение запрещено.' },
+          { status: 409 }
+        )
+      }
+    }
+
     // Подсчет баллов
     const { score, results } = calculateScore(
       test.formily_schema,

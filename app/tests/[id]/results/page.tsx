@@ -92,6 +92,8 @@ export default async function TestResultPage({ params, searchParams }: TestResul
   const test = response.tests
   const results = response.results_data as any || {}
   const constructs = results.constructs || {}
+  const subconstructs = results.subconstructs || {}
+  const skills = results.skills || {}
 
   return (
     <div className="min-h-screen bg-background">
@@ -142,6 +144,38 @@ export default async function TestResultPage({ params, searchParams }: TestResul
               </CardHeader>
               <CardContent className="space-y-4">
                 {Object.entries(constructs).map(([name, value]) => (
+                  <ConstructScore key={name} name={name} value={value as number} />
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {Object.keys(subconstructs).length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="h-5 w-5" />
+                  Подшкалы
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {Object.entries(subconstructs).map(([name, value]) => (
+                  <ConstructScore key={name} name={name} value={value as number} />
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {Object.keys(skills).length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="h-5 w-5" />
+                  Навыки
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {Object.entries(skills).map(([name, value]) => (
                   <ConstructScore key={name} name={name} value={value as number} />
                 ))}
               </CardContent>

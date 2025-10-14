@@ -521,6 +521,57 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
     }
   }
 
+  const validateQuestions = () => {
+    const ids = new Set<string>()
+    for (const question of questions) {
+      if (!question.id || !question.id.trim()) {
+        toast({
+          variant: 'destructive',
+          title: 'Ошибка в вопросах',
+          description: 'Каждый вопрос должен иметь идентификатор.',
+        })
+        return false
+      }
+      if (ids.has(question.id)) {
+        toast({
+          variant: 'destructive',
+          title: 'Дублирующиеся вопросы',
+          description: `Идентификатор "${question.id}" используется более одного раза.`,
+        })
+        return false
+      }
+      ids.add(question.id)
+      if (!question.title || !question.title.trim()) {
+        toast({
+          variant: 'destructive',
+          title: 'Ошибка в вопросах',
+          description: 'У каждого вопроса должен быть текст.',
+        })
+        return false
+      }
+      if (['radio', 'checkbox', 'select', 'image_choice'].includes(question.type)) {
+        if (!question.options || question.options.length === 0) {
+          toast({
+            variant: 'destructive',
+            title: 'Недостаточно вариантов',
+            description: 'Вопросы с выбором должны содержать хотя бы один вариант.',
+          })
+          return false
+        }
+        const hasEmptyOption = question.options.some(option => !option.label || !option.label.trim())
+        if (hasEmptyOption) {
+          toast({
+            variant: 'destructive',
+            title: 'Ошибка в вариантах ответа',
+            description: 'Каждый вариант должен содержать текст.',
+          })
+          return false
+        }
+      }
+    }
+    return true
+  }
+
   const handleSave = async () => {
     if (!title.trim()) {
       toast({
@@ -537,6 +588,10 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
         title: 'Нет вопросов',
         description: 'Пожалуйста, добавьте хотя бы один вопрос.',
       })
+      return
+    }
+
+    if (!validateQuestions()) {
       return
     }
 
