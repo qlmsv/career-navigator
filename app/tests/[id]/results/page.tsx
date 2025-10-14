@@ -64,7 +64,7 @@ export default async function TestResultPage({ params, searchParams }: TestResul
 
   const resolvedParams = await params
   const resolvedSearchParams = searchParams ? await searchParams : {}
-  const rawResponseId = resolvedSearchParams.responseId
+  const rawResponseId = resolvedSearchParams['responseId']
   const responseId = Array.isArray(rawResponseId) ? rawResponseId[0] : rawResponseId
 
   if (!responseId) {
