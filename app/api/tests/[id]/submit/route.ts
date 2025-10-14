@@ -222,9 +222,21 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
       maxScore: Math.round(finalMax * 100) / 100,
       percentage: Math.round(percentage * 10) / 10,
       details: results,
-      constructs: Object.fromEntries(Object.entries(aggregates).map(([k, v]) => [k, Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100])),
-      subconstructs: Object.fromEntries(Object.entries(aggregatesSub).map(([k, v]) => [k, Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100])),
-      skills: Object.fromEntries(Object.entries(aggregatesSkill).map(([k, v]) => [k, Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100]))
+      constructs: Object.fromEntries(Object.entries(aggregates).map(([k, v]) => [k, {
+        sum: Math.round(v.sum * 100) / 100,
+        average: Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100,
+        items: v.count
+      }])),
+      subconstructs: Object.fromEntries(Object.entries(aggregatesSub).map(([k, v]) => [k, {
+        sum: Math.round(v.sum * 100) / 100,
+        average: Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100,
+        items: v.count
+      }])),
+      skills: Object.fromEntries(Object.entries(aggregatesSkill).map(([k, v]) => [k, {
+        sum: Math.round(v.sum * 100) / 100,
+        average: Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100,
+        items: v.count
+      }]))
     }
   }
 }

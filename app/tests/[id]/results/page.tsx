@@ -42,15 +42,28 @@ async function getResponseDetails(testId: string, responseId: string) {
   return data
 }
 
-function ConstructScore({ name, value }: { name: string; value: number }) {
-  const percentage = (value / 5) * 100;
+interface ConstructScoreProps {
+  name: string
+  value: {
+    sum: number
+    average: number
+    items: number
+  }
+}
+
+function ConstructScore({ name, value }: ConstructScoreProps) {
+  const percentage = Math.min(Math.max((value.average / 5) * 100, 0), 100);
   return (
     <div className="space-y-1">
       <div className="flex justify-between items-center text-sm">
         <span className="font-medium">{name}</span>
-        <span className="text-muted-foreground">{value.toFixed(2)} / 5.00</span>
+        <span className="text-muted-foreground">
+          <span className="font-semibold">Сумма: {value.sum.toFixed(2)}</span>
+          <span className="ml-2">Среднее: {value.average.toFixed(2)} / 5.00</span>
+        </span>
       </div>
       <Progress value={percentage} />
+      <p className="text-xs text-muted-foreground">Количество вопросов: {value.items}</p>
     </div>
   )
 }
