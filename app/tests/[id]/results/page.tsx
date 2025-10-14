@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 
 interface TestResultPageProps {
-  params: {
+  params: Promise<{
     id: string;
     attemptId: string;
-  };
+  }>;
   searchParams?: { [key: string]: string | string[] | undefined };
 }
 
@@ -63,7 +63,8 @@ export default async function TestResultPage({ params }: TestResultPageProps) {
     notFound()
   }
 
-  const response = await getResponseDetails(params.attemptId, user.id)
+  const resolvedParams = await params
+  const response = await getResponseDetails(resolvedParams.attemptId, user.id)
 
   if (!response || !response.tests) {
     notFound()
@@ -78,7 +79,7 @@ export default async function TestResultPage({ params }: TestResultPageProps) {
       <header className="border-b">
         <div className="container mx-auto px-6 py-4">
           <Button variant="ghost" asChild>
-            <Link href={`/tests/${params.id}`}>
+            <Link href={`/tests/${resolvedParams.id}`}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Назад к тесту
             </Link>
