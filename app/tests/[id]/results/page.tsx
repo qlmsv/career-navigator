@@ -147,12 +147,6 @@ export default async function TestResultPage({ params, searchParams }: TestResul
               </CardContent>
             </Card>
           )}
-
-          <div className="mt-4 text-center">
-            <Button asChild size="lg">
-              <Link href="/admin">Перейти в панель управления</Link>
-            </Button>
-          </div>
         </div>
       </main>
     </div>
