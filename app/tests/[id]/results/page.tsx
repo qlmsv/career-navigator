@@ -6,12 +6,16 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 
-type TestResultPageProps = {
+interface TestResultPageProps {
   params: {
     id: string;
     attemptId: string;
   };
   searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+declare module 'next' {
+  interface PageProps extends TestResultPageProps {}
 }
 
 async function getResponseDetails(responseId: string, userId: string) {
