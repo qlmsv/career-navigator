@@ -11,6 +11,7 @@ type TestResultPageProps = {
     id: string;
     attemptId: string;
   };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 async function getResponseDetails(responseId: string, userId: string) {
