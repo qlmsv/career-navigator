@@ -1,27 +1,33 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle, ArrowLeft, TrendingUp, Star, Check } from 'lucide-react'
+import { CheckCircle, ArrowLeft, TrendingUp, Star } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 
+interface TestResultPageProps {
+  params: {
+    id: string;
+    attemptId: string;
+  };
+}
+
 async function getResponseDetails(responseId: string, userId: string) {
   const supabase = createClient()
-  // Ищем в таблице test_responses, а не test_attempts
   const { data, error } = await supabase
     .from('test_responses')
     .select(
       `
-       *,
+      *,
       tests (
-         title,
+        title,
         description
-           )
-         `
+      )
+    `
     )
     .eq('id', responseId)
-    .eq('user_identifier', userId) // Проверяем по user_identifier
+    .eq('user_identifier', userId)
     .single()
 
   if (error) {
@@ -31,9 +37,8 @@ async function getResponseDetails(responseId: string, userId: string) {
   return data
 }
 
-// Компонент для отображения шкалы конструкта
 function ConstructScore({ name, value }: { name: string; value: number }) {
-  const percentage = (value / 5) * 100 // Предполагаем, что средний балл по шкале от 1 до 5
+  const percentage = (value / 5) * 100 // Assuming a 1-5 scale for average construct score
   return (
     <div className="space-y-1">
       <div className="flex justify-between items-center text-sm">
@@ -45,7 +50,7 @@ function ConstructScore({ name, value }: { name: string; value: number }) {
   )
 }
 
-export default async function TestResultPage({ params }: { params: { id: string, attemptId: string } }) {
+export default async function TestResultPage({ params }: TestResultPageProps) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -53,7 +58,6 @@ export default async function TestResultPage({ params }: { params: { id: string,
     notFound()
   }
 
-  // params.attemptId теперь является response_id
   const response = await getResponseDetails(params.attemptId, user.id)
 
   if (!response || !response.tests) {
