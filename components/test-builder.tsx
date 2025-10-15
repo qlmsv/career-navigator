@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Plus, Trash2, GripVertical, Save } from 'lucide-react'
+import { Plus, Trash2, GripVertical, Save, Upload } from 'lucide-react'
 import { ISchema } from '@formily/react'
 import type { QuestionType } from '@/lib/types'
 import { useToast } from '@/hooks/use-toast'
@@ -171,6 +171,7 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
   const [subconstructs, setSubconstructs] = useState<string[]>([])
   const [skills, setSkills] = useState<string[]>([])
   const [scoringMode, setScoringMode] = useState<'sum' | 'average' | 'product'>('sum')
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const questionIds = useMemo(() => questions.map(q => q.id), [questions]);
 
@@ -191,6 +192,51 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const handleImportTemplate = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) {
+      return
+    }
+
+    try {
+      const text = await file.text()
+      const data = JSON.parse(text)
+
+      if (!data || typeof data !== 'object') {
+        throw new Error('Некорректный формат файла')
+      }
+
+      if (!data.formily_schema) {
+        throw new Error('Отсутствует ключ formily_schema')
+      }
+
+      const parsed = parseSchema(data.formily_schema)
+      setQuestions(parsed.questions)
+      setConstructs(parsed.constructs || [])
+      setSubconstructs(parsed.subconstructs || [])
+      setSkills(parsed.skills || [])
+      setScoringMode(parsed.scoringMode || 'sum')
+      setTitle(data.title || '')
+      setDescription(data.description || '')
+
+      toast({
+        title: 'Шаблон загружен',
+        description: file.name,
+      })
+    } catch (error: any) {
+      console.error('Failed to import template:', error)
+      toast({
+        variant: 'destructive',
+        title: 'Ошибка импорта',
+        description: error?.message || 'Не удалось прочитать шаблон.',
+      })
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -629,14 +675,28 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
           <CardTitle>Информация о тесте</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="test-title">Название теста *</Label>
-            <Input
-              id="test-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Например: Тест по математике"
-            />
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <Label htmlFor="test-title">Название теста *</Label>
+              <Input
+                id="test-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Например: Тест по математике"
+              />
+            </div>
+            <div className="flex items-end gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json"
+                onChange={handleImportTemplate}
+                className="hidden"
+              />
+              <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                <Upload className="h-4 w-4 mr-2" />Загрузить шаблон
+              </Button>
+            </div>
           </div>
           <div>
             <Label htmlFor="test-description">Описание</Label>
