@@ -104,9 +104,9 @@ export default async function TestResultPage({ params, searchParams }: TestResul
 
   const test = response.tests
   const results = response.results_data as any || {}
-  const constructs = results.constructs || {}
-  const subconstructs = results.subconstructs || {}
-  const skills = results.skills || {}
+  const constructs = (results.constructs ?? {}) as Record<string, ConstructScoreProps['value']>
+  const subconstructs = (results.subconstructs ?? {}) as Record<string, ConstructScoreProps['value']>
+  const skills = (results.skills ?? {}) as Record<string, ConstructScoreProps['value']>
 
   return (
     <div className="min-h-screen bg-background">
@@ -157,7 +157,7 @@ export default async function TestResultPage({ params, searchParams }: TestResul
               </CardHeader>
               <CardContent className="space-y-4">
                 {Object.entries(constructs).map(([name, value]) => (
-                  <ConstructScore key={name} name={name} value={value as number} />
+                  <ConstructScore key={name} name={name} value={value} />
                 ))}
               </CardContent>
             </Card>
@@ -173,7 +173,7 @@ export default async function TestResultPage({ params, searchParams }: TestResul
               </CardHeader>
               <CardContent className="space-y-4">
                 {Object.entries(subconstructs).map(([name, value]) => (
-                  <ConstructScore key={name} name={name} value={value as number} />
+                  <ConstructScore key={name} name={name} value={value} />
                 ))}
               </CardContent>
             </Card>
@@ -189,7 +189,7 @@ export default async function TestResultPage({ params, searchParams }: TestResul
               </CardHeader>
               <CardContent className="space-y-4">
                 {Object.entries(skills).map(([name, value]) => (
-                  <ConstructScore key={name} name={name} value={value as number} />
+                  <ConstructScore key={name} name={name} value={value} />
                 ))}
               </CardContent>
             </Card>
