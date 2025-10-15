@@ -107,6 +107,7 @@ export default async function TestResultPage({ params, searchParams }: TestResul
   const constructs = (results.constructs ?? {}) as Record<string, ConstructScoreProps['value']>
   const subconstructs = (results.subconstructs ?? {}) as Record<string, ConstructScoreProps['value']>
   const skills = (results.skills ?? {}) as Record<string, ConstructScoreProps['value']>
+  const hasAggregates = Object.keys(constructs).length > 0 || Object.keys(subconstructs).length > 0 || Object.keys(skills).length > 0
 
   return (
     <div className="min-h-screen bg-background">
@@ -129,23 +130,25 @@ export default async function TestResultPage({ params, searchParams }: TestResul
         </div>
 
         <div className="max-w-2xl mx-auto mt-8 grid gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Общий результат
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">Процент правильных ответов</p>
-                <p className="text-6xl font-bold">{results.percentage?.toFixed(1) || '0.0'}%</p>
-              </div>
-              <div className="text-center text-sm text-muted-foreground">
-                (Набрано {results.totalScore?.toFixed(1)} из {results.maxScore?.toFixed(1)} возможных баллов)
-              </div>
-            </CardContent>
-          </Card>
+          {!hasAggregates && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Общий результат
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground">Процент правильных ответов</p>
+                  <p className="text-6xl font-bold">{results.percentage?.toFixed(1) || '0.0'}%</p>
+                </div>
+                <div className="text-center text-sm text-muted-foreground">
+                  (Набрано {results.totalScore?.toFixed(1)} из {results.maxScore?.toFixed(1)} возможных баллов)
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {Object.keys(constructs).length > 0 && (
             <Card>
