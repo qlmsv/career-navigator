@@ -136,47 +136,7 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
 
     // Подсчет баллов по вариантам (если заданы баллы на уровне опций)
     const component = field['x-component']
-    if (optionPoints && (component === 'Radio.Group' || component === 'Checkbox.Group' || component === 'Select')) {
-      const userAnswer = responseData[key]
-      if (userAnswer !== undefined) {
-        if (Array.isArray(userAnswer)) {
-          // множественный выбор: суммируем баллы выбранных
-          let questionScore = 0
-          let questionMax = 0
-          Object.values(optionPoints).forEach(v => { questionMax += Number(v || 0) })
-          userAnswer.forEach((val: any) => {
-            const p = optionPoints[String(val)]
-            if (typeof p === 'number') questionScore += p
-          })
-          totalScore += questionScore
-          maxScore += questionMax
-          results[key] = {
-            userAnswer,
-            isCorrect: true,
-            points: questionScore,
-            maxPoints: questionMax
-          }
-        } else {
-          // один выбор: начисляем балл выбранного, максимум — максимум из опций
-          const chosenPoints = optionPoints[String(userAnswer)] || 0
-          const questionMax = Object.values(optionPoints).reduce((m, v) => Math.max(m, Number(v || 0)), 0)
-          totalScore += chosenPoints
-          maxScore += questionMax
-          results[key] = {
-            userAnswer,
-            isCorrect: true,
-            points: chosenPoints,
-            maxPoints: questionMax
-          }
-        }
-      }
-    }
-
-    // Агрегации по конструктам (для шкал 1-5)
-    const componentType = field['x-component']
-    const userAnswer = responseData[key]
-    if ((componentType === 'Slider' || componentType === 'Rate' || componentType === 'NPS') && typeof userAnswer === 'number') {
-      const value = meta.reverse ? (componentType === 'NPS' ? 10 - userAnswer : 6 - userAnswer) : userAnswer
+    const recordConstructAggregates = (value: number) => {
       if (meta.construct) {
         const k = String(meta.construct)
         aggregates[k] = aggregates[k] || { sum: 0, count: 0 }
@@ -195,6 +155,52 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
         aggregatesSkill[k].sum += value
         aggregatesSkill[k].count += 1
       }
+    }
+
+    if (optionPoints && (component === 'Radio.Group' || component === 'Checkbox.Group' || component === 'Select')) {
+      const userAnswer = responseData[key]
+      if (userAnswer !== undefined) {
+        if (Array.isArray(userAnswer)) {
+          // множественный выбор: суммируем баллы выбранных
+          let questionScore = 0
+          let questionMax = 0
+          Object.values(optionPoints).forEach(v => { questionMax += Number(v || 0) })
+          userAnswer.forEach((val: any) => {
+            const p = optionPoints[String(val)]
+            if (typeof p === 'number') questionScore += p
+          })
+          totalScore += questionScore
+          recordConstructAggregates(questionScore)
+          maxScore += questionMax
+          results[key] = {
+            userAnswer,
+            isCorrect: true,
+            points: questionScore,
+            maxPoints: questionMax
+          }
+        } else {
+          // один выбор: начисляем балл выбранного, максимум — максимум из опций
+          const chosenPoints = optionPoints[String(userAnswer)] || 0
+          const questionMax = Object.values(optionPoints).reduce((m, v) => Math.max(m, Number(v || 0)), 0)
+          totalScore += chosenPoints
+          recordConstructAggregates(chosenPoints)
+          maxScore += questionMax
+          results[key] = {
+            userAnswer,
+            isCorrect: true,
+            points: chosenPoints,
+            maxPoints: questionMax
+          }
+        }
+      }
+    }
+
+    // Агрегации по конструктам (для шкал 1-5)
+    const componentType = field['x-component']
+    const userAnswer = responseData[key]
+    if ((componentType === 'Slider' || componentType === 'Rate' || componentType === 'NPS') && typeof userAnswer === 'number') {
+      const value = meta.reverse ? (componentType === 'NPS' ? 10 - userAnswer : 6 - userAnswer) : userAnswer
+      recordConstructAggregates(value)
     }
   })
 
