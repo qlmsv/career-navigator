@@ -73,7 +73,9 @@ const results1 = calculateFullResults(highSkillsUser)
 console.log('\n📊 Индекс цифровых навыков:')
 console.log(`   Индекс: ${results1.digitalSkills.skillIndex.toFixed(4)}`)
 console.log(`   Среднее по региону: ${results1.digitalSkills.regionalAverage.toFixed(4)}`)
-console.log(`   Разница: ${results1.digitalSkills.difference >= 0 ? '+' : ''}${results1.digitalSkills.difference.toFixed(4)}`)
+console.log(
+  `   Разница: ${results1.digitalSkills.difference >= 0 ? '+' : ''}${results1.digitalSkills.difference.toFixed(4)}`,
+)
 console.log(`   Процентиль: ${results1.digitalSkills.percentile.toFixed(1)}%`)
 
 console.log('\n💼 Скоринг трудоустройства:')
@@ -97,7 +99,9 @@ const results2 = calculateFullResults(basicSkillsUser)
 console.log('\n📊 Индекс цифровых навыков:')
 console.log(`   Индекс: ${results2.digitalSkills.skillIndex.toFixed(4)}`)
 console.log(`   Среднее по региону: ${results2.digitalSkills.regionalAverage.toFixed(4)}`)
-console.log(`   Разница: ${results2.digitalSkills.difference >= 0 ? '+' : ''}${results2.digitalSkills.difference.toFixed(4)}`)
+console.log(
+  `   Разница: ${results2.digitalSkills.difference >= 0 ? '+' : ''}${results2.digitalSkills.difference.toFixed(4)}`,
+)
 console.log(`   Процентиль: ${results2.digitalSkills.percentile.toFixed(1)}%`)
 
 console.log('\n💼 Скоринг трудоустройства:')
@@ -132,8 +136,6 @@ console.log(
 console.log(
   `Вероятность найма:    ${results1.employmentScoring.probabilityPercent.toFixed(2)}%             ${results2.employmentScoring.probabilityPercent.toFixed(2)}%`,
 )
-console.log(
-  `Регион:               ${results1.regionName.padEnd(20)} ${results2.regionName}`,
-)
+console.log(`Регион:               ${results1.regionName.padEnd(20)} ${results2.regionName}`)
 
 console.log('\n═══════════════════════════════════════════════════════════════')

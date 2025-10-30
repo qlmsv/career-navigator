@@ -251,7 +251,7 @@ export function calculateDigitalSkillsIndex(answers: Record<string, any>): Digit
   }
 
   // Получаем региональное среднее
-  const region = answers.region || 'moscow'
+  const region = answers['region'] || 'moscow'
   const regionalAverage = REGIONAL_AVERAGES[region] || 0
   const difference = totalIndex - regionalAverage
 
@@ -280,7 +280,7 @@ export function calculateEmploymentScoring(answers: Record<string, any>): Employ
   let product = SCORING_WEIGHTS.constant
 
   // 2. Пол
-  const gender = answers.gender || 'male'
+  const gender = answers['gender'] || 'male'
   const genderWeight = SCORING_WEIGHTS.gender[gender as keyof typeof SCORING_WEIGHTS.gender] || 1
   product *= genderWeight
   factorsBreakdown.push({
@@ -291,7 +291,7 @@ export function calculateEmploymentScoring(answers: Record<string, any>): Employ
   })
 
   // 3. Тип поселения
-  const settlementType = answers.settlement_type || 'city'
+  const settlementType = answers['settlement_type'] || 'city'
   const settlementWeight =
     SCORING_WEIGHTS.settlement_type[
       settlementType as keyof typeof SCORING_WEIGHTS.settlement_type
@@ -305,7 +305,7 @@ export function calculateEmploymentScoring(answers: Record<string, any>): Employ
   })
 
   // 4. Регион
-  const region = answers.region || 'moscow'
+  const region = answers['region'] || 'moscow'
   const regionWeight = SCORING_WEIGHTS.region[region as keyof typeof SCORING_WEIGHTS.region] || 0.8
   product *= regionWeight
   factorsBreakdown.push({
@@ -316,7 +316,7 @@ export function calculateEmploymentScoring(answers: Record<string, any>): Employ
   })
 
   // 5. Размер семьи
-  const familySize = answers.family_size || '2'
+  const familySize = answers['family_size'] || '2'
   const familyWeight =
     SCORING_WEIGHTS.family_size[familySize as keyof typeof SCORING_WEIGHTS.family_size] || 0.9
   product *= familyWeight
@@ -328,7 +328,7 @@ export function calculateEmploymentScoring(answers: Record<string, any>): Employ
   })
 
   // 6. Возраст
-  const age = answers.age || '26_30'
+  const age = answers['age'] || '26_30'
   const ageWeight = SCORING_WEIGHTS.age[age as keyof typeof SCORING_WEIGHTS.age] || 1
   product *= ageWeight
   factorsBreakdown.push({
@@ -339,7 +339,7 @@ export function calculateEmploymentScoring(answers: Record<string, any>): Employ
   })
 
   // 7. Образование
-  const education = answers.education || 'bachelor'
+  const education = answers['education'] || 'bachelor'
   const educationWeight =
     SCORING_WEIGHTS.education[education as keyof typeof SCORING_WEIGHTS.education] || 1
   product *= educationWeight
@@ -351,7 +351,7 @@ export function calculateEmploymentScoring(answers: Record<string, any>): Employ
   })
 
   // 8. Профессиональные навыки (множественный выбор)
-  const professionalSkills = answers.professional_skills || []
+  const professionalSkills = answers['professional_skills'] || []
   const skillsList: string[] = Array.isArray(professionalSkills)
     ? professionalSkills
     : [professionalSkills]
@@ -399,7 +399,7 @@ export function calculateEmploymentScoring(answers: Record<string, any>): Employ
 export function calculateFullResults(answers: Record<string, any>): CalculationResult {
   const digitalSkills = calculateDigitalSkillsIndex(answers)
   const employmentScoring = calculateEmploymentScoring(answers)
-  const region = answers.region || 'moscow'
+  const region = answers['region'] || 'moscow'
   const regionName = REGION_NAMES[region] || region
 
   return {
