@@ -2,10 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import type { SubmitResponseInput } from '@/lib/types'
 
-export async function POST(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const startTime = Date.now()
   console.log('[TEST-SUBMIT] Starting submission process')
 
@@ -18,10 +15,7 @@ export async function POST(
 
     if (!input.response_data) {
       console.log('[TEST-SUBMIT] Missing response data')
-      return NextResponse.json(
-        { success: false, error: 'Response data required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: 'Response data required' }, { status: 400 })
     }
 
     // Получаем тест для подсчета баллов
@@ -32,10 +26,7 @@ export async function POST(
       .single()
 
     if (testError || !test) {
-      return NextResponse.json(
-        { success: false, error: 'Test not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ success: false, error: 'Test not found' }, { status: 404 })
     }
 
     if (!test.allow_multiple_attempts && input.user_identifier) {
@@ -49,23 +40,20 @@ export async function POST(
         console.error('[TEST-SUBMIT] Failed to verify attempts:', checkError)
         return NextResponse.json(
           { success: false, error: 'Failed to verify attempts' },
-          { status: 400 }
+          { status: 400 },
         )
       }
 
       if ((count || 0) > 0) {
         return NextResponse.json(
           { success: false, error: 'Повторное прохождение запрещено.' },
-          { status: 409 }
+          { status: 409 },
         )
       }
     }
 
     // Подсчет баллов
-    const { score, results } = calculateScore(
-      test.formily_schema,
-      input.response_data
-    )
+    const { score, results } = calculateScore(test.formily_schema, input.response_data)
 
     // Сохраняем ответ
     const { data: response, error: responseError } = await supabaseAdmin
@@ -76,16 +64,13 @@ export async function POST(
         user_identifier: input.user_identifier,
         time_spent_seconds: input.time_spent_seconds,
         score,
-        results_data: results
+        results_data: results,
       })
       .select()
       .single()
 
     if (responseError) {
-      return NextResponse.json(
-        { success: false, error: responseError.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: responseError.message }, { status: 400 })
     }
 
     const duration = Date.now() - startTime
@@ -97,16 +82,13 @@ export async function POST(
         response_id: response.id,
         score,
         results,
-        show_results: test.show_results
-      }
+        show_results: test.show_results,
+      },
     })
   } catch (error) {
     const duration = Date.now() - startTime
     console.error(`[TEST-SUBMIT] Error after ${duration}ms:`, error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -157,14 +139,19 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
       }
     }
 
-    if (optionPoints && (component === 'Radio.Group' || component === 'Checkbox.Group' || component === 'Select')) {
+    if (
+      optionPoints &&
+      (component === 'Radio.Group' || component === 'Checkbox.Group' || component === 'Select')
+    ) {
       const userAnswer = responseData[key]
       if (userAnswer !== undefined) {
         if (Array.isArray(userAnswer)) {
           // множественный выбор: суммируем баллы выбранных
           let questionScore = 0
           let questionMax = 0
-          Object.values(optionPoints).forEach(v => { questionMax += Number(v || 0) })
+          Object.values(optionPoints).forEach((v) => {
+            questionMax += Number(v || 0)
+          })
           userAnswer.forEach((val: any) => {
             const p = optionPoints[String(val)]
             if (typeof p === 'number') questionScore += p
@@ -176,12 +163,15 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
             userAnswer,
             isCorrect: true,
             points: questionScore,
-            maxPoints: questionMax
+            maxPoints: questionMax,
           }
         } else {
           // один выбор: начисляем балл выбранного, максимум — максимум из опций
           const chosenPoints = optionPoints[String(userAnswer)] || 0
-          const questionMax = Object.values(optionPoints).reduce((m, v) => Math.max(m, Number(v || 0)), 0)
+          const questionMax = Object.values(optionPoints).reduce(
+            (m, v) => Math.max(m, Number(v || 0)),
+            0,
+          )
           totalScore += chosenPoints
           recordConstructAggregates(chosenPoints)
           maxScore += questionMax
@@ -189,7 +179,7 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
             userAnswer,
             isCorrect: true,
             points: chosenPoints,
-            maxPoints: questionMax
+            maxPoints: questionMax,
           }
         }
       }
@@ -198,8 +188,15 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
     // Агрегации по конструктам (для шкал 1-5)
     const componentType = field['x-component']
     const userAnswer = responseData[key]
-    if ((componentType === 'Slider' || componentType === 'Rate' || componentType === 'NPS') && typeof userAnswer === 'number') {
-      const value = meta.reverse ? (componentType === 'NPS' ? 10 - userAnswer : 6 - userAnswer) : userAnswer
+    if (
+      (componentType === 'Slider' || componentType === 'Rate' || componentType === 'NPS') &&
+      typeof userAnswer === 'number'
+    ) {
+      const value = meta.reverse
+        ? componentType === 'NPS'
+          ? 10 - userAnswer
+          : 6 - userAnswer
+        : userAnswer
       recordConstructAggregates(value)
     }
   })
@@ -214,7 +211,7 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
     // Перемножение: интерпретируем на уровне деталей как произведение (не храним подробно),
     // здесь используем эвристику: переводим сумму в логарифмическую шкалу нельзя без исходных множителей.
     // Упростим: если maxScore>0, усилим итоговую долю квадратированием как суррогат произведения.
-    const ratio = finalMax > 0 ? (finalTotal / finalMax) : 0
+    const ratio = finalMax > 0 ? finalTotal / finalMax : 0
     const boosted = Math.pow(ratio, 2)
     finalTotal = boosted * finalMax
   }
@@ -228,21 +225,36 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
       maxScore: Math.round(finalMax * 100) / 100,
       percentage: Math.round(percentage * 10) / 10,
       details: results,
-      constructs: Object.fromEntries(Object.entries(aggregates).map(([k, v]) => [k, {
-        sum: Math.round(v.sum * 100) / 100,
-        average: Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100,
-        items: v.count
-      }])),
-      subconstructs: Object.fromEntries(Object.entries(aggregatesSub).map(([k, v]) => [k, {
-        sum: Math.round(v.sum * 100) / 100,
-        average: Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100,
-        items: v.count
-      }])),
-      skills: Object.fromEntries(Object.entries(aggregatesSkill).map(([k, v]) => [k, {
-        sum: Math.round(v.sum * 100) / 100,
-        average: Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100,
-        items: v.count
-      }]))
-    }
+      constructs: Object.fromEntries(
+        Object.entries(aggregates).map(([k, v]) => [
+          k,
+          {
+            sum: Math.round(v.sum * 100) / 100,
+            average: Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100,
+            items: v.count,
+          },
+        ]),
+      ),
+      subconstructs: Object.fromEntries(
+        Object.entries(aggregatesSub).map(([k, v]) => [
+          k,
+          {
+            sum: Math.round(v.sum * 100) / 100,
+            average: Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100,
+            items: v.count,
+          },
+        ]),
+      ),
+      skills: Object.fromEntries(
+        Object.entries(aggregatesSkill).map(([k, v]) => [
+          k,
+          {
+            sum: Math.round(v.sum * 100) / 100,
+            average: Math.round((v.sum / Math.max(v.count, 1)) * 100) / 100,
+            items: v.count,
+          },
+        ]),
+      ),
+    },
   }
 }

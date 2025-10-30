@@ -27,7 +27,7 @@ export type {
   SkillLevel,
   SKILL_LEVEL_NAMES,
   COMPETITIVENESS_LEVEL_NAMES,
-  DEMAND_LEVEL_NAMES
+  DEMAND_LEVEL_NAMES,
 } from './types/career-navigator'
 
 // Database types

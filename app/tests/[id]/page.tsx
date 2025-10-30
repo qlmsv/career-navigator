@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -19,11 +19,7 @@ export default function TakeTestPage() {
   const [submitting, setSubmitting] = useState(false)
   const [startTime] = useState(Date.now())
 
-  useEffect(() => {
-    loadTest()
-  }, [testId])
-
-  const loadTest = async () => {
+  const loadTest = useCallback(async () => {
     try {
       setLoading(true)
       const response = await fetch(`/api/tests/${testId}`)
@@ -42,10 +38,18 @@ export default function TakeTestPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [testId, router])
+
+  useEffect(() => {
+    loadTest()
+  }, [loadTest])
 
   const handleSubmit = async (values: any) => {
-    if (!confirm('Вы уверены, что хотите отправить ответы? Изменить их после отправки будет невозможно.')) {
+    if (
+      !confirm(
+        'Вы уверены, что хотите отправить ответы? Изменить их после отправки будет невозможно.',
+      )
+    ) {
       return
     }
 
@@ -58,8 +62,8 @@ export default function TakeTestPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           response_data: values,
-          time_spent_seconds: timeSpent
-        })
+          time_spent_seconds: timeSpent,
+        }),
       })
 
       const result = await response.json()
@@ -115,9 +119,7 @@ export default function TakeTestPage() {
             <CardHeader>
               <CardTitle className="text-3xl">{test.title}</CardTitle>
               {test.description && (
-                <CardDescription className="text-base mt-2">
-                  {test.description}
-                </CardDescription>
+                <CardDescription className="text-base mt-2">{test.description}</CardDescription>
               )}
             </CardHeader>
             {test.time_limit_minutes && (
@@ -141,7 +143,8 @@ export default function TakeTestPage() {
                       Внимание!
                     </h4>
                     <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
-                      У вас только одна попытка прохождения этого теста. После отправки ответов вы не сможете пройти тест повторно.
+                      У вас только одна попытка прохождения этого теста. После отправки ответов вы
+                      не сможете пройти тест повторно.
                     </p>
                   </div>
                 </div>

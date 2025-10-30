@@ -1,9 +1,9 @@
 // import './lib/env.mjs' // Removed env validation
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -23,8 +23,8 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, './'),
-    };
-    
+    }
+
     // Оптимизация для production
     if (process.env.NODE_ENV === 'production') {
       config.optimization = {
@@ -43,9 +43,9 @@ const nextConfig = {
         },
       }
     }
-    
-    return config;
-  },
-};
 
-export default nextConfig;
+    return config
+  },
+}
+
+export default nextConfig

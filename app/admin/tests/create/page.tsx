@@ -23,8 +23,8 @@ export default function CreateTestPage() {
           description: metadata.description,
           formily_schema: schema,
           show_results: true,
-          allow_multiple_attempts: true
-        })
+          allow_multiple_attempts: true,
+        }),
       })
 
       const result = await response.json()
@@ -55,29 +55,29 @@ export default function CreateTestPage() {
 
   return (
     <AdminGuard>
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
-      <header className="border-b bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-6 py-4">
-          <Button variant="ghost" asChild>
-            <Link href="/admin">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Назад к панели
-            </Link>
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+        <header className="border-b bg-background/95 backdrop-blur">
+          <div className="container mx-auto px-6 py-4">
+            <Button variant="ghost" asChild>
+              <Link href="/admin">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Назад к панели
+              </Link>
             </Button>
-        </div>
-      </header>
+          </div>
+        </header>
 
-      <main className="container mx-auto px-6 py-12">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Создание нового теста</h1>
-          <p className="text-muted-foreground mt-2">
-            Создайте тест, добавив вопросы различных типов
-          </p>
-        </div>
+        <main className="container mx-auto px-6 py-12">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold">Создание нового теста</h1>
+            <p className="text-muted-foreground mt-2">
+              Создайте тест, добавив вопросы различных типов
+            </p>
+          </div>
 
-        <TestBuilder onSave={handleSave} />
-      </main>
-    </div>
+          <TestBuilder onSave={handleSave} />
+        </main>
+      </div>
     </AdminGuard>
   )
 }

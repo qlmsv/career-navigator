@@ -7,8 +7,8 @@ export function createClient() {
   return createSupabaseClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   })
 }
 
@@ -19,7 +19,7 @@ export function createAdminClient() {
   return createSupabaseClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   })
 }

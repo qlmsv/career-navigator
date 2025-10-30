@@ -26,7 +26,7 @@ export interface DigitalSkill {
   is_active: boolean
   created_at: string
   updated_at: string
-  
+
   // Связанные данные
   category?: DigitalSkillCategory
 }
@@ -60,15 +60,15 @@ export interface ProfessionSkillRequirement {
   profession_id: string
   region_id: string
   skill_id: string
-  
+
   required_level: number // 1-5
   importance_weight: number // 0.1-1.0
   demand_level: 'low' | 'medium' | 'high' | 'critical'
   salary_impact?: number // влияние на зарплату в %
-  
+
   created_at: string
   updated_at: string
-  
+
   // Связанные данные
   profession?: Profession
   region?: Region
@@ -79,21 +79,21 @@ export interface RegionalSalaryData {
   id: string
   profession_id: string
   region_id: string
-  
+
   salary_min?: number
   salary_median?: number
   salary_max?: number
   currency: string
-  
+
   vacancy_count: number
   competition_level: 'low' | 'medium' | 'high'
   growth_trend: 'declining' | 'stable' | 'growing'
-  
+
   data_source?: string
   collection_date: string
   created_at: string
   updated_at: string
-  
+
   // Связанные данные
   profession?: Profession
   region?: Region
@@ -104,7 +104,7 @@ export interface RegionalSalaryData {
 export interface UserSkillAssessment {
   id: string
   user_id: string
-  
+
   // Профессиональная информация
   current_profession_id?: string
   target_profession_id?: string
@@ -112,19 +112,19 @@ export interface UserSkillAssessment {
   experience_years?: number
   current_salary?: number
   target_salary?: number
-  
+
   // Результаты
   assessment_data: Record<string, any> // JSONB
   overall_score?: number
   competitiveness_level?: 'low' | 'below_average' | 'average' | 'above_average' | 'high'
-  
+
   // Метаданные
   assessment_duration?: number // секунды
   is_completed: boolean
   completed_at?: string
   created_at: string
   updated_at: string
-  
+
   // Связанные данные
   current_profession?: Profession
   target_profession?: Profession
@@ -137,17 +137,17 @@ export interface UserSkillScore {
   id: string
   assessment_id: string
   skill_id: string
-  
+
   self_assessment_level: number // 1-5
   confidence_level?: number // 1-5
-  
+
   // Сравнение с рынком
   market_required_level?: number
   gap_analysis?: number // разница между требуемым и текущим
   improvement_priority?: 'low' | 'medium' | 'high' | 'critical'
-  
+
   created_at: string
-  
+
   // Связанные данные
   skill?: DigitalSkill
 }
@@ -161,23 +161,23 @@ export interface LearningResource {
   provider?: string
   url?: string
   resource_type: 'course' | 'certification' | 'book' | 'video' | 'article' | 'practice'
-  
+
   // Связь с навыками
   target_skills?: string[] // массив skill_id
   skill_level_from: number
   skill_level_to: number
-  
+
   // Характеристики
   duration_hours?: number
   price_rub: number
   language: string
   difficulty_level: 'beginner' | 'intermediate' | 'advanced'
-  
+
   // Рейтинг
   rating?: number
   reviews_count: number
   completion_rate?: number
-  
+
   is_active: boolean
   created_at: string
   updated_at: string
@@ -188,18 +188,18 @@ export interface LearningResource {
 export interface UserRecommendation {
   id: string
   assessment_id: string
-  
+
   // Рекомендации
   priority_skills: Record<string, any> // JSONB
   recommended_resources: Record<string, any> // JSONB
   career_paths: Record<string, any> // JSONB
   salary_potential: Record<string, any> // JSONB
-  
+
   // ИИ-анализ
   ai_analysis?: string
   action_plan: Record<string, any> // JSONB
   timeline_months?: number
-  
+
   generated_at: string
   expires_at: string
 }
@@ -214,7 +214,7 @@ export interface SkillAssessmentForm {
   experience_years: number
   current_salary?: number
   target_salary?: number
-  
+
   // Оценки навыков по категориям
   skill_assessments: {
     [skillId: string]: {
@@ -227,7 +227,7 @@ export interface SkillAssessmentForm {
 export interface AssessmentResult {
   overall_score: number
   competitiveness_level: 'low' | 'below_average' | 'average' | 'above_average' | 'high'
-  
+
   // Детализация по навыкам
   skill_results: {
     [skillId: string]: {
@@ -237,11 +237,11 @@ export interface AssessmentResult {
       priority: 'low' | 'medium' | 'high' | 'critical'
     }
   }
-  
+
   // Статистика
   strengths: DigitalSkill[]
   improvement_areas: DigitalSkill[]
-  
+
   // Сравнение с рынком
   market_comparison: {
     salary_potential_min: number
@@ -260,7 +260,7 @@ export interface CareerRecommendations {
     importance: 'high' | 'medium' | 'low'
     salary_impact: number
   }>
-  
+
   // Рекомендуемые курсы и ресурсы
   recommended_resources: Array<{
     resource: LearningResource
@@ -268,7 +268,7 @@ export interface CareerRecommendations {
     expected_improvement: number
     roi_estimate: number // возврат инвестиций
   }>
-  
+
   // Карьерные пути
   career_paths: Array<{
     target_profession: Profession
@@ -277,7 +277,7 @@ export interface CareerRecommendations {
     salary_increase_potential: number
     difficulty: 'easy' | 'medium' | 'hard'
   }>
-  
+
   // План действий
   action_plan: Array<{
     step: number
@@ -298,11 +298,12 @@ export interface ApiResponse<T> {
   message?: string
 }
 
-export interface AssessmentApiResponse extends ApiResponse<{
-  assessment: UserSkillAssessment
-  results: AssessmentResult
-  recommendations: CareerRecommendations
-}> {}
+export interface AssessmentApiResponse
+  extends ApiResponse<{
+    assessment: UserSkillAssessment
+    results: AssessmentResult
+    recommendations: CareerRecommendations
+  }> {}
 
 // ========== УТИЛИТЫ ==========
 
@@ -311,9 +312,9 @@ export type SkillLevel = 1 | 2 | 3 | 4 | 5
 export const SKILL_LEVEL_NAMES: Record<SkillLevel, string> = {
   1: 'Начинающий',
   2: 'Базовый',
-  3: 'Средний', 
+  3: 'Средний',
   4: 'Продвинутый',
-  5: 'Экспертный'
+  5: 'Экспертный',
 }
 
 export const COMPETITIVENESS_LEVEL_NAMES = {
@@ -321,12 +322,12 @@ export const COMPETITIVENESS_LEVEL_NAMES = {
   below_average: 'Ниже среднего',
   average: 'Средняя',
   above_average: 'Выше среднего',
-  high: 'Высокая'
+  high: 'Высокая',
 } as const
 
 export const DEMAND_LEVEL_NAMES = {
   low: 'Низкий спрос',
   medium: 'Средний спрос',
   high: 'Высокий спрос',
-  critical: 'Критически важно'
+  critical: 'Критически важно',
 } as const

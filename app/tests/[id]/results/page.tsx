@@ -8,9 +8,9 @@ import { Progress } from '@/components/ui/progress'
 
 interface TestResultPageProps {
   params: Promise<{
-    id: string;
-  }>;
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+    id: string
+  }>
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 declare module 'next' {
@@ -29,7 +29,7 @@ async function getResponseDetails(testId: string, responseId: string) {
         description,
         show_results
       )
-    `
+    `,
     )
     .eq('id', responseId)
     .eq('test_id', testId)
@@ -52,7 +52,7 @@ interface ConstructScoreProps {
 }
 
 function ConstructScore({ name, value }: ConstructScoreProps) {
-  const percentage = Math.min(Math.max((value.average / 5) * 100, 0), 100);
+  const percentage = Math.min(Math.max((value.average / 5) * 100, 0), 100)
   return (
     <div className="space-y-1">
       <div className="flex justify-between items-center text-sm">
@@ -92,7 +92,10 @@ export default async function TestResultPage({ params, searchParams }: TestResul
             <CardTitle className="text-2xl">Результаты недоступны</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-muted-foreground">
-            <p>Для этого теста просмотр результатов отключен. Свяжитесь с организатором для получения дополнительной информации.</p>
+            <p>
+              Для этого теста просмотр результатов отключен. Свяжитесь с организатором для получения
+              дополнительной информации.
+            </p>
             <Button asChild variant="secondary">
               <Link href={`/tests/${resolvedParams.id}`}>Вернуться к тесту</Link>
             </Button>
@@ -103,9 +106,12 @@ export default async function TestResultPage({ params, searchParams }: TestResul
   }
 
   const test = response.tests
-  const results = response.results_data as any || {}
+  const results = (response.results_data as any) || {}
   const constructs = (results.constructs ?? {}) as Record<string, ConstructScoreProps['value']>
-  const subconstructs = (results.subconstructs ?? {}) as Record<string, ConstructScoreProps['value']>
+  const subconstructs = (results.subconstructs ?? {}) as Record<
+    string,
+    ConstructScoreProps['value']
+  >
   const skills = (results.skills ?? {}) as Record<string, ConstructScoreProps['value']>
 
   return (

@@ -9,7 +9,13 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
 import { Card, CardContent } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { useToast } from '@/hooks/use-toast'
 import { Progress } from './ui/progress'
@@ -21,13 +27,13 @@ interface TestViewerProps {
 }
 
 const simpleHash = (str: string) => {
-  let hash = 0;
+  let hash = 0
   for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash |= 0; // Convert to 32bit integer
+    const char = str.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash |= 0 // Convert to 32bit integer
   }
-  return hash;
+  return hash
 }
 
 export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestViewerProps) {
@@ -37,14 +43,13 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
 
   const storageKey = useMemo(() => {
     try {
-      const schemaString = JSON.stringify(schema);
-      const hash = simpleHash(schemaString);
-      return `test-answers-${hash}`;
+      const schemaString = JSON.stringify(schema)
+      const hash = simpleHash(schemaString)
+      return `test-answers-${hash}`
     } catch (e) {
-      return `test-answers-fallback`;
+      return `test-answers-fallback`
     }
-  }, [schema]);
-
+  }, [schema])
 
   // Загрузка ответов из localStorage при монтировании
   useEffect(() => {
@@ -52,7 +57,10 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
       const savedAnswers = localStorage.getItem(storageKey)
       if (savedAnswers) {
         setAnswers(JSON.parse(savedAnswers))
-        toast({ title: 'Прогресс восстановлен', description: 'Ваши предыдущие ответы были загружены.' })
+        toast({
+          title: 'Прогресс восстановлен',
+          description: 'Ваши предыдущие ответы были загружены.',
+        })
       }
     } catch (error) {
       console.error('Failed to load answers from localStorage', error)
@@ -71,9 +79,9 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
   }, [answers, storageKey])
 
   const handleChange = (fieldName: string, value: any) => {
-    setAnswers(prev => ({ ...prev, [fieldName]: value }))
+    setAnswers((prev) => ({ ...prev, [fieldName]: value }))
     if (errors[fieldName]) {
-      setErrors(prev => {
+      setErrors((prev) => {
         const newErrors = { ...prev }
         delete newErrors[fieldName]
         return newErrors
@@ -90,7 +98,12 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
     Object.entries(properties).forEach(([key, field]: [string, any]) => {
       if (field.required && field.type !== 'void') {
         const value = answers[key]
-        if (value === undefined || value === null || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && value.trim() === '')) {
+        if (
+          value === undefined ||
+          value === null ||
+          (Array.isArray(value) && value.length === 0) ||
+          (typeof value === 'string' && value.trim() === '')
+        ) {
           newErrors[key] = 'Это обязательный вопрос'
         }
       }
@@ -109,24 +122,34 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
     await onSubmit(answers)
   }
 
-  const properties = schema.properties || {}
+  const memoizedProperties = useMemo(() => schema.properties || {}, [schema])
 
   const { totalQuestions, answeredQuestions } = useMemo(() => {
-    const questionKeys = Object.keys(properties).filter(key => properties[key].type !== 'void');
-    const answeredCount = questionKeys.filter(key => {
-      const answer = answers[key];
-      return answer !== undefined && answer !== null && answer !== '' && (!Array.isArray(answer) || answer.length > 0);
-    }).length;
-    return { totalQuestions: questionKeys.length, answeredQuestions: answeredCount };
-  }, [answers, properties]);
+    const questionKeys = Object.keys(memoizedProperties).filter(
+      (key) => memoizedProperties[key].type !== 'void',
+    )
+    const answeredCount = questionKeys.filter((key) => {
+      const answer = answers[key]
+      return (
+        answer !== undefined &&
+        answer !== null &&
+        answer !== '' &&
+        (!Array.isArray(answer) || answer.length > 0)
+      )
+    }).length
+    return { totalQuestions: questionKeys.length, answeredQuestions: answeredCount }
+  }, [answers, memoizedProperties])
 
-  const progressPercentage = totalQuestions > 0 ? (answeredQuestions / totalQuestions) * 100 : 0;
+  const progressPercentage = totalQuestions > 0 ? (answeredQuestions / totalQuestions) * 100 : 0
 
   const renderField = (key: string, field: any) => {
     // Пропускаем void поля (информационные блоки)
     if (field.type === 'void') {
       return (
-        <Card key={key} className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+        <Card
+          key={key}
+          className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800"
+        >
           <CardContent className="pt-6">
             <div className="whitespace-pre-line text-sm text-blue-900 dark:text-blue-100">
               {field['x-content'] || field.title}
@@ -147,9 +170,7 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
           {field.title}
           {field.required && <span className="text-red-500 ml-1">*</span>}
         </Label>
-        {field.description && (
-          <p className="text-sm text-muted-foreground">{field.description}</p>
-        )}
+        {field.description && <p className="text-sm text-muted-foreground">{field.description}</p>}
 
         {/* Текст */}
         {component === 'Input' && (
@@ -220,10 +241,7 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
 
         {/* Radio */}
         {component === 'Radio.Group' && (
-          <RadioGroup
-            value={value || ''}
-            onValueChange={(val) => handleChange(key, val)}
-          >
+          <RadioGroup value={value || ''} onValueChange={(val) => handleChange(key, val)}>
             {(field.enum || []).map((option: any) => (
               <div key={option.value} className="flex items-center space-x-2">
                 <RadioGroupItem value={option.value} id={`${key}-${option.value}`} />
@@ -300,9 +318,11 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
             {/* Метки */}
             {componentProps.marks && (
               <div className="flex justify-between text-xs text-muted-foreground px-1">
-                {Object.entries(componentProps.marks).map(([markValue, markLabel]: [string, any]) => (
-                  <span key={markValue}>{markLabel}</span>
-                ))}
+                {Object.entries(componentProps.marks).map(
+                  ([markValue, markLabel]: [string, any]) => (
+                    <span key={markValue}>{markLabel}</span>
+                  ),
+                )}
               </div>
             )}
             {/* Текущее значение */}
@@ -341,17 +361,29 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
 
         {/* DatePicker */}
         {component === 'DatePicker' && (
-          <Input type="date" value={value || ''} onChange={(e) => handleChange(key, e.target.value)} />
+          <Input
+            type="date"
+            value={value || ''}
+            onChange={(e) => handleChange(key, e.target.value)}
+          />
         )}
 
         {/* TimePicker */}
         {component === 'TimePicker' && (
-          <Input type="time" value={value || ''} onChange={(e) => handleChange(key, e.target.value)} />
+          <Input
+            type="time"
+            value={value || ''}
+            onChange={(e) => handleChange(key, e.target.value)}
+          />
         )}
 
         {/* DateTimePicker */}
         {component === 'DateTimePicker' && (
-          <Input type="datetime-local" value={value || ''} onChange={(e) => handleChange(key, e.target.value)} />
+          <Input
+            type="datetime-local"
+            value={value || ''}
+            onChange={(e) => handleChange(key, e.target.value)}
+          />
         )}
 
         {/* Image Choice */}
@@ -368,7 +400,11 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
                 >
                   {option.image && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={option.image} alt={option.label} className="w-full h-28 object-cover" />
+                    <img
+                      src={option.image}
+                      alt={option.label}
+                      className="w-full h-28 object-cover"
+                    />
                   )}
                   <div className="p-2 text-sm">{option.label}</div>
                 </button>
@@ -400,10 +436,7 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
 
         {/* Upload */}
         {component === 'Upload' && (
-          <Input
-            type="file"
-            onChange={(e) => handleChange(key, e.target.files?.[0] || null)}
-          />
+          <Input type="file" onChange={(e) => handleChange(key, e.target.files?.[0] || null)} />
         )}
 
         {/* Signature (простая текстовая) */}
@@ -432,7 +465,9 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
                 <tr>
                   <th className="text-left py-2"></th>
                   {(componentProps.columns || []).map((col: any) => (
-                    <th key={col.value} className="text-center px-2 py-2">{col.label}</th>
+                    <th key={col.value} className="text-center px-2 py-2">
+                      {col.label}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -441,7 +476,9 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
                   <tr key={row.value} className="border-t">
                     <td className="py-2 pr-2">{row.label}</td>
                     {(componentProps.columns || []).map((col: any) => {
-                      const selected = Array.isArray(value) ? value.find((v: any) => v?.row === row.value)?.col === col.value : false
+                      const selected = Array.isArray(value)
+                        ? value.find((v: any) => v?.row === row.value)?.col === col.value
+                        : false
                       return (
                         <td key={col.value} className="text-center py-2">
                           <input
@@ -468,31 +505,54 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
         {component === 'Ranking' && (
           <div className="space-y-2">
             {((field.enum as any[]) || []).map((opt) => (
-              <div key={opt.value} className="flex items-center justify-between border rounded px-3 py-2">
+              <div
+                key={opt.value}
+                className="flex items-center justify-between border rounded px-3 py-2"
+              >
                 <span>{opt.label}</span>
                 <div className="flex items-center gap-2">
-                  <Button type="button" size="sm" variant="outline" onClick={() => {
-                    const current = Array.isArray(value) ? value : []
-                    const idx = current.indexOf(opt.value)
-                    if (idx > 0) {
-                      const cp = [...current]
-                      ;[cp[idx-1], cp[idx]] = [cp[idx], cp[idx-1]]
-                      handleChange(key, cp)
-                    }
-                  }}>↑</Button>
-                  <Button type="button" size="sm" variant="outline" onClick={() => {
-                    const current = Array.isArray(value) ? value : []
-                    const idx = current.indexOf(opt.value)
-                    if (idx >= 0 && idx < current.length - 1) {
-                      const cp = [...current]
-                      ;[cp[idx+1], cp[idx]] = [cp[idx], cp[idx+1]]
-                      handleChange(key, cp)
-                    }
-                  }}>↓</Button>
-                  <Button type="button" size="sm" onClick={() => {
-                    const current = Array.isArray(value) ? value : []
-                    if (!current.includes(opt.value)) handleChange(key, [...current, opt.value])
-                  }}>Добавить</Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      const current = Array.isArray(value) ? value : []
+                      const idx = current.indexOf(opt.value)
+                      if (idx > 0) {
+                        const cp = [...current]
+                        ;[cp[idx - 1], cp[idx]] = [cp[idx], cp[idx - 1]]
+                        handleChange(key, cp)
+                      }
+                    }}
+                  >
+                    ↑
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      const current = Array.isArray(value) ? value : []
+                      const idx = current.indexOf(opt.value)
+                      if (idx >= 0 && idx < current.length - 1) {
+                        const cp = [...current]
+                        ;[cp[idx + 1], cp[idx]] = [cp[idx], cp[idx + 1]]
+                        handleChange(key, cp)
+                      }
+                    }}
+                  >
+                    ↓
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => {
+                      const current = Array.isArray(value) ? value : []
+                      if (!current.includes(opt.value)) handleChange(key, [...current, opt.value])
+                    }}
+                  >
+                    Добавить
+                  </Button>
                 </div>
               </div>
             ))}
@@ -521,15 +581,14 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
             ))}
             {value && (
               <p className="text-xs text-muted-foreground">
-                Сумма: {Object.values(value).reduce((a: any, b: any) => Number(a) + Number(b), 0)} / {componentProps.total || 100}
+                Сумма: {Object.values(value).reduce((a: any, b: any) => Number(a) + Number(b), 0)} /{' '}
+                {componentProps.total || 100}
               </p>
             )}
           </div>
         )}
 
-        {hasError && (
-          <p className="text-sm text-red-500">{errors[key]}</p>
-        )}
+        {hasError && <p className="text-sm text-red-500">{errors[key]}</p>}
       </div>
     )
   }
@@ -543,21 +602,18 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
             <Progress value={progressPercentage} className="mt-1 h-2" />
           </div>
           <div className="text-right">
-            <p className="text-xl font-bold">{answeredQuestions}/{totalQuestions}</p>
+            <p className="text-xl font-bold">
+              {answeredQuestions}/{totalQuestions}
+            </p>
             <p className="text-xs text-muted-foreground">вопросов</p>
           </div>
         </div>
       </Card>
 
-      {Object.entries(properties).map(([key, field]) => renderField(key, field))}
+      {Object.entries(memoizedProperties).map(([key, field]) => renderField(key, field))}
 
       <div className="flex justify-center pt-8">
-        <Button
-          type="submit"
-          size="lg"
-          disabled={submitting}
-          className="w-full max-w-md"
-        >
+        <Button type="submit" size="lg" disabled={submitting} className="w-full max-w-md">
           {submitting ? 'Отправка...' : 'Отправить ответы'}
         </Button>
       </div>

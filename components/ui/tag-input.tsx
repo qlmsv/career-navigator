@@ -16,8 +16,11 @@ export function TagInput({ value, onChange, placeholder }: TagInputProps) {
 
   const handleAddTag = () => {
     if (inputValue.trim() === '') return
-    const newTags = inputValue.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
-    const uniqueNewTags = newTags.filter(tag => !value.includes(tag))
+    const newTags = inputValue
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0)
+    const uniqueNewTags = newTags.filter((tag) => !value.includes(tag))
     if (uniqueNewTags.length > 0) {
       onChange([...value, ...uniqueNewTags])
     }
@@ -35,14 +38,17 @@ export function TagInput({ value, onChange, placeholder }: TagInputProps) {
   }
 
   const handleRemoveTag = (tagToRemove: string) => {
-    onChange(value.filter(tag => tag !== tagToRemove))
+    onChange(value.filter((tag) => tag !== tagToRemove))
   }
 
   return (
     <div>
       <div className="flex flex-wrap gap-2 p-2 border rounded-md min-h-[40px]">
-        {value.map(tag => (
-          <div key={tag} className="flex items-center gap-1 bg-secondary text-secondary-foreground rounded-md px-2 py-1 text-sm">
+        {value.map((tag) => (
+          <div
+            key={tag}
+            className="flex items-center gap-1 bg-secondary text-secondary-foreground rounded-md px-2 py-1 text-sm"
+          >
             {tag}
             <button onClick={() => handleRemoveTag(tag)} className="focus:outline-none">
               <X className="h-3 w-3" />

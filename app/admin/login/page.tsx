@@ -41,11 +41,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 px-4">
       <div className="w-full max-w-md">
         {/* Back button */}
-        <Button 
-          variant="ghost" 
-          asChild
-          className="mb-6"
-        >
+        <Button variant="ghost" asChild className="mb-6">
           <Link href="/">
             <ArrowLeft className="h-4 w-4 mr-2" />
             На главную
@@ -93,12 +89,7 @@ export default function AdminLoginPage() {
                 </div>
               )}
 
-              <Button 
-                type="submit" 
-                className="w-full" 
-                size="lg"
-                disabled={loading}
-              >
+              <Button type="submit" className="w-full" size="lg" disabled={loading}>
                 {loading ? 'Вход...' : 'Войти'}
               </Button>
             </form>

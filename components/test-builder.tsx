@@ -6,7 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Plus, Trash2, GripVertical, Save, Upload } from 'lucide-react'
 import { ISchema } from '@formily/react'
@@ -59,109 +65,124 @@ interface TestBuilderProps {
   onSave: (schema: ISchema, metadata: any) => void | Promise<void>
 }
 
-function parseSchema(schema: ISchema): { questions: Question[], constructs: string[], subconstructs: string[], skills: string[], scoringMode: 'sum' | 'average' | 'product' } {
-    const questions: Question[] = [];
-    const properties = schema.properties || {};
+function parseSchema(schema: ISchema): {
+  questions: Question[]
+  constructs: string[]
+  subconstructs: string[]
+  skills: string[]
+  scoringMode: 'sum' | 'average' | 'product'
+} {
+  const questions: Question[] = []
+  const properties = schema.properties || {}
 
-    if (typeof properties === 'object') {
-        for (const id in properties) {
-            const fieldSchema = (properties as any)[id];
-            if (!fieldSchema) continue;
+  if (typeof properties === 'object') {
+    for (const id in properties) {
+      const fieldSchema = (properties as any)[id]
+      if (!fieldSchema) continue
 
-            let question: Partial<Question> = {
-                id,
-                title: fieldSchema.title || '',
-                description: fieldSchema.description || '',
-                required: !!fieldSchema.required,
-            };
+      let question: Partial<Question> = {
+        id,
+        title: fieldSchema.title || '',
+        description: fieldSchema.description || '',
+        required: !!fieldSchema.required,
+      }
 
-            const componentType = fieldSchema['x-component'] || '';
-            const typeMapping: { [key: string]: QuestionType } = {
-                'Input': 'text',
-                'Input.TextArea': 'textarea',
-                'InputNumber': 'number',
-                'Input.Email': 'email',
-                'Input.Phone': 'phone',
-                'Input.URL': 'url',
-                'Radio.Group': 'radio',
-                'Checkbox.Group': 'checkbox',
-                'Select': 'select',
-                'ImageChoice': 'image_choice',
-                'Switch': 'boolean',
-                'DatePicker': 'date',
-                'TimePicker': 'time',
-                'DateTimePicker': 'datetime',
-                'Rate': 'rating',
-                'Slider': 'slider',
-                'NPS': 'nps',
-                'Matrix': 'matrix',
-                'Ranking': 'ranking',
-                'ConstantSum': 'constant_sum',
-                'Upload': 'upload',
-                'Signature': 'signature',
-                'Location': 'location',
-                'Divider': 'divider',
-                'HTML': 'html'
-            };
-            
-            let qType: QuestionType = 'text';
-            if (componentType === 'Radio.Group' && fieldSchema.enum?.length === 2 && fieldSchema.enum[0].value === 'yes') {
-                qType = 'yes_no';
-            } else if (componentType === 'Slider' && (fieldSchema['x-component-props']?.marks)) {
-                 qType = 'scale';
-            } else {
-                qType = typeMapping[componentType] || 'text';
-            }
+      const componentType = fieldSchema['x-component'] || ''
+      const typeMapping: { [key: string]: QuestionType } = {
+        Input: 'text',
+        'Input.TextArea': 'textarea',
+        InputNumber: 'number',
+        'Input.Email': 'email',
+        'Input.Phone': 'phone',
+        'Input.URL': 'url',
+        'Radio.Group': 'radio',
+        'Checkbox.Group': 'checkbox',
+        Select: 'select',
+        ImageChoice: 'image_choice',
+        Switch: 'boolean',
+        DatePicker: 'date',
+        TimePicker: 'time',
+        DateTimePicker: 'datetime',
+        Rate: 'rating',
+        Slider: 'slider',
+        NPS: 'nps',
+        Matrix: 'matrix',
+        Ranking: 'ranking',
+        ConstantSum: 'constant_sum',
+        Upload: 'upload',
+        Signature: 'signature',
+        Location: 'location',
+        Divider: 'divider',
+        HTML: 'html',
+      }
 
-            question.type = qType;
+      let qType: QuestionType = 'text'
+      if (
+        componentType === 'Radio.Group' &&
+        fieldSchema.enum?.length === 2 &&
+        fieldSchema.enum[0].value === 'yes'
+      ) {
+        qType = 'yes_no'
+      } else if (componentType === 'Slider' && fieldSchema['x-component-props']?.marks) {
+        qType = 'scale'
+      } else {
+        qType = typeMapping[componentType] || 'text'
+      }
 
-            if (fieldSchema.enum) {
-                const optionPoints = fieldSchema['x-component-props']?.optionPoints || {};
-                question.options = fieldSchema.enum.map((opt: { label: string, value: any }) => ({
-                    label: opt.label,
-                    value: String(opt.value),
-                    points: optionPoints[String(opt.value)]
-                }));
-            }
-            
-            if (qType === 'matrix') {
-                question.rowsOptions = fieldSchema['x-component-props']?.rows || [];
-                question.columnsOptions = fieldSchema['x-component-props']?.columns || [];
-            }
+      question.type = qType
 
-            const props = fieldSchema['x-component-props'] || {};
-            question.min = props.min;
-            question.max = props.max;
-            question.step = props.step;
-            if (qType === 'rating') {
-                question.max = props.count;
-            }
-            if (qType === 'textarea') {
-                question.rows = props.rows;
-            }
+      if (fieldSchema.enum) {
+        const optionPoints = fieldSchema['x-component-props']?.optionPoints || {}
+        question.options = fieldSchema.enum.map((opt: { label: string; value: any }) => ({
+          label: opt.label,
+          value: String(opt.value),
+          points: optionPoints[String(opt.value)],
+        }))
+      }
 
-            const meta = fieldSchema['x-meta'] || {};
-            question.construct = meta.construct;
-            question.subconstruct = meta.subconstruct;
-            question.skill = meta.skill;
-            question.reverse = meta.reverse;
+      if (qType === 'matrix') {
+        question.rowsOptions = fieldSchema['x-component-props']?.rows || []
+        question.columnsOptions = fieldSchema['x-component-props']?.columns || []
+      }
 
-            questions.push(question as Question);
-        }
+      const props = fieldSchema['x-component-props'] || {}
+      question.min = props.min
+      question.max = props.max
+      question.step = props.step
+      if (qType === 'rating') {
+        question.max = props.count
+      }
+      if (qType === 'textarea') {
+        question.rows = props.rows
+      }
+
+      const meta = fieldSchema['x-meta'] || {}
+      question.construct = meta.construct
+      question.subconstruct = meta.subconstruct
+      question.skill = meta.skill
+      question.reverse = meta.reverse
+
+      questions.push(question as Question)
     }
-    
-    const meta = schema['x-meta'] || {};
+  }
 
-    return {
-        questions,
-        constructs: meta.constructs || [],
-        subconstructs: meta.subconstructs || [],
-        skills: meta.skills || [],
-        scoringMode: meta.scoringMode || 'sum',
-    };
+  const meta = schema['x-meta'] || {}
+
+  return {
+    questions,
+    constructs: meta.constructs || [],
+    subconstructs: meta.subconstructs || [],
+    skills: meta.skills || [],
+    scoringMode: meta.scoringMode || 'sum',
+  }
 }
 
-export default function TestBuilder({ initialSchema, initialTitle, initialDescription, onSave }: TestBuilderProps) {
+export default function TestBuilder({
+  initialSchema,
+  initialTitle,
+  initialDescription,
+  onSave,
+}: TestBuilderProps) {
   const { toast } = useToast()
   const [title, setTitle] = useState(initialTitle || '')
   const [description, setDescription] = useState(initialDescription || '')
@@ -173,25 +194,25 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
   const [scoringMode, setScoringMode] = useState<'sum' | 'average' | 'product'>('sum')
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-  const questionIds = useMemo(() => questions.map(q => q.id), [questions]);
+  const questionIds = useMemo(() => questions.map((q) => q.id), [questions])
 
   useEffect(() => {
     if (initialSchema) {
-        const parsed = parseSchema(initialSchema);
-        setQuestions(parsed.questions);
-        setConstructs(parsed.constructs);
-        setSubconstructs(parsed.subconstructs);
-        setSkills(parsed.skills);
-        setScoringMode(parsed.scoringMode);
+      const parsed = parseSchema(initialSchema)
+      setQuestions(parsed.questions)
+      setConstructs(parsed.constructs)
+      setSubconstructs(parsed.subconstructs)
+      setSkills(parsed.skills)
+      setScoringMode(parsed.scoringMode)
     }
-  }, [initialSchema]);
+  }, [initialSchema])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+    }),
+  )
 
   const handleImportTemplate = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -239,19 +260,20 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
   }
 
   function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
+    const { active, over } = event
     if (over && active.id !== over.id) {
       setQuestions((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
+        const oldIndex = items.findIndex((item) => item.id === active.id)
+        const newIndex = items.findIndex((item) => item.id === over.id)
+        return arrayMove(items, oldIndex, newIndex)
+      })
     }
   }
 
   const addQuestion = (type: QuestionType) => {
-    const hasOptions = type === 'radio' || type === 'checkbox' || type === 'select' || type === 'image_choice'
-    
+    const hasOptions =
+      type === 'radio' || type === 'checkbox' || type === 'select' || type === 'image_choice'
+
     const newQuestion: Question = {
       id: `q_${Date.now()}`,
       type,
@@ -262,91 +284,107 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
         ? {
             rowsOptions: [
               { label: 'Строка 1', value: 'row1' },
-              { label: 'Строка 2', value: 'row2' }
+              { label: 'Строка 2', value: 'row2' },
             ],
             columnsOptions: [
               { label: 'Колонка 1', value: 'col1' },
-              { label: 'Колонка 2', value: 'col2' }
-            ]
+              { label: 'Колонка 2', value: 'col2' },
+            ],
           }
-        : {})
+        : {}),
     }
     setQuestions((prev) => [...prev, newQuestion])
   }
 
   const updateQuestion = (id: string, updates: Partial<Question>) => {
-    setQuestions(questions.map(q => q.id === id ? { ...q, ...updates } : q))
+    setQuestions(questions.map((q) => (q.id === id ? { ...q, ...updates } : q)))
   }
 
   const deleteQuestion = (id: string) => {
-    setQuestions(questions.filter(q => q.id !== id))
+    setQuestions(questions.filter((q) => q.id !== id))
   }
 
   const addOption = (questionId: string) => {
-    setQuestions(questions.map(q => {
-      if (q.id === questionId && q.options) {
-        return {
-          ...q,
-          options: [
-            ...q.options,
-            { label: `Вариант ${q.options.length + 1}`, value: `opt${q.options.length + 1}`, points: 0 }
-          ]
+    setQuestions(
+      questions.map((q) => {
+        if (q.id === questionId && q.options) {
+          return {
+            ...q,
+            options: [
+              ...q.options,
+              {
+                label: `Вариант ${q.options.length + 1}`,
+                value: `opt${q.options.length + 1}`,
+                points: 0,
+              },
+            ],
+          }
         }
-      }
-      return q
-    }))
+        return q
+      }),
+    )
   }
 
   const updateOption = (questionId: string, optionIndex: number, label: string) => {
-    setQuestions(questions.map(q => {
-      if (q.id === questionId && q.options) {
-        const newOptions = [...q.options]
-        const currentOption = newOptions[optionIndex]
-        if (currentOption) {
-          newOptions[optionIndex] = { 
-            ...currentOption, 
-            label,
-            value: currentOption.value || `opt${optionIndex + 1}`
-          }
-        }
-        return { ...q, options: newOptions }
-      }
-      return q
-    }))
-  }
-  
-  const updateOptionPoints = (questionId: string, optionIndex: number, points: number | undefined) => {
-    setQuestions(questions.map(q => {
-      if (q.id === questionId && q.options) {
-        const newOptions = [...q.options]
-        const currentOption = newOptions[optionIndex]
-        if (currentOption) {
-          if (points === undefined) {
-            const { points: _omit, ...rest } = currentOption as any
-            newOptions[optionIndex] = rest
-          } else {
+    setQuestions(
+      questions.map((q) => {
+        if (q.id === questionId && q.options) {
+          const newOptions = [...q.options]
+          const currentOption = newOptions[optionIndex]
+          if (currentOption) {
             newOptions[optionIndex] = {
               ...currentOption,
-              points
+              label,
+              value: currentOption.value || `opt${optionIndex + 1}`,
             }
           }
+          return { ...q, options: newOptions }
         }
-        return { ...q, options: newOptions }
-      }
-      return q
-    }))
+        return q
+      }),
+    )
+  }
+
+  const updateOptionPoints = (
+    questionId: string,
+    optionIndex: number,
+    points: number | undefined,
+  ) => {
+    setQuestions(
+      questions.map((q) => {
+        if (q.id === questionId && q.options) {
+          const newOptions = [...q.options]
+          const currentOption = newOptions[optionIndex]
+          if (currentOption) {
+            if (points === undefined) {
+              const { points: _omit, ...rest } = currentOption as any
+              newOptions[optionIndex] = rest
+            } else {
+              newOptions[optionIndex] = {
+                ...currentOption,
+                points,
+              }
+            }
+          }
+          return { ...q, options: newOptions }
+        }
+        return q
+      }),
+    )
   }
 
   const deleteOption = (questionId: string, optionIndex: number) => {
-    setQuestions(questions.map(q => {
-      if (q.id === questionId && q.options) {
-        return {
-          ...q,
-          options: q.options.filter((_, i) => i !== optionIndex)
+    setQuestions(
+      questions.map((q) => {
+        if (q.id === questionId && q.options) {
+          return {
+            ...q,
+            options: q.options.filter((_, i) => i !== optionIndex),
+          }
         }
-      }
-      return q
-    }))
+        return q
+      }),
+    )
   }
 
   const generateSchema = (): ISchema => {
@@ -356,7 +394,7 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
       const fieldSchema: any = {
         title: question.title,
         'x-decorator': 'FormItem',
-        required: question.required
+        required: question.required,
       }
 
       if (question.description) {
@@ -368,7 +406,7 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
           fieldSchema.type = 'string'
           fieldSchema['x-component'] = 'Input'
           fieldSchema['x-component-props'] = {
-            placeholder: 'Введите ответ...'
+            placeholder: 'Введите ответ...',
           }
           break
         case 'textarea':
@@ -376,7 +414,7 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
           fieldSchema['x-component'] = 'Input.TextArea'
           fieldSchema['x-component-props'] = {
             rows: question.rows || 4,
-            placeholder: 'Введите ответ...'
+            placeholder: 'Введите ответ...',
           }
           break
         case 'number':
@@ -385,49 +423,62 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
           fieldSchema['x-component-props'] = {
             min: question.min,
             max: question.max,
-            step: question.step || 1
+            step: question.step || 1,
           }
           break
         case 'email':
           fieldSchema.type = 'string'
           fieldSchema['x-component'] = 'Input.Email'
           fieldSchema['x-component-props'] = {
-            placeholder: 'name@example.com'
+            placeholder: 'name@example.com',
           }
           break
         case 'phone':
           fieldSchema.type = 'string'
           fieldSchema['x-component'] = 'Input.Phone'
           fieldSchema['x-component-props'] = {
-            placeholder: '+7 900 000-00-00'
+            placeholder: '+7 900 000-00-00',
           }
           break
         case 'url':
           fieldSchema.type = 'string'
           fieldSchema['x-component'] = 'Input.URL'
           fieldSchema['x-component-props'] = {
-            placeholder: 'https://...'
+            placeholder: 'https://...',
           }
           break
         case 'radio':
           fieldSchema.type = 'string'
           fieldSchema['x-component'] = 'Radio.Group'
-          fieldSchema.enum = question.options?.map(opt => ({ label: opt.label, value: opt.value }))
+          fieldSchema.enum = question.options?.map((opt) => ({
+            label: opt.label,
+            value: opt.value,
+          }))
           break
         case 'checkbox':
           fieldSchema.type = 'array'
           fieldSchema['x-component'] = 'Checkbox.Group'
-          fieldSchema.enum = question.options?.map(opt => ({ label: opt.label, value: opt.value }))
+          fieldSchema.enum = question.options?.map((opt) => ({
+            label: opt.label,
+            value: opt.value,
+          }))
           break
         case 'select':
           fieldSchema.type = 'string'
           fieldSchema['x-component'] = 'Select'
-          fieldSchema.enum = question.options?.map(opt => ({ label: opt.label, value: opt.value }))
+          fieldSchema.enum = question.options?.map((opt) => ({
+            label: opt.label,
+            value: opt.value,
+          }))
           break
         case 'image_choice':
           fieldSchema.type = 'string'
           fieldSchema['x-component'] = 'ImageChoice'
-          fieldSchema.enum = question.options?.map(opt => ({ label: opt.label, value: opt.value, image: (opt as any).image }))
+          fieldSchema.enum = question.options?.map((opt) => ({
+            label: opt.label,
+            value: opt.value,
+            image: (opt as any).image,
+          }))
           break
         case 'boolean':
           fieldSchema.type = 'boolean'
@@ -438,7 +489,7 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
           fieldSchema['x-component'] = 'Radio.Group'
           fieldSchema.enum = [
             { label: 'Да', value: 'yes' },
-            { label: 'Нет', value: 'no' }
+            { label: 'Нет', value: 'no' },
           ]
           break
         case 'date':
@@ -457,7 +508,7 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
           fieldSchema.type = 'number'
           fieldSchema['x-component'] = 'Rate'
           fieldSchema['x-component-props'] = {
-            count: question.max || 5
+            count: question.max || 5,
           }
           break
         case 'scale':
@@ -467,7 +518,7 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
             min: question.min || 1,
             max: question.max || 10,
             step: question.step || 1,
-            marks: true
+            marks: true,
           }
           break
         case 'slider':
@@ -475,7 +526,7 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
           fieldSchema['x-component'] = 'Slider'
           fieldSchema['x-component-props'] = {
             min: question.min || 0,
-            max: question.max || 100
+            max: question.max || 100,
           }
           break
         case 'nps':
@@ -483,7 +534,7 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
           fieldSchema['x-component'] = 'NPS'
           fieldSchema['x-component-props'] = {
             min: 0,
-            max: 10
+            max: 10,
           }
           break
         case 'matrix':
@@ -491,20 +542,23 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
           fieldSchema['x-component'] = 'Matrix'
           fieldSchema['x-component-props'] = {
             rows: question.rowsOptions || [],
-            columns: question.columnsOptions || []
+            columns: question.columnsOptions || [],
           }
           break
         case 'ranking':
           fieldSchema.type = 'array'
           fieldSchema['x-component'] = 'Ranking'
-          fieldSchema.enum = question.options?.map(opt => ({ label: opt.label, value: opt.value }))
+          fieldSchema.enum = question.options?.map((opt) => ({
+            label: opt.label,
+            value: opt.value,
+          }))
           break
         case 'constant_sum':
           fieldSchema.type = 'array'
           fieldSchema['x-component'] = 'ConstantSum'
           fieldSchema['x-component-props'] = {
             total: (question as any).max || 100,
-            items: question.options?.map(opt => ({ label: opt.label, value: opt.value })) || []
+            items: question.options?.map((opt) => ({ label: opt.label, value: opt.value })) || [],
           }
           break
         case 'upload':
@@ -529,26 +583,31 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
           break
       }
 
-      if (question.options && question.options.some(o => typeof o.points === 'number')) {
+      if (question.options && question.options.some((o) => typeof o.points === 'number')) {
         const optionPoints: Record<string, number> = {}
-        question.options.forEach(opt => {
+        question.options.forEach((opt) => {
           if (opt.value !== undefined && typeof opt.points === 'number') {
             optionPoints[String(opt.value)] = Number(opt.points)
           }
         })
         fieldSchema['x-component-props'] = {
           ...fieldSchema['x-component-props'],
-          optionPoints
+          optionPoints,
         }
       }
 
-      if (question.construct || question.subconstruct || question.skill || typeof question.reverse === 'boolean') {
+      if (
+        question.construct ||
+        question.subconstruct ||
+        question.skill ||
+        typeof question.reverse === 'boolean'
+      ) {
         fieldSchema['x-meta'] = {
           ...(fieldSchema['x-meta'] || {}),
           ...(question.construct ? { construct: question.construct } : {}),
           ...(question.subconstruct ? { subconstruct: question.subconstruct } : {}),
           ...(question.skill ? { skill: question.skill } : {}),
-          ...(typeof question.reverse === 'boolean' ? { reverse: !!question.reverse } : {})
+          ...(typeof question.reverse === 'boolean' ? { reverse: !!question.reverse } : {}),
         }
       }
 
@@ -562,8 +621,8 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
         constructs,
         subconstructs,
         skills,
-        scoringMode
-      }
+        scoringMode,
+      },
     }
   }
 
@@ -604,7 +663,9 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
           })
           return false
         }
-        const hasEmptyOption = question.options.some(option => !option.label || !option.label.trim())
+        const hasEmptyOption = question.options.some(
+          (option) => !option.label || !option.label.trim(),
+        )
         if (hasEmptyOption) {
           toast({
             variant: 'destructive',
@@ -657,7 +718,12 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
     }
   }
 
-  const questionTypes: Array<{ value: QuestionType; label: string; icon: string; category: string }> = [
+  const questionTypes: Array<{
+    value: QuestionType
+    label: string
+    icon: string
+    category: string
+  }> = [
     { value: 'text', label: 'Текст', icon: '📝', category: 'basic' },
     { value: 'textarea', label: 'Длинный текст', icon: '📄', category: 'basic' },
     { value: 'number', label: 'Число', icon: '🔢', category: 'basic' },
@@ -694,7 +760,8 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
                 className="hidden"
               />
               <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                <Upload className="h-4 w-4 mr-2" />Загрузить шаблон
+                <Upload className="h-4 w-4 mr-2" />
+                Загрузить шаблон
               </Button>
             </div>
           </div>
@@ -728,11 +795,7 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
             </div>
             <div>
               <Label>Навыки</Label>
-              <TagInput
-                value={skills}
-                onChange={setSkills}
-                placeholder="Добавить навык..."
-              />
+              <TagInput value={skills} onChange={setSkills} placeholder="Добавить навык..." />
             </div>
           </div>
 
@@ -765,12 +828,16 @@ export default function TestBuilder({ initialSchema, initialTitle, initialDescri
                 onUpdate={(updates) => updateQuestion(question.id, updates)}
                 onDelete={() => deleteQuestion(question.id)}
                 onAddOption={() => addOption(question.id)}
-                onUpdateOption={(optionIndex, label) => updateOption(question.id, optionIndex, label)}
+                onUpdateOption={(optionIndex, label) =>
+                  updateOption(question.id, optionIndex, label)
+                }
                 onDeleteOption={(optionIndex) => deleteOption(question.id, optionIndex)}
                 constructsList={constructs}
                 subconstructsList={subconstructs}
                 skillsList={skills}
-                onUpdateOptionPoints={(optionIndex, pts) => updateOptionPoints(question.id, optionIndex, pts)}
+                onUpdateOptionPoints={(optionIndex, pts) =>
+                  updateOptionPoints(question.id, optionIndex, pts)
+                }
               />
             ))}
           </SortableContext>
@@ -827,10 +894,10 @@ interface QuestionEditorProps {
   dragHandleProps?: any
 }
 
-function QuestionEditor({ 
-  question, 
-  index, 
-  onUpdate, 
+function QuestionEditor({
+  question,
+  index,
+  onUpdate,
   onDelete,
   onAddOption,
   onUpdateOption,
@@ -839,7 +906,7 @@ function QuestionEditor({
   subconstructsList,
   skillsList,
   onUpdateOptionPoints,
-  dragHandleProps
+  dragHandleProps,
 }: QuestionEditorProps) {
   const hasOptions = ['radio', 'checkbox', 'select'].includes(question.type)
   const hasMinMax = ['number', 'scale', 'slider'].includes(question.type)
@@ -907,7 +974,10 @@ function QuestionEditor({
                       onChange={(e) => {
                         const val = e.target.value
                         const num = val === '' ? undefined : Number.parseFloat(val)
-                        onUpdateOptionPoints(optIndex, Number.isNaN(num as any) ? undefined : (num as number | undefined))
+                        onUpdateOptionPoints(
+                          optIndex,
+                          Number.isNaN(num as any) ? undefined : (num as number | undefined),
+                        )
                       }}
                       placeholder="Баллы"
                     />
@@ -935,26 +1005,36 @@ function QuestionEditor({
         <div className="grid grid-cols-4 gap-4">
           <div>
             <Label>Конструкт</Label>
-            <Select value={question.construct || ''} onValueChange={(v) => onUpdate({ construct: v })}>
+            <Select
+              value={question.construct || ''}
+              onValueChange={(v) => onUpdate({ construct: v })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Выберите конструкт" />
               </SelectTrigger>
               <SelectContent className="bg-background">
                 {constructsList.map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
             <Label>Субконструкт</Label>
-            <Select value={question.subconstruct || ''} onValueChange={(v) => onUpdate({ subconstruct: v })}>
+            <Select
+              value={question.subconstruct || ''}
+              onValueChange={(v) => onUpdate({ subconstruct: v })}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Выберите субконструкт" />
               </SelectTrigger>
               <SelectContent className="bg-background">
                 {subconstructsList.map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -967,7 +1047,9 @@ function QuestionEditor({
               </SelectTrigger>
               <SelectContent className="bg-background">
                 {skillsList.map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -979,7 +1061,9 @@ function QuestionEditor({
                 checked={!!question.reverse}
                 onCheckedChange={(checked) => onUpdate({ reverse: !!checked })}
               />
-              <Label htmlFor={`reverse-${question.id}`} className="cursor-pointer">Реверс</Label>
+              <Label htmlFor={`reverse-${question.id}`} className="cursor-pointer">
+                Реверс
+              </Label>
             </div>
           </div>
         </div>
@@ -996,7 +1080,11 @@ function QuestionEditor({
                       onChange={(e) => {
                         const next = [...(question.rowsOptions || [])]
                         const prev = next[rowIndex] || { label: '', value: `row${rowIndex + 1}` }
-                        next[rowIndex] = { ...prev, label: e.target.value, value: prev.value || `row${rowIndex + 1}` }
+                        next[rowIndex] = {
+                          ...prev,
+                          label: e.target.value,
+                          value: prev.value || `row${rowIndex + 1}`,
+                        }
                         onUpdate({ rowsOptions: next })
                       }}
                       placeholder={`Строка ${rowIndex + 1}`}
@@ -1020,7 +1108,10 @@ function QuestionEditor({
                   onClick={() => {
                     const next = [
                       ...(question.rowsOptions || []),
-                      { label: `Строка ${(question.rowsOptions || []).length + 1}`, value: `row${(question.rowsOptions || []).length + 1}` }
+                      {
+                        label: `Строка ${(question.rowsOptions || []).length + 1}`,
+                        value: `row${(question.rowsOptions || []).length + 1}`,
+                      },
                     ]
                     onUpdate({ rowsOptions: next })
                   }}
@@ -1041,7 +1132,11 @@ function QuestionEditor({
                       onChange={(e) => {
                         const next = [...(question.columnsOptions || [])]
                         const prev = next[colIndex] || { label: '', value: `col${colIndex + 1}` }
-                        next[colIndex] = { ...prev, label: e.target.value, value: prev.value || `col${colIndex + 1}` }
+                        next[colIndex] = {
+                          ...prev,
+                          label: e.target.value,
+                          value: prev.value || `col${colIndex + 1}`,
+                        }
                         onUpdate({ columnsOptions: next })
                       }}
                       placeholder={`Колонка ${colIndex + 1}`}
@@ -1050,7 +1145,9 @@ function QuestionEditor({
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        const next = (question.columnsOptions || []).filter((_, i) => i !== colIndex)
+                        const next = (question.columnsOptions || []).filter(
+                          (_, i) => i !== colIndex,
+                        )
                         onUpdate({ columnsOptions: next })
                       }}
                       disabled={(question.columnsOptions || []).length <= 1}
@@ -1065,7 +1162,10 @@ function QuestionEditor({
                   onClick={() => {
                     const next = [
                       ...(question.columnsOptions || []),
-                      { label: `Колонка ${(question.columnsOptions || []).length + 1}`, value: `col${(question.columnsOptions || []).length + 1}` }
+                      {
+                        label: `Колонка ${(question.columnsOptions || []).length + 1}`,
+                        value: `col${(question.columnsOptions || []).length + 1}`,
+                      },
                     ]
                     onUpdate({ columnsOptions: next })
                   }}
@@ -1125,24 +1225,18 @@ function QuestionEditor({
 }
 
 function SortableQuestionEditor(props: QuestionEditorProps & { id: string }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: props.id });
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: props.id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-  };
+  }
 
   return (
     <div ref={setNodeRef} style={style}>
-      <QuestionEditor {...props} dragHandleProps={{...attributes, ...listeners}} />
+      <QuestionEditor {...props} dragHandleProps={{ ...attributes, ...listeners }} />
     </div>
-  );
+  )
 }
 
 interface QuickAddButtonsProps {
@@ -1151,18 +1245,17 @@ interface QuickAddButtonsProps {
   compact?: boolean
 }
 
-
 function QuickAddButtons({ questionTypes, onAdd, compact }: QuickAddButtonsProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const categories = {
-    basic: questionTypes.filter(t => t.category === 'basic'),
-    choice: questionTypes.filter(t => t.category === 'choice'),
-    scale: questionTypes.filter(t => t.category === 'scale'),
-    datetime: questionTypes.filter(t => t.category === 'datetime'),
-    boolean: questionTypes.filter(t => t.category === 'boolean'),
-    advanced: questionTypes.filter(t => t.category === 'advanced'),
-    special: questionTypes.filter(t => t.category === 'special'),
+    basic: questionTypes.filter((t) => t.category === 'basic'),
+    choice: questionTypes.filter((t) => t.category === 'choice'),
+    scale: questionTypes.filter((t) => t.category === 'scale'),
+    datetime: questionTypes.filter((t) => t.category === 'datetime'),
+    boolean: questionTypes.filter((t) => t.category === 'boolean'),
+    advanced: questionTypes.filter((t) => t.category === 'advanced'),
+    special: questionTypes.filter((t) => t.category === 'special'),
   }
 
   if (compact) {
@@ -1170,7 +1263,7 @@ function QuickAddButtons({ questionTypes, onAdd, compact }: QuickAddButtonsProps
   }
 
   const allowed = ['text', 'textarea', 'radio', 'checkbox', 'rating', 'scale']
-  const popularTypes = questionTypes.filter(t => allowed.includes(t.value as any))
+  const popularTypes = questionTypes.filter((t) => allowed.includes(t.value as any))
 
   return (
     <Card className="sticky top-4 z-20 shadow-lg bg-background/95 backdrop-blur border-2">
@@ -1229,7 +1322,7 @@ function getQuestionTypeLabel(type: QuestionType): string {
     signature: 'Подпись',
     location: 'Местоположение',
     divider: 'Разделитель',
-    html: 'HTML блок'
+    html: 'HTML блок',
   }
   return labels[type] || type
 }

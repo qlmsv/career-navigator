@@ -53,7 +53,9 @@ export default function HomePage() {
             <div className="flex items-center gap-4">
               {isAdmin && (
                 <>
-                  <Badge variant="default" className="hidden sm:flex">Администратор</Badge>
+                  <Badge variant="default" className="hidden sm:flex">
+                    Администратор
+                  </Badge>
                   <Button asChild>
                     <Link href="/admin">Панель управления</Link>
                   </Button>
@@ -72,16 +74,16 @@ export default function HomePage() {
               🎯 Оценка карьерного потенциала
             </Badge>
           </div>
-          
+
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
             Узнайте свой
             <br />
             карьерный потенциал
           </h1>
-          
+
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Пройдите тесты для самодиагностики конкурентоспособности на рынке труда. 
-            Оцените свои навыки и получите персональные рекомендации по развитию карьеры.
+            Пройдите тесты для самодиагностики конкурентоспособности на рынке труда. Оцените свои
+            навыки и получите персональные рекомендации по развитию карьеры.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -107,7 +109,8 @@ export default function HomePage() {
               </div>
               <CardTitle>Комплексная оценка</CardTitle>
               <CardDescription>
-                Оцените свои профессиональные компетенции, личностные качества и навыки через психометрические тесты.
+                Оцените свои профессиональные компетенции, личностные качества и навыки через
+                психометрические тесты.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -131,7 +134,8 @@ export default function HomePage() {
               </div>
               <CardTitle>Персональные рекомендации</CardTitle>
               <CardDescription>
-                Получите индивидуальные рекомендации по развитию карьеры на основе ваших результатов.
+                Получите индивидуальные рекомендации по развитию карьеры на основе ваших
+                результатов.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -143,8 +147,8 @@ export default function HomePage() {
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Тесты для самодиагностики</h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Выберите тест для оценки ваших компетенций и личностных качеств. 
-            По результатам вы получите подробный анализ и рекомендации для развития карьеры.
+            Выберите тест для оценки ваших компетенций и личностных качеств. По результатам вы
+            получите подробный анализ и рекомендации для развития карьеры.
           </p>
         </div>
 
@@ -158,9 +162,7 @@ export default function HomePage() {
             <CardContent className="pt-6 text-center">
               <div className="mb-4 text-6xl">📝</div>
               <h3 className="text-lg font-semibold mb-2">Тесты не найдены</h3>
-              <p className="text-muted-foreground mb-4">
-                В данный момент нет доступных тестов
-              </p>
+              <p className="text-muted-foreground mb-4">В данный момент нет доступных тестов</p>
               {isAdmin && (
                 <Button asChild>
                   <Link href="/admin/tests/create">Создать первый тест</Link>
@@ -171,7 +173,7 @@ export default function HomePage() {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {tests.map((test) => (
-              <Card 
+              <Card
                 key={test.id}
                 className="hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-blue-500"
               >
@@ -186,9 +188,7 @@ export default function HomePage() {
                     )}
                   </div>
                   {test.description && (
-                    <CardDescription className="line-clamp-2">
-                      {test.description}
-                    </CardDescription>
+                    <CardDescription className="line-clamp-2">{test.description}</CardDescription>
                   )}
                 </CardHeader>
                 <CardContent>
@@ -204,7 +204,7 @@ export default function HomePage() {
                       <span>Мгновенный результат</span>
                     </div>
                   </div>
-                  
+
                   <Button asChild className="w-full" size="lg">
                     <Link href={`/tests/${test.id}`}>
                       <Play className="h-4 w-4 mr-2" />

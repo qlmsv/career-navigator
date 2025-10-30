@@ -15,7 +15,7 @@ export default function AdminGuard({ children }: AdminGuardProps) {
   useEffect(() => {
     // Ждем пока загрузится состояние админа
     if (loading) return
-    
+
     if (!isAdmin) {
       router.push('/admin/login')
     }

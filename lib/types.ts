@@ -5,47 +5,47 @@
 import { ISchema } from '@formily/react'
 
 // Типы вопросов (расширенный список как в Qualtrics)
-export type QuestionType = 
+export type QuestionType =
   // Базовые типы
-  | 'text'              // Текстовый ввод (короткий)
-  | 'textarea'          // Многострочный текст
-  | 'number'            // Числовой ввод
-  | 'email'             // Email адрес
-  | 'phone'             // Телефон
-  | 'url'               // URL адрес
-  
+  | 'text' // Текстовый ввод (короткий)
+  | 'textarea' // Многострочный текст
+  | 'number' // Числовой ввод
+  | 'email' // Email адрес
+  | 'phone' // Телефон
+  | 'url' // URL адрес
+
   // Выбор из вариантов
-  | 'radio'             // Один выбор (Radio)
-  | 'checkbox'          // Множественный выбор
-  | 'select'            // Dropdown (выпадающий список)
-  | 'image_choice'      // Выбор изображений
-  
+  | 'radio' // Один выбор (Radio)
+  | 'checkbox' // Множественный выбор
+  | 'select' // Dropdown (выпадающий список)
+  | 'image_choice' // Выбор изображений
+
   // Шкалы и рейтинги
-  | 'rating'            // Звездочки / рейтинг
-  | 'scale'             // Шкала Лайкерта (1-5, 1-7, 1-10)
-  | 'slider'            // Слайдер
-  | 'nps'               // Net Promoter Score (0-10)
-  
+  | 'rating' // Звездочки / рейтинг
+  | 'scale' // Шкала Лайкерта (1-5, 1-7, 1-10)
+  | 'slider' // Слайдер
+  | 'nps' // Net Promoter Score (0-10)
+
   // Даты и время
-  | 'date'              // Дата
-  | 'time'              // Время
-  | 'datetime'          // Дата и время
-  
+  | 'date' // Дата
+  | 'time' // Время
+  | 'datetime' // Дата и время
+
   // Булевы
-  | 'boolean'           // Да/Нет (switch)
-  | 'yes_no'            // Да/Нет (radio)
-  
+  | 'boolean' // Да/Нет (switch)
+  | 'yes_no' // Да/Нет (radio)
+
   // Сложные типы
-  | 'matrix'            // Матричная таблица
-  | 'ranking'           // Ранжирование (drag & drop)
-  | 'constant_sum'      // Постоянная сумма (сумма должна быть N)
-  | 'upload'            // Загрузка файла
-  | 'signature'         // Подпись
-  | 'location'          // Выбор местоположения
-  
+  | 'matrix' // Матричная таблица
+  | 'ranking' // Ранжирование (drag & drop)
+  | 'constant_sum' // Постоянная сумма (сумма должна быть N)
+  | 'upload' // Загрузка файла
+  | 'signature' // Подпись
+  | 'location' // Выбор местоположения
+
   // Специальные
-  | 'divider'           // Разделитель (только текст)
-  | 'html'              // Произвольный HTML
+  | 'divider' // Разделитель (только текст)
+  | 'html' // Произвольный HTML
 
 export interface Admin {
   id: string

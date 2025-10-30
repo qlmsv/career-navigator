@@ -19,7 +19,7 @@ export async function loginAdmin(email: string, password: string): Promise<Admin
     const response = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
     })
 
     const result = await response.json()
@@ -33,7 +33,7 @@ export async function loginAdmin(email: string, password: string): Promise<Admin
     const session: AdminSession = {
       admin: result.data.admin,
       token: generateToken(),
-      expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 часа
+      expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 часа
     }
 
     // Сохраняем в localStorage
@@ -121,6 +121,6 @@ export function useAdmin() {
     isAdmin: !!admin,
     loading,
     login,
-    logout
+    logout,
   }
 }

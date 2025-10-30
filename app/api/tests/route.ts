@@ -8,10 +8,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
 
-    let query = supabaseAdmin
-      .from('tests')
-      .select('*')
-      .order('created_at', { ascending: false })
+    let query = supabaseAdmin.from('tests').select('*').order('created_at', { ascending: false })
 
     // Фильтр по статусу
     if (status && status !== 'all') {
@@ -26,19 +23,13 @@ export async function GET(request: Request) {
     const { data, error } = await query
 
     if (error) {
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: error.message }, { status: 400 })
     }
 
     return NextResponse.json({ success: true, data })
   } catch (error) {
     console.error('Get tests error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -50,7 +41,7 @@ export async function POST(request: Request) {
     if (!input.title || !input.formily_schema) {
       return NextResponse.json(
         { success: false, error: 'Title and formily_schema required' },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -63,24 +54,18 @@ export async function POST(request: Request) {
         show_results: input.show_results ?? true,
         allow_multiple_attempts: input.allow_multiple_attempts ?? true,
         time_limit_minutes: input.time_limit_minutes,
-        status: 'draft'
+        status: 'draft',
       })
       .select()
       .single()
 
     if (error) {
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ success: false, error: error.message }, { status: 400 })
     }
 
     return NextResponse.json({ success: true, data })
   } catch (error) {
     console.error('Create test error:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 })
   }
 }

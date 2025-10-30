@@ -10,10 +10,17 @@ export async function POST() {
         intro: {
           type: 'void',
           'x-component': 'FormItem',
-          'x-content': '📊 Оцените каждое утверждение по шкале от 1 до 5\n\n1 = Абсолютно не согласен | 5 = Полностью согласен'
-        }
+          'x-content':
+            '📊 Оцените каждое утверждение по шкале от 1 до 5\n\n1 = Абсолютно не согласен | 5 = Полностью согласен',
+        },
       }
-      const big5Constructs = ['Extraversion', 'Agreeableness', 'Conscientiousness', 'Neuroticism', 'Openness']
+      const big5Constructs = [
+        'Extraversion',
+        'Agreeableness',
+        'Conscientiousness',
+        'Neuroticism',
+        'Openness',
+      ]
       for (let i = 1; i <= 50; i += 1) {
         const construct = big5Constructs[(i - 1) % big5Constructs.length]
         const subconstruct = `${construct} Facet ${(Math.floor((i - 1) / 5) % 6) + 1}`
@@ -24,8 +31,8 @@ export async function POST() {
           'x-decorator': 'FormItem',
           'x-component': 'Slider',
           'x-component-props': { min: 1, max: 5, step: 1, marks: makeMarks },
-          'x-meta': { construct, subconstruct, skill, reverse: (i % 5) === 0 },
-          required: true
+          'x-meta': { construct, subconstruct, skill, reverse: i % 5 === 0 },
+          required: true,
         }
       }
       return { type: 'object', properties }
@@ -36,10 +43,18 @@ export async function POST() {
         intro: {
           type: 'void',
           'x-component': 'FormItem',
-          'x-content': '⭐ Оцените каждое утверждение звездочками от 1 до 5\n\n1 звезда = Совершенно не согласен | 5 звезд = Совершенно согласен'
-        }
+          'x-content':
+            '⭐ Оцените каждое утверждение звездочками от 1 до 5\n\n1 звезда = Совершенно не согласен | 5 звезд = Совершенно согласен',
+        },
       }
-      const hexacoConstructs = ['Honesty-Humility', 'Emotionality', 'eXtraversion', 'Agreeableness', 'Conscientiousness', 'Openness']
+      const hexacoConstructs = [
+        'Honesty-Humility',
+        'Emotionality',
+        'eXtraversion',
+        'Agreeableness',
+        'Conscientiousness',
+        'Openness',
+      ]
       for (let i = 1; i <= 60; i += 1) {
         const construct = hexacoConstructs[(i - 1) % hexacoConstructs.length]
         const subconstruct = `${construct} Facet ${(Math.floor((i - 1) / 6) % 6) + 1}`
@@ -50,8 +65,8 @@ export async function POST() {
           'x-decorator': 'FormItem',
           'x-component': 'Rate',
           'x-component-props': { count: 5 },
-          'x-meta': { construct, subconstruct, skill, reverse: (i % 6) === 0 },
-          required: true
+          'x-meta': { construct, subconstruct, skill, reverse: i % 6 === 0 },
+          required: true,
         }
       }
       return { type: 'object', properties }
@@ -67,12 +82,13 @@ export async function POST() {
       .from('tests')
       .insert({
         title: 'Big Five - Тест личности',
-        description: 'Полноценный опросник Большой Пятерки (50 утверждений). Оцените по шкале от 1 до 5.',
+        description:
+          'Полноценный опросник Большой Пятерки (50 утверждений). Оцените по шкале от 1 до 5.',
         formily_schema: big5Schema,
         status: 'published',
         show_results: true,
         allow_multiple_attempts: true,
-        time_limit_minutes: 20
+        time_limit_minutes: 20,
       })
       .select()
       .single()
@@ -92,7 +108,7 @@ export async function POST() {
         status: 'published',
         show_results: true,
         allow_multiple_attempts: true,
-        time_limit_minutes: 30
+        time_limit_minutes: 30,
       })
       .select()
       .single()
@@ -105,15 +121,15 @@ export async function POST() {
       success: true,
       data: {
         big5,
-        hexaco
+        hexaco,
       },
-      message: 'Tests created and published successfully!'
+      message: 'Tests created and published successfully!',
     })
   } catch (error) {
     console.error('Seed tests error:', error)
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

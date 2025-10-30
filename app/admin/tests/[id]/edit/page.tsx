@@ -54,7 +54,7 @@ export default function EditTestPage() {
           title: metadata.title ?? test?.title,
           description: metadata.description ?? test?.description,
           formily_schema: schema,
-        })
+        }),
       })
       const json = await res.json()
       if (json.success) {
@@ -99,5 +99,3 @@ export default function EditTestPage() {
     </AdminGuard>
   )
 }
-
-
