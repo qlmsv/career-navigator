@@ -1,0 +1,650 @@
+{
+  "title": "Тест оценки цифровых навыков и скоринга трудоустройства",
+  "description": "Комплексная оценка ваших цифровых навыков и расчет вероятности трудоустройства на основе персональных характеристик",
+  "formily_schema": {
+    "type": "object",
+    "properties": {
+      "section_intro": {
+        "type": "void",
+        "x-component": "HTML",
+        "x-content": "<h2>Раздел 1: Оценка цифровых навыков</h2><p>Отметьте навыки, которыми вы владеете. Это поможет рассчитать ваш индекс цифровых навыков.</p>"
+      },
+      "skill_1": {
+        "type": "string",
+        "title": "Копирование или перемещение файлов или папок",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0297,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "file_management"
+        }
+      },
+      "skill_2": {
+        "type": "string",
+        "title": "Редактирование текста в текстовом редакторе",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0224,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "text_editing"
+        }
+      },
+      "skill_3": {
+        "type": "string",
+        "title": "Работа с электронными таблицами (Excel, Google Sheets)",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0341,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "spreadsheets"
+        }
+      },
+      "skill_4": {
+        "type": "string",
+        "title": "Редактирование видео или фотографий",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0289,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "media_editing"
+        }
+      },
+      "skill_5": {
+        "type": "string",
+        "title": "Создание презентаций (PowerPoint, Google Slides)",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0318,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "presentations"
+        }
+      },
+      "skill_6": {
+        "type": "string",
+        "title": "Отправка сообщений в мессенджерах (WhatsApp, Telegram, и т.д.)",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0156,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "messaging"
+        }
+      },
+      "skill_7": {
+        "type": "string",
+        "title": "Подключение и установка новых устройств (принтер, сканер, камера)",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0412,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "device_setup"
+        }
+      },
+      "skill_8": {
+        "type": "string",
+        "title": "Передача файлов между устройствами",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0287,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "file_transfer"
+        }
+      },
+      "skill_9": {
+        "type": "string",
+        "title": "Установка программ и приложений",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0376,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "software_installation"
+        }
+      },
+      "skill_10": {
+        "type": "string",
+        "title": "Создание безопасных паролей",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0298,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "password_security"
+        }
+      },
+      "skill_11": {
+        "type": "string",
+        "title": "Проверка достоверности информации в интернете",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0334,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "information_verification"
+        }
+      },
+      "skill_12": {
+        "type": "string",
+        "title": "Ограничение доступа к личным данным в социальных сетях",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0389,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "privacy_management"
+        }
+      },
+      "skill_13": {
+        "type": "string",
+        "title": "Программирование (написание кода)",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0445,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "programming"
+        }
+      },
+      "skill_14": {
+        "type": "string",
+        "title": "Онлайн-покупки и банковские операции",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0312,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "online_transactions"
+        }
+      },
+      "skill_15": {
+        "type": "string",
+        "title": "Другие цифровые действия (работа с облачными сервисами, настройка сети и т.д.)",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Да, владею", "value": "yes" },
+          { "label": "Нет, не владею", "value": "no" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "yes": 0.0356,
+            "no": 0
+          }
+        },
+        "x-meta": {
+          "construct": "digital_skills",
+          "skill": "advanced_digital"
+        }
+      },
+      "section_scoring": {
+        "type": "void",
+        "x-component": "HTML",
+        "x-content": "<h2>Раздел 2: Скоринг трудоустройства</h2><p>Ответьте на вопросы о себе для расчета вероятности трудоустройства.</p>"
+      },
+      "gender": {
+        "type": "string",
+        "title": "Ваш пол",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Мужской", "value": "male" },
+          { "label": "Женский", "value": "female" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "male": 1.0,
+            "female": 0.415
+          }
+        },
+        "x-meta": {
+          "construct": "employment_scoring",
+          "subconstruct": "demographics"
+        }
+      },
+      "settlement_type": {
+        "type": "string",
+        "title": "Тип населенного пункта",
+        "x-component": "Radio.Group",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Город", "value": "city" },
+          { "label": "Село/Деревня", "value": "village" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "city": 1.0,
+            "village": 0.91
+          }
+        },
+        "x-meta": {
+          "construct": "employment_scoring",
+          "subconstruct": "location"
+        }
+      },
+      "region": {
+        "type": "string",
+        "title": "Регион проживания",
+        "x-component": "Select",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Москва", "value": "moscow" },
+          { "label": "Санкт-Петербург", "value": "spb" },
+          { "label": "Московская область", "value": "moscow_oblast" },
+          { "label": "Ленинградская область", "value": "leningrad_oblast" },
+          { "label": "Краснодарский край", "value": "krasnodar" },
+          { "label": "Свердловская область", "value": "sverdlovsk" },
+          { "label": "Новосибирская область", "value": "novosibirsk" },
+          { "label": "Республика Татарстан", "value": "tatarstan" },
+          { "label": "Нижегородская область", "value": "nizhny_novgorod" },
+          { "label": "Челябинская область", "value": "chelyabinsk" },
+          { "label": "Самарская область", "value": "samara" },
+          { "label": "Ростовская область", "value": "rostov" },
+          { "label": "Республика Башкортостан", "value": "bashkortostan" },
+          { "label": "Пермский край", "value": "perm" },
+          { "label": "Красноярский край", "value": "krasnoyarsk" },
+          { "label": "Воронежская область", "value": "voronezh" },
+          { "label": "Волгоградская область", "value": "volgograd" },
+          { "label": "Саратовская область", "value": "saratov" },
+          { "label": "Тюменская область", "value": "tyumen" },
+          { "label": "Алтайский край", "value": "altai_krai" },
+          { "label": "Кемеровская область", "value": "kemerovo" },
+          { "label": "Иркутская область", "value": "irkutsk" },
+          { "label": "Ставропольский край", "value": "stavropol" },
+          { "label": "Удмуртская Республика", "value": "udmurtia" },
+          { "label": "Омская область", "value": "omsk" },
+          { "label": "Калужская область", "value": "kaluga" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "moscow": 1.1,
+            "spb": 1.05,
+            "moscow_oblast": 0.95,
+            "leningrad_oblast": 0.92,
+            "krasnodar": 0.88,
+            "sverdlovsk": 0.87,
+            "novosibirsk": 0.85,
+            "tatarstan": 0.89,
+            "nizhny_novgorod": 0.84,
+            "chelyabinsk": 0.82,
+            "samara": 0.83,
+            "rostov": 0.81,
+            "bashkortostan": 0.8,
+            "perm": 0.79,
+            "krasnoyarsk": 0.78,
+            "voronezh": 0.77,
+            "volgograd": 0.76,
+            "saratov": 0.75,
+            "tyumen": 0.91,
+            "altai_krai": 0.72,
+            "kemerovo": 0.74,
+            "irkutsk": 0.73,
+            "stavropol": 0.71,
+            "udmurtia": 0.7,
+            "omsk": 0.69,
+            "kaluga": 0.86
+          }
+        },
+        "x-meta": {
+          "construct": "employment_scoring",
+          "subconstruct": "location"
+        }
+      },
+      "family_size": {
+        "type": "string",
+        "title": "Количество членов семьи (включая вас)",
+        "x-component": "Select",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "1 человек", "value": "1" },
+          { "label": "2 человека", "value": "2" },
+          { "label": "3 человека", "value": "3" },
+          { "label": "4 человека", "value": "4" },
+          { "label": "5 человек", "value": "5" },
+          { "label": "6 человек", "value": "6" },
+          { "label": "7 человек", "value": "7" },
+          { "label": "8+ человек", "value": "8" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "1": 0.85,
+            "2": 1.0,
+            "3": 0.95,
+            "4": 0.88,
+            "5": 0.82,
+            "6": 0.75,
+            "7": 0.68,
+            "8": 0.6
+          }
+        },
+        "x-meta": {
+          "construct": "employment_scoring",
+          "subconstruct": "family"
+        }
+      },
+      "age": {
+        "type": "string",
+        "title": "Ваш возраст",
+        "x-component": "Select",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "15-17 лет", "value": "15_17" },
+          { "label": "18-20 лет", "value": "18_20" },
+          { "label": "21-25 лет", "value": "21_25" },
+          { "label": "26-30 лет", "value": "26_30" },
+          { "label": "31-35 лет", "value": "31_35" },
+          { "label": "36-40 лет", "value": "36_40" },
+          { "label": "41-45 лет", "value": "41_45" },
+          { "label": "46-50 лет", "value": "46_50" },
+          { "label": "51-55 лет", "value": "51_55" },
+          { "label": "56-60 лет", "value": "56_60" },
+          { "label": "61-65 лет", "value": "61_65" },
+          { "label": "66+ лет", "value": "66_plus" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "15_17": 0.45,
+            "18_20": 0.68,
+            "21_25": 1.12,
+            "26_30": 1.45,
+            "31_35": 1.38,
+            "36_40": 1.25,
+            "41_45": 1.08,
+            "46_50": 0.92,
+            "51_55": 0.75,
+            "56_60": 0.58,
+            "61_65": 0.35,
+            "66_plus": 0.18
+          }
+        },
+        "x-meta": {
+          "construct": "employment_scoring",
+          "subconstruct": "demographics"
+        }
+      },
+      "education": {
+        "type": "string",
+        "title": "Уровень образования",
+        "x-component": "Select",
+        "x-decorator": "FormItem",
+        "required": true,
+        "enum": [
+          { "label": "Начальное общее (1-4 класс)", "value": "primary" },
+          { "label": "Основное общее (5-9 класс)", "value": "secondary" },
+          { "label": "Среднее общее (10-11 класс)", "value": "high_school" },
+          { "label": "Среднее профессиональное (колледж, техникум)", "value": "vocational" },
+          { "label": "Неоконченное высшее", "value": "incomplete_higher" },
+          { "label": "Высшее (бакалавриат)", "value": "bachelor" },
+          { "label": "Высшее (специалитет)", "value": "specialist" },
+          { "label": "Высшее (магистратура)", "value": "master" },
+          { "label": "Аспирантура/Кандидат наук", "value": "phd" },
+          { "label": "Докторская степень", "value": "doctorate" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "primary": 0.15,
+            "secondary": 0.35,
+            "high_school": 0.58,
+            "vocational": 0.88,
+            "incomplete_higher": 1.05,
+            "bachelor": 1.45,
+            "specialist": 1.52,
+            "master": 1.68,
+            "phd": 1.82,
+            "doctorate": 1.95
+          }
+        },
+        "x-meta": {
+          "construct": "employment_scoring",
+          "subconstruct": "education"
+        }
+      },
+      "professional_skills": {
+        "type": "array",
+        "title": "Ваши профессиональные навыки (выберите все подходящие)",
+        "x-component": "Checkbox.Group",
+        "x-decorator": "FormItem",
+        "required": false,
+        "enum": [
+          { "label": "Знание иностранных языков", "value": "languages" },
+          { "label": "Опыт работы в команде", "value": "teamwork" },
+          { "label": "Аналитическое мышление", "value": "analytics" },
+          { "label": "Управление проектами", "value": "project_management" },
+          { "label": "Коммуникативные навыки", "value": "communication" },
+          { "label": "Навыки продаж", "value": "sales" },
+          { "label": "Финансовая грамотность", "value": "finance" },
+          { "label": "Креативность и дизайн", "value": "creativity" },
+          { "label": "Технические навыки (IT)", "value": "tech" },
+          { "label": "Юридические знания", "value": "legal" },
+          { "label": "Лидерские качества", "value": "leadership" },
+          { "label": "Организаторские способности", "value": "organization" },
+          { "label": "Работа с большими данными", "value": "big_data" }
+        ],
+        "x-component-props": {
+          "optionPoints": {
+            "languages": 1.35,
+            "teamwork": 1.22,
+            "analytics": 1.45,
+            "project_management": 1.58,
+            "communication": 1.18,
+            "sales": 1.28,
+            "finance": 1.42,
+            "creativity": 1.15,
+            "tech": 1.77,
+            "legal": 1.52,
+            "leadership": 1.65,
+            "organization": 1.25,
+            "big_data": 1.68
+          }
+        },
+        "x-meta": {
+          "construct": "employment_scoring",
+          "subconstruct": "skills"
+        }
+      }
+    },
+    "x-meta": {
+      "constructs": ["digital_skills", "employment_scoring"],
+      "subconstructs": ["demographics", "location", "family", "education", "skills"],
+      "skills": [
+        "file_management",
+        "text_editing",
+        "spreadsheets",
+        "media_editing",
+        "presentations",
+        "messaging",
+        "device_setup",
+        "file_transfer",
+        "software_installation",
+        "password_security",
+        "information_verification",
+        "privacy_management",
+        "programming",
+        "online_transactions",
+        "advanced_digital"
+      ],
+      "scoringMode": "custom",
+      "scoringConstant": 0.2142,
+      "regionalAverages": {
+        "moscow": 0.2821,
+        "spb": 0.2203,
+        "moscow_oblast": 0.1845,
+        "leningrad_oblast": 0.1654,
+        "krasnodar": 0.1523,
+        "sverdlovsk": 0.1487,
+        "novosibirsk": 0.1421,
+        "tatarstan": 0.1556,
+        "nizhny_novgorod": 0.1398,
+        "chelyabinsk": 0.1312,
+        "samara": 0.1365,
+        "rostov": 0.1289,
+        "bashkortostan": 0.1245,
+        "perm": 0.1198,
+        "krasnoyarsk": 0.1156,
+        "voronezh": 0.1134,
+        "volgograd": 0.1089,
+        "saratov": 0.1045,
+        "tyumen": 0.1687,
+        "altai_krai": 0.0987,
+        "kemerovo": 0.1023,
+        "irkutsk": 0.0998,
+        "stavropol": 0.0945,
+        "udmurtia": 0.0912,
+        "omsk": 0.0876,
+        "kaluga": 0.0503
+      }
+    }
+  }
+}
