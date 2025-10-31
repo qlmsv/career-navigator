@@ -122,16 +122,11 @@ export async function POST() {
         'x-meta': { factor: 'settlement_type' },
       }
 
-      // Вопрос 3: Регион (только 7 регионов из примера в all_test_data.md)
-      const employmentRegions = [
-        { label: 'Алтайский край', value: 'altai_krai' },
-        { label: 'Краснодарский край', value: 'krasnodar_krai' },
-        { label: 'г. Москва', value: 'moscow' },
-        { label: 'г. Санкт-Петербург', value: 'spb' },
-        { label: 'Московская область', value: 'moscow_oblast' },
-        { label: 'Нижегородская область', value: 'nizhny_novgorod_oblast' },
-        { label: 'Новосибирская область', value: 'novosibirsk_oblast' },
-      ]
+      // Вопрос 3: Регион (все 85 регионов)
+      const employmentRegions = Object.entries(REGION_NAMES).map(([key, name]) => ({
+        label: name,
+        value: key,
+      }))
 
       properties['region'] = {
         type: 'string',
@@ -141,6 +136,7 @@ export async function POST() {
         'x-component-props': {
           placeholder: 'Выберите регион',
           showSearch: true,
+          filterOption: true,
         },
         enum: employmentRegions.map((r) => r.value),
         'x-enum-options': employmentRegions,
