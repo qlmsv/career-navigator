@@ -261,8 +261,15 @@ export default function HomePage() {
             {/* Grant Information */}
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                Проект реализован при финансовой поддержке Уральского федерального университета
-                имени первого Президента России Б.Н. Ельцина в рамках программы грантовой поддержки
+                Проект поддержан грантом Российского научного фонда № 23-78-10165,{' '}
+                <a
+                  href="https://rscf.ru/project/23-78-10165/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                >
+                  https://rscf.ru/project/23-78-10165/
+                </a>
               </p>
             </div>
 
