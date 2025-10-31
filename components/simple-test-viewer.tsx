@@ -242,7 +242,7 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
         {/* Radio */}
         {component === 'Radio.Group' && (
           <RadioGroup value={value || ''} onValueChange={(val) => handleChange(key, val)}>
-            {(field.enum || []).map((option: any) => (
+            {(field['x-enum-options'] || []).map((option: any) => (
               <div key={option.value} className="flex items-center space-x-2">
                 <RadioGroupItem value={option.value} id={`${key}-${option.value}`} />
                 <Label htmlFor={`${key}-${option.value}`} className="font-normal cursor-pointer">
@@ -256,7 +256,7 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
         {/* Checkbox Group */}
         {component === 'Checkbox.Group' && (
           <div className="space-y-2">
-            {(field.enum || []).map((option: any) => {
+            {(field['x-enum-options'] || []).map((option: any) => {
               const checked = Array.isArray(value) && value.includes(option.value)
               return (
                 <div key={option.value} className="flex items-center space-x-2">
@@ -280,6 +280,20 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
           </div>
         )}
 
+        {/* Single Checkbox */}
+        {component === 'Checkbox' && (
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id={key}
+              checked={!!value}
+              onCheckedChange={(isChecked) => handleChange(key, isChecked ? 'yes' : undefined)}
+            />
+            <Label htmlFor={key} className="font-normal cursor-pointer">
+              {componentProps.label || 'Да'}
+            </Label>
+          </div>
+        )}
+
         {/* Select */}
         {component === 'Select' && (
           <Select value={value || ''} onValueChange={(val) => handleChange(key, val)}>
@@ -287,7 +301,7 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
               <SelectValue placeholder={componentProps.placeholder || 'Выберите...'} />
             </SelectTrigger>
             <SelectContent className="bg-background">
-              {(field.enum || []).map((option: any) => (
+              {(field['x-enum-options'] || []).map((option: any) => (
                 <SelectItem key={option.value} value={String(option.value)}>
                   {option.label}
                 </SelectItem>
@@ -389,7 +403,7 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
         {/* Image Choice */}
         {component === 'ImageChoice' && (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {(field.enum || []).map((option: any) => {
+            {(field['x-enum-options'] || []).map((option: any) => {
               const selected = value === option.value
               return (
                 <button
@@ -504,7 +518,7 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
         {/* Ranking (упрощенная без DnD) */}
         {component === 'Ranking' && (
           <div className="space-y-2">
-            {((field.enum as any[]) || []).map((opt) => (
+            {(field['x-enum-options'] || []).map((opt: any) => (
               <div
                 key={opt.value}
                 className="flex items-center justify-between border rounded px-3 py-2"
