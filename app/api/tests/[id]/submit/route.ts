@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-server'
 import type { SubmitResponseInput } from '@/lib/types'
+import {
+  calculateDigitalSkillsIndex,
+  calculateEmploymentScoring,
+  REGION_NAMES,
+} from '@/lib/digital-skills-calculator'
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const startTime = Date.now()
@@ -94,6 +99,56 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
 // Функция подсчета баллов
 function calculateScore(schema: any, responseData: Record<string, any>) {
+  // Проверяем тип теста
+  const testType = schema['x-meta']?.testType
+
+  // Обработка ICT Index Test
+  if (testType === 'ict_index') {
+    const ictResult = calculateDigitalSkillsIndex(responseData)
+    const region = responseData.region || 'moscow'
+    const regionName = REGION_NAMES[region] || region
+
+    return {
+      score: Math.round(ictResult.skillIndex * 100),
+      results: {
+        testType: 'ict_index',
+        skillIndex: Math.round(ictResult.skillIndex * 1000) / 1000,
+        regionalAverage: Math.round(ictResult.regionalAverage * 1000) / 1000,
+        difference: Math.round(ictResult.difference * 1000) / 1000,
+        percentile: Math.round(ictResult.percentile * 10) / 10,
+        region,
+        regionName,
+        skillsBreakdown: ictResult.skillsBreakdown,
+        interpretation:
+          ictResult.difference > 0
+            ? `Ваш индекс выше среднего по региону на ${Math.abs(Math.round(ictResult.difference * 1000) / 1000)}`
+            : `Ваш индекс ниже среднего по региону на ${Math.abs(Math.round(ictResult.difference * 1000) / 1000)}`,
+      },
+    }
+  }
+
+  // Обработка Employment Scoring Test
+  if (testType === 'employment_scoring') {
+    const empResult = calculateEmploymentScoring(responseData)
+    const region = responseData.region || 'moscow'
+    const regionName = REGION_NAMES[region] || region
+
+    return {
+      score: Math.round(empResult.probabilityPercent * 10) / 10,
+      results: {
+        testType: 'employment_scoring',
+        probability: Math.round(empResult.probability * 1000) / 1000,
+        probabilityPercent: Math.round(empResult.probabilityPercent * 10) / 10,
+        rawScore: Math.round(empResult.rawScore * 1000) / 1000,
+        region,
+        regionName,
+        factorsBreakdown: empResult.factorsBreakdown,
+        interpretation: `Вероятность трудоустройства: ${Math.round(empResult.probabilityPercent)}%`,
+      },
+    }
+  }
+
+  // Стандартная логика для остальных тестов
   let totalScore = 0
   let maxScore = 0
   const results: Record<string, any> = {}
