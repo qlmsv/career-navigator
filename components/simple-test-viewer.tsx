@@ -286,7 +286,7 @@ export default function SimpleTestViewer({ schema, onSubmit, submitting }: TestV
             <SelectTrigger className={hasError ? 'border-red-500' : ''}>
               <SelectValue placeholder={componentProps.placeholder || 'Выберите...'} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-background">
               {(field.enum || []).map((option: any) => (
                 <SelectItem key={option.value} value={String(option.value)}>
                   {option.label}
