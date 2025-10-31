@@ -56,7 +56,7 @@ export async function POST() {
         value: key,
       }))
 
-      properties.region = {
+      properties['region'] = {
         type: 'string',
         title: 'Выберите ваш регион проживания',
         'x-decorator': 'FormItem',
@@ -93,7 +93,7 @@ export async function POST() {
       }
 
       // Вопрос 1: Пол
-      properties.gender = {
+      properties['gender'] = {
         type: 'string',
         title: '1. Каков ваш пол?',
         'x-decorator': 'FormItem',
@@ -108,7 +108,7 @@ export async function POST() {
       }
 
       // Вопрос 2: Тип населенного пункта
-      properties.settlement_type = {
+      properties['settlement_type'] = {
         type: 'string',
         title: '2. В каком типе населенного пункта вы проживаете?',
         'x-decorator': 'FormItem',
@@ -133,7 +133,7 @@ export async function POST() {
         { label: 'Новосибирская область', value: 'novosibirsk_oblast' },
       ]
 
-      properties.region = {
+      properties['region'] = {
         type: 'string',
         title: '3. В каком регионе вы проживаете?',
         'x-decorator': 'FormItem',
@@ -154,7 +154,7 @@ export async function POST() {
         value: `${i + 1}`,
       }))
 
-      properties.family_size = {
+      properties['family_size'] = {
         type: 'string',
         title: '4. Сколько у вас членов семьи?',
         'x-decorator': 'FormItem',
@@ -186,7 +186,7 @@ export async function POST() {
         { label: '80+', value: '80_plus' },
       ]
 
-      properties.age = {
+      properties['age'] = {
         type: 'string',
         title: '5. Укажите ваш примерный возраст',
         'x-decorator': 'FormItem',
@@ -213,7 +213,7 @@ export async function POST() {
         { label: 'Магистр', value: 'master' },
       ]
 
-      properties.education = {
+      properties['education'] = {
         type: 'string',
         title: '6. Укажите ваш уровень образования',
         'x-decorator': 'FormItem',
@@ -244,7 +244,7 @@ export async function POST() {
         { label: 'Иные навыки', value: 'other_skills' },
       ]
 
-      properties.professional_skills = {
+      properties['professional_skills'] = {
         type: 'array',
         title: '7. Укажите какими навыками вы обладаете?',
         'x-decorator': 'FormItem',
