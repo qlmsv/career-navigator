@@ -105,7 +105,7 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
   // Обработка ICT Index Test
   if (testType === 'ict_index') {
     const ictResult = calculateDigitalSkillsIndex(responseData)
-    const region = responseData.region || 'moscow'
+    const region = responseData['region'] || 'moscow'
     const regionName = REGION_NAMES[region] || region
 
     return {
@@ -130,7 +130,7 @@ function calculateScore(schema: any, responseData: Record<string, any>) {
   // Обработка Employment Scoring Test
   if (testType === 'employment_scoring') {
     const empResult = calculateEmploymentScoring(responseData)
-    const region = responseData.region || 'moscow'
+    const region = responseData['region'] || 'moscow'
     const regionName = REGION_NAMES[region] || region
 
     return {
