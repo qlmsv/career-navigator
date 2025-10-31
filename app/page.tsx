@@ -257,16 +257,27 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t mt-20 bg-white/50 dark:bg-gray-900/50 backdrop-blur">
         <div className="container mx-auto px-6 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-center md:text-left">
+          <div className="flex flex-col items-center gap-6">
+            {/* Grant Information */}
+            <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                © 2024 Карьерный Навигатор. Самодиагностика конкурентоспособности на рынке труда
+                Проект реализован при финансовой поддержке Уральского федерального университета
+                имени первого Президента России Б.Н. Ельцина в рамках программы грантовой поддержки
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              <Badge variant="outline">Психометрические тесты</Badge>
-              <Badge variant="outline">Региональный анализ</Badge>
-              <Badge variant="outline">Персональные рекомендации</Badge>
+
+            {/* Main Footer Content */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
+              <div className="text-center md:text-left">
+                <p className="text-sm text-muted-foreground">
+                  © 2024 Карьерный Навигатор. Самодиагностика конкурентоспособности на рынке труда
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <Badge variant="outline">Психометрические тесты</Badge>
+                <Badge variant="outline">Региональный анализ</Badge>
+                <Badge variant="outline">Персональные рекомендации</Badge>
+              </div>
             </div>
           </div>
         </div>
