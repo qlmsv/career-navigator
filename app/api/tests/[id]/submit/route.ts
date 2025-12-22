@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
 import type { SubmitResponseInput } from '@/lib/types'
 import {
   calculateDigitalSkillsIndex,
@@ -7,11 +7,36 @@ import {
   REGION_NAMES,
 } from '@/lib/digital-skills-calculator'
 
+function getSupabaseClient() {
+  const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL']
+  const supabaseKey = process.env['SUPABASE_SERVICE_ROLE_KEY']
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Supabase credentials not configured')
+  }
+
+  return createClient(supabaseUrl, supabaseKey)
+}
+
+export const dynamic = 'force-dynamic'
+
+function isBuildPhase() {
+  return process.env['NEXT_PHASE'] === 'phase-production-build'
+}
+
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const startTime = Date.now()
   console.log('[TEST-SUBMIT] Starting submission process')
 
+  if (isBuildPhase()) {
+    return NextResponse.json(
+      { success: false, error: 'Submit endpoint not available during build' },
+      { status: 503 },
+    )
+  }
+
   try {
+    const supabase = getSupabaseClient()
     const { id } = await context.params
     console.log('[TEST-SUBMIT] Processing test ID:', id)
 
@@ -24,7 +49,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     }
 
     // Получаем тест для подсчета баллов
-    const { data: test, error: testError } = await supabaseAdmin
+    const { data: test, error: testError } = await supabase
       .from('tests')
       .select('*')
       .eq('id', id)
@@ -35,7 +60,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     }
 
     if (!test.allow_multiple_attempts && input.user_identifier) {
-      const { count, error: checkError } = await supabaseAdmin
+      const { count, error: checkError } = await supabase
         .from('test_responses')
         .select('*', { count: 'exact', head: true })
         .eq('test_id', id)
@@ -61,7 +86,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     const { score, results } = calculateScore(test.formily_schema, input.response_data)
 
     // Сохраняем ответ
-    const { data: response, error: responseError } = await supabaseAdmin
+    const { data: response, error: responseError } = await supabase
       .from('test_responses')
       .insert({
         test_id: id,
