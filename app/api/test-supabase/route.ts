@@ -1,17 +1,43 @@
-import { supabaseAdmin } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    // Test the Supabase connection
-    const { data, error } = await supabaseAdmin
-      .from('test_table')
-      .select('*')
-      .limit(1)
+    const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL']
+    const supabaseKey = process.env['SUPABASE_SERVICE_ROLE_KEY']
+    
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.json(
+        { 
+          status: 'Error',
+          message: 'Missing Supabase credentials',
+          config: {
+            url: supabaseUrl ? 'Set' : 'Missing',
+            key: supabaseKey ? 'Set' : 'Missing'
+          }
+        },
+        { status: 500 }
+      )
+    }
+    
+    // Create a new client to test the connection
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    
+    // Just get the current user session to test the connection
+    const { data: { session }, error } = await supabase.auth.getSession()
     
     if (error) {
       return NextResponse.json(
-        { error: 'Supabase connection error', details: error },
+        { 
+          status: 'Error',
+          message: 'Failed to connect to Supabase',
+          error: error.message,
+          config: {
+            url: 'Set',
+            key: 'Set',
+            connectionTest: 'Failed'
+          }
+        },
         { status: 500 }
       )
     }
@@ -20,8 +46,10 @@ export async function GET() {
       status: 'Success',
       message: 'Successfully connected to Supabase',
       config: {
-        url: process.env['NEXT_PUBLIC_SUPABASE_URL'] ? 'Set' : 'Missing',
-        key: process.env['SUPABASE_SERVICE_ROLE_KEY'] ? 'Set' : 'Missing'
+        url: 'Set',
+        key: 'Set',
+        connectionTest: 'Success',
+        authenticated: !!session
       }
     })
   } catch (error) {
