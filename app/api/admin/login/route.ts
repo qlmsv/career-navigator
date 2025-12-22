@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 // Create a function to get the Supabase client
 function getSupabaseClient() {
   const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL']
-  const supabaseKey = process.env['SUPABASE_SERVICE_ROLE_KEY']
+  const supabaseKey = process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error('Supabase credentials not configured')
@@ -50,7 +50,10 @@ export async function POST(request: Request) {
 
     if (error || !data) {
       console.error('Login failed:', error)
-      return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 })
+      return NextResponse.json(
+        { success: false, error: error?.message || 'Invalid credentials' },
+        { status: 401 },
+      )
     }
 
     const duration = Date.now() - startTime
@@ -59,6 +62,11 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       data: {
+        admin: {
+          id: data.user?.id,
+          email: data.user?.email,
+          created_at: data.user?.created_at,
+        },
         user: {
           id: data.user?.id,
           email: data.user?.email,
