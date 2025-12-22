@@ -186,20 +186,22 @@ nano ecosystem.config.js
 
 ```javascript
 module.exports = {
-  apps: [{
-    name: 'career-navigator',
-    script: 'npm',
-    args: 'start',
-    cwd: '/home/deploy/career-navigator',
-    env: {
-      NODE_ENV: 'production',
-      PORT: 3000
+  apps: [
+    {
+      name: 'career-navigator',
+      script: 'npm',
+      args: 'start',
+      cwd: '/home/deploy/career-navigator',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000,
+      },
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
     },
-    instances: 1,
-    autorestart: true,
-    watch: false,
-    max_memory_restart: '1G',
-  }]
+  ],
 }
 ```
 
@@ -305,8 +307,8 @@ systemctl restart nginx
 2. Выберите ваш домен → **Управление доменом** → **DNS-серверы и зона**
 3. Добавьте A-записи:
 
-   | Тип | Субдомен | Значение | TTL |
-   |-----|----------|----------|-----|
+   | Тип | Субдомен | Значение   | TTL  |
+   | --- | -------- | ---------- | ---- |
    | A   | @        | ВАШ_IP_VPS | 3600 |
    | A   | www      | ВАШ_IP_VPS | 3600 |
 
@@ -331,6 +333,7 @@ certbot --nginx -d ваш-домен.ru -d www.ваш-домен.ru
 ```
 
 Certbot автоматически:
+
 - Получит SSL сертификат
 - Обновит конфигурацию Nginx
 - Настроит автообновление
@@ -346,6 +349,7 @@ certbot renew --dry-run
 ## Шаг 11: Проверка работы
 
 Откройте в браузере:
+
 ```
 https://ваш-домен.ru
 ```
@@ -527,10 +531,12 @@ apt update && apt upgrade -y
 ## Стоимость
 
 **VPS-2 на reg.ru:**
+
 - 2 GB RAM, 2 vCPU, 30 GB SSD
 - ~400-500 руб/месяц
 
 **VPS-3 на reg.ru:**
+
 - 4 GB RAM, 2 vCPU, 60 GB SSD
 - ~700-800 руб/месяц
 
@@ -543,6 +549,7 @@ apt update && apt upgrade -y
 ## Поддержка
 
 Если возникнут проблемы:
+
 1. Проверьте логи: `pm2 logs`
 2. Проверьте статус: `pm2 status`
 3. Проверьте Nginx: `nginx -t`
