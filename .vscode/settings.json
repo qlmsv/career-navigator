@@ -19,5 +19,6 @@
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
-  "workbench.colorTheme": "Default High Contrast"
+  "workbench.colorTheme": "Monokai",
+  "terminal.integrated.scrollback": 100000
 }

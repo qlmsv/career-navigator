@@ -1,7 +1,29 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
+
+// Create a function to get the Supabase client
+function getSupabaseClient() {
+  const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL']
+  const supabaseKey = process.env['SUPABASE_SERVICE_ROLE_KEY']
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Supabase credentials not configured')
+  }
+
+  return createClient(supabaseUrl, supabaseKey)
+}
+
+export const dynamic = 'force-dynamic' // Prevent static generation
 
 export async function POST(request: Request) {
+  // Skip during build
+  if (process.env['NEXT_PHASE'] === 'phase-production-build') {
+    return NextResponse.json(
+      { success: false, error: 'Login not available during build' },
+      { status: 503 },
+    )
+  }
+
   const startTime = Date.now()
   console.log('[AUTH] Login attempt started')
 
@@ -20,22 +42,14 @@ export async function POST(request: Request) {
       )
     }
 
-    // Получаем админа
-    const { data: admin, error } = await supabaseAdmin
-      .from('admins')
-      .select('*')
-      .eq('email', email)
-      .single()
+    const supabase = getSupabaseClient()
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-    if (error || !admin) {
-      console.error('Admin not found:', error)
-      return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 })
-    }
-
-    // Простая проверка пароля (для демо)
-    // В реальном приложении используйте bcrypt для сравнения хэшей
-    if (admin.password_hash !== password) {
-      console.error('Invalid password')
+    if (error || !data) {
+      console.error('Login failed:', error)
       return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 })
     }
 
@@ -45,11 +59,11 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       data: {
-        admin: {
-          id: admin.id,
-          email: admin.email,
-          name: admin.name,
+        user: {
+          id: data.user?.id,
+          email: data.user?.email,
         },
+        session: data.session,
       },
     })
   } catch (error) {

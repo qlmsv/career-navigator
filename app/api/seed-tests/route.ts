@@ -1,10 +1,33 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
+
+// Create a function to get the Supabase client
+function getSupabaseClient() {
+  const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL']
+  const supabaseKey = process.env['SUPABASE_SERVICE_ROLE_KEY']
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Supabase credentials not configured')
+  }
+
+  return createClient(supabaseUrl, supabaseKey)
+}
+
+export const dynamic = 'force-dynamic' // Prevent static generation
 
 export async function POST() {
+  // Skip during build
+  if (process.env['NEXT_PHASE'] === 'phase-production-build') {
+    return NextResponse.json(
+      { success: false, error: 'Seed endpoint not available during build' },
+      { status: 503 },
+    )
+  }
+
   try {
-    // Генераторы полноценных схем
+    const supabase = getSupabaseClient()
     const makeMarks = { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5' } as const
+
     const buildBig5Schema = () => {
       const properties: Record<string, any> = {
         intro: {
@@ -74,11 +97,11 @@ export async function POST() {
 
     const big5Schema = buildBig5Schema()
 
-    // Заменяем существующие тесты (по title) и создаем новые
-    await supabaseAdmin.from('tests').delete().eq('title', 'Big Five - Тест личности')
-    await supabaseAdmin.from('tests').delete().eq('title', 'HEXACO - Личностный опросник')
-
-    const { data: big5, error: big5Error } = await supabaseAdmin
+    // Delete existing tests with the same titles
+    await supabase.from('tests').delete().eq('title', 'Big Five - Тест личности')
+    await supabase.from('tests').delete().eq('title', 'HEXACO - Личностный опросник')
+    // Create Big Five test
+    const { data: big5, error: big5Error } = await supabase
       .from('tests')
       .insert({
         title: 'Big Five - Тест личности',
@@ -92,14 +115,12 @@ export async function POST() {
       })
       .select()
       .single()
-
     if (big5Error) {
       throw new Error('Big5 error: ' + big5Error.message)
     }
-
     const hexacoSchema = buildHexacoSchema()
-
-    const { data: hexaco, error: hexacoError } = await supabaseAdmin
+    // Create HEXACO test
+    const { data: hexaco, error: hexacoError } = await supabase
       .from('tests')
       .insert({
         title: 'HEXACO - Личностный опросник',
@@ -112,11 +133,9 @@ export async function POST() {
       })
       .select()
       .single()
-
     if (hexacoError) {
       throw new Error('HEXACO error: ' + hexacoError.message)
     }
-
     return NextResponse.json({
       success: true,
       data: {
@@ -128,7 +147,10 @@ export async function POST() {
   } catch (error) {
     console.error('Seed tests error:', error)
     return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
+      {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 },
     )
   }
