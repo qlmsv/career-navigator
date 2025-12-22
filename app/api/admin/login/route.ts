@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       console.error('Login failed:', error)
       return NextResponse.json(
         { success: false, error: 'Invalid credentials' },
-        { status: 401 },
+        { status: 401 }
       )
     }
 
