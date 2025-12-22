@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 
 // Create a function to get the Supabase client
 function getSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL']
+  const supabaseKey = process.env['SUPABASE_SERVICE_ROLE_KEY']
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error('Supabase credentials not configured')
@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic' // Prevent static generation
 
 export async function POST(request: Request) {
   // Skip during build
-  if (process.env.NEXT_PHASE === 'phase-production-build') {
+  if (process.env['NEXT_PHASE'] === 'phase-production-build') {
     return NextResponse.json(
       { success: false, error: 'Login not available during build' },
       { status: 503 },
