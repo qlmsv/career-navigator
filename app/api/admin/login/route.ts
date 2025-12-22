@@ -5,11 +5,11 @@ import { createClient } from '@supabase/supabase-js'
 function getSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  
+
   if (!supabaseUrl || !supabaseKey) {
     throw new Error('Supabase credentials not configured')
   }
-  
+
   return createClient(supabaseUrl, supabaseKey)
 }
 
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       console.error('Login failed:', error)
       return NextResponse.json(
         { success: false, error: 'Invalid credentials' },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
           id: data.user?.id,
           email: data.user?.email,
         },
-        session: data.session
+        session: data.session,
       },
     })
   } catch (error) {
