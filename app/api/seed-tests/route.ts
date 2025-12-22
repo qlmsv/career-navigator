@@ -98,15 +98,8 @@ export async function POST() {
     const big5Schema = buildBig5Schema()
 
     // Delete existing tests with the same titles
-    await supabase
-      .from('tests')
-      .delete()
-      .eq('title', 'Big Five - Тест личности')
-    await supabase
-      .from('tests')
-      .delete()
-      .eq('title', 'HEXACO - Личностный опросник')
-
+    await supabase.from('tests').delete().eq('title', 'Big Five - Тест личности')
+    await supabase.from('tests').delete().eq('title', 'HEXACO - Личностный опросник')
     // Create Big Five test
     const { data: big5, error: big5Error } = await supabase
       .from('tests')
@@ -122,20 +115,16 @@ export async function POST() {
       })
       .select()
       .single()
-
     if (big5Error) {
       throw new Error('Big5 error: ' + big5Error.message)
     }
-
     const hexacoSchema = buildHexacoSchema()
-
     // Create HEXACO test
     const { data: hexaco, error: hexacoError } = await supabase
       .from('tests')
       .insert({
         title: 'HEXACO - Личностный опросник',
-        description:
-          'Полноценный опросник HEXACO (60 утверждений). Оцените звездочками от 1 до 5.',
+        description: 'Полноценный опросник HEXACO (60 утверждений). Оцените звездочками от 1 до 5.',
         formily_schema: hexacoSchema,
         status: 'published',
         show_results: true,
@@ -144,11 +133,9 @@ export async function POST() {
       })
       .select()
       .single()
-
     if (hexacoError) {
       throw new Error('HEXACO error: ' + hexacoError.message)
     }
-
     return NextResponse.json({
       success: true,
       data: {
