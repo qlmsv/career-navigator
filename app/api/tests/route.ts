@@ -1,14 +1,39 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
 import type { CreateTestInput } from '@/lib/types'
+
+function getSupabaseClient() {
+  const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL']
+  const supabaseKey = process.env['SUPABASE_SERVICE_ROLE_KEY']
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Supabase credentials not configured')
+  }
+
+  return createClient(supabaseUrl, supabaseKey)
+}
+
+export const dynamic = 'force-dynamic'
+
+function isBuildPhase() {
+  return process.env['NEXT_PHASE'] === 'phase-production-build'
+}
 
 // GET - получить список тестов
 export async function GET(request: Request) {
+  if (isBuildPhase()) {
+    return NextResponse.json(
+      { success: false, error: 'Tests endpoint not available during build' },
+      { status: 503 },
+    )
+  }
+
   try {
+    const supabase = getSupabaseClient()
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
 
-    let query = supabaseAdmin.from('tests').select('*').order('created_at', { ascending: false })
+    let query = supabase.from('tests').select('*').order('created_at', { ascending: false })
 
     // Фильтр по статусу
     if (status && status !== 'all') {
@@ -35,7 +60,15 @@ export async function GET(request: Request) {
 
 // POST - создать новый тест (только для админов)
 export async function POST(request: Request) {
+  if (isBuildPhase()) {
+    return NextResponse.json(
+      { success: false, error: 'Tests endpoint not available during build' },
+      { status: 503 },
+    )
+  }
+
   try {
+    const supabase = getSupabaseClient()
     const input: CreateTestInput = await request.json()
 
     if (!input.title || !input.formily_schema) {
@@ -45,7 +78,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('tests')
       .insert({
         title: input.title,
