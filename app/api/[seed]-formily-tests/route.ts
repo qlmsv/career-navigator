@@ -1,8 +1,29 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
 import { REGION_NAMES } from '@/lib/digital-skills-calculator'
 
+// Create a function to get the Supabase client
+function getSupabaseClient() {
+  const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL']
+  const supabaseKey = process.env['SUPABASE_SERVICE_ROLE_KEY']
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Supabase credentials not configured')
+  }
+
+  return createClient(supabaseUrl, supabaseKey)
+}
+
+export const dynamic = 'force-dynamic' // Prevent static generation
+
 export async function POST() {
+  // Skip during build
+  if (process.env['NEXT_PHASE'] === 'phase-production-build') {
+    return NextResponse.json(
+      { success: false, error: 'Seed endpoint not available during build' },
+      { status: 503 }
+    )
+  }
   try {
     // ========== ICT INDEX TEST ==========
     const buildICTIndexSchema = () => {
@@ -261,16 +282,19 @@ export async function POST() {
       }
     }
 
+    // Get Supabase client
+    const supabase = getSupabaseClient()
+    
     // Удаляем существующие тесты с такими же названиями
-    await supabaseAdmin.from('tests').delete().eq('title', 'ICT Index - Тест цифровых навыков')
-    await supabaseAdmin
+    await supabase.from('tests').delete().eq('title', 'ICT Index - Тест цифровых навыков')
+    await supabase
       .from('tests')
       .delete()
       .eq('title', 'Employment Scoring - Оценка трудоустройства')
 
     // Создаем ICT Index Test
     const ictSchema = buildICTIndexSchema()
-    const { data: ictTest, error: ictError } = await supabaseAdmin
+    const { data: ictTest, error: ictError } = await supabase
       .from('tests')
       .insert({
         title: 'ICT Index - Тест цифровых навыков',
@@ -291,7 +315,7 @@ export async function POST() {
 
     // Создаем Employment Scoring Test
     const employmentSchema = buildEmploymentScoringSchema()
-    const { data: employmentTest, error: employmentError } = await supabaseAdmin
+    const { data: employmentTest, error: employmentError } = await supabase
       .from('tests')
       .insert({
         title: 'Employment Scoring - Оценка трудоустройства',
