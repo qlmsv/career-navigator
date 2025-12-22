@@ -21,7 +21,7 @@ export async function POST() {
   if (process.env['NEXT_PHASE'] === 'phase-production-build') {
     return NextResponse.json(
       { success: false, error: 'Seed endpoint not available during build' },
-      { status: 503 }
+      { status: 503 },
     )
   }
   try {
@@ -284,13 +284,10 @@ export async function POST() {
 
     // Get Supabase client
     const supabase = getSupabaseClient()
-    
+
     // Удаляем существующие тесты с такими же названиями
     await supabase.from('tests').delete().eq('title', 'ICT Index - Тест цифровых навыков')
-    await supabase
-      .from('tests')
-      .delete()
-      .eq('title', 'Employment Scoring - Оценка трудоустройства')
+    await supabase.from('tests').delete().eq('title', 'Employment Scoring - Оценка трудоустройства')
 
     // Создаем ICT Index Test
     const ictSchema = buildICTIndexSchema()
