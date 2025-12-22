@@ -239,7 +239,9 @@ export default async function TestResultPage({ params, searchParams }: TestResul
                   </div>
                   <div className="pt-4 border-t">
                     <p className="text-sm text-muted-foreground">Raw Score (техническая метрика)</p>
-                    <p className="text-lg font-semibold">{results.rawScore?.toFixed(3) || '0.000'}</p>
+                    <p className="text-lg font-semibold">
+                      {results.rawScore?.toFixed(3) || '0.000'}
+                    </p>
                   </div>
                   <div className="pt-4 border-t">
                     <p className="text-sm font-medium">{results.interpretation}</p>
@@ -267,7 +269,9 @@ export default async function TestResultPage({ params, searchParams }: TestResul
                           </p>
                         </div>
                         <div className="text-right">
-                          <span className="text-sm font-semibold">×{factor.weight?.toFixed(3)}</span>
+                          <span className="text-sm font-semibold">
+                            ×{factor.weight?.toFixed(3)}
+                          </span>
                         </div>
                       </div>
                     ))}
