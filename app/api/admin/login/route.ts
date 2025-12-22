@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   if (process.env.NEXT_PHASE === 'phase-production-build') {
     return NextResponse.json(
       { success: false, error: 'Login not available during build' },
-      { status: 503 }
+      { status: 503 },
     )
   }
 
@@ -50,10 +50,7 @@ export async function POST(request: Request) {
 
     if (error || !data) {
       console.error('Login failed:', error)
-      return NextResponse.json(
-        { success: false, error: 'Invalid credentials' },
-        { status: 401 }
-      )
+      return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 })
     }
 
     const duration = Date.now() - startTime
