@@ -147,7 +147,7 @@ export default function HomePage() {
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Тесты для самодиагностики</h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Выберите тест для оценки ваших компетенций и личностных качеств. По результатам вы
+            Выберите тест для оценки ваших компетенций и личностных качеств. Тесты содержат как известные методики, так и материалы, разработанные авторами на основе статистических данных Росстата с применением экономико-статистического моделирования. По результатам вы
             получите подробный анализ и рекомендации для развития карьеры.
           </p>
         </div>
@@ -277,7 +277,7 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
               <div className="text-center md:text-left">
                 <p className="text-sm text-muted-foreground">
-                  © 2024 Карьерный Навигатор. Самодиагностика конкурентоспособности на рынке труда
+                  © 2026 Карьерный Навигатор. Самодиагностика конкурентоспособности на рынке труда
                 </p>
               </div>
               <div className="flex items-center gap-4">
